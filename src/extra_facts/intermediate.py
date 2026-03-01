@@ -186,6 +186,8 @@ def _serialize_pool_metadata(meta: PoolMetadata | None) -> dict[str, object] | N
     return {
         "subelement_titles": meta.subelement_titles,
         "group_titles": meta.group_titles,
+        "subelement_friendly_titles": meta.subelement_friendly_titles,
+        "group_friendly_titles": meta.group_friendly_titles,
     }
 
 
@@ -196,6 +198,8 @@ def _deserialize_pool_metadata(payload: object) -> PoolMetadata | None:
     return PoolMetadata(
         subelement_titles=_to_str_map(payload_dict.get("subelement_titles")),
         group_titles=_to_str_map(payload_dict.get("group_titles")),
+        subelement_friendly_titles=_to_str_map(payload_dict.get("subelement_friendly_titles")),
+        group_friendly_titles=_to_str_map(payload_dict.get("group_friendly_titles")),
     )
 
 

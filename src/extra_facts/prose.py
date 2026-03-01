@@ -5,7 +5,7 @@ import json
 import os
 import re
 import threading
-from collections.abc import Callable
+from collections.abc import Callable, Iterable
 from concurrent.futures import Future, ThreadPoolExecutor, as_completed
 from dataclasses import dataclass
 from datetime import UTC, datetime
@@ -17,7 +17,7 @@ from requests.adapters import HTTPAdapter
 from requests_cache import CachedSession
 
 from .facts import fact_sentence
-from .models import LlmProse, PoolQuestion, ProseMeta, ProseValidation, QuestionPool
+from .models import LlmProse, PoolMetadata, PoolQuestion, ProseMeta, ProseValidation, QuestionPool
 
 PROSE_SCHEMA_VERSION = 1
 NUM_RE = re.compile(r"\b\d+(?:\.\d+)?\b")
@@ -41,6 +41,8 @@ NEGATION_KEYWORDS = (
 )
 DEFAULT_OPENAI_HTTP_CACHE_DIR = Path(".cache/openai-http")
 DEFAULT_OPENAI_HTTP_CACHE_NAME = "responses"
+SUBELEMENT_HEADING_MAX_WORDS = 6
+GROUP_HEADING_MAX_WORDS = 10
 
 
 class ProseClient(Protocol):
@@ -51,6 +53,15 @@ class ProseClient(Protocol):
         correct_answer: str,
         feedback: str | None = None,
     ) -> tuple[str, float | None]:
+        ...
+
+
+class HeadingClient(Protocol):
+    def generate_headings(
+        self,
+        subelement_titles: dict[str, str],
+        group_titles: dict[str, str],
+    ) -> tuple[dict[str, str], dict[str, str]]:
         ...
 
 
@@ -130,6 +141,49 @@ class OpenAIProseClient:
         prose_fact = str(data.get("prose_fact", "")).strip()
         confidence = _parse_confidence(data.get("confidence"))
         return prose_fact, confidence
+
+    def generate_headings(
+        self,
+        subelement_titles: dict[str, str],
+        group_titles: dict[str, str],
+    ) -> tuple[dict[str, str], dict[str, str]]:
+        if not subelement_titles and not group_titles:
+            return {}, {}
+
+        prompt = _heading_prompt(
+            subelement_titles=subelement_titles,
+            group_titles=group_titles,
+            prompt_version=self.prompt_version,
+        )
+        response = self._session().post(
+            "https://api.openai.com/v1/responses",
+            headers={
+                "Authorization": f"Bearer {self.api_key}",
+                "Content-Type": "application/json",
+            },
+            json={
+                "model": self.model,
+                "input": prompt,
+                "text": {"format": {"type": "json_object"}},
+            },
+            timeout=60,
+        )
+        response.raise_for_status()
+
+        payload = response.json()
+        output_text = _extract_output_text(payload)
+        data = cast(dict[str, Any], json.loads(output_text))
+        rewritten_subelements = _sanitize_heading_map(
+            payload=data.get("subelement_titles"),
+            allowed_keys=subelement_titles.keys(),
+            max_words=SUBELEMENT_HEADING_MAX_WORDS,
+        )
+        rewritten_groups = _sanitize_heading_map(
+            payload=data.get("group_titles"),
+            allowed_keys=group_titles.keys(),
+            max_words=GROUP_HEADING_MAX_WORDS,
+        )
+        return rewritten_subelements, rewritten_groups
 
     def _session(self) -> requests.Session:
         session = getattr(self._local, "session", None)
@@ -278,6 +332,47 @@ def enrich_pool_with_prose(
     return enriched, summary
 
 
+def enrich_pool_metadata_with_headings(
+    pool: QuestionPool,
+    client: HeadingClient,
+) -> QuestionPool:
+    metadata = pool.metadata
+    if metadata is None:
+        return pool
+
+    try:
+        generated_subelements, generated_groups = client.generate_headings(
+            subelement_titles=metadata.subelement_titles,
+            group_titles=metadata.group_titles,
+        )
+    except Exception:
+        return pool
+
+    if not generated_subelements and not generated_groups:
+        return pool
+
+    merged_metadata = PoolMetadata(
+        subelement_titles=metadata.subelement_titles,
+        group_titles=metadata.group_titles,
+        subelement_friendly_titles={
+            **metadata.subelement_friendly_titles,
+            **generated_subelements,
+        },
+        group_friendly_titles={
+            **metadata.group_friendly_titles,
+            **generated_groups,
+        },
+    )
+    return QuestionPool(
+        schema_version=pool.schema_version,
+        excluded_count=pool.excluded_count,
+        questions=pool.questions,
+        metadata=merged_metadata,
+        prose_schema_version=pool.prose_schema_version,
+        prose_meta=pool.prose_meta,
+    )
+
+
 def validate_prose(question_text: str, correct_answer: str, prose_fact: str) -> ProseValidation:
     source = f"{question_text} {correct_answer}".lower()
     prose = prose_fact.lower()
@@ -419,6 +514,57 @@ def _prompt(
     if feedback:
         prompt += f" Validator feedback for retry: {feedback}."
     return prompt
+
+
+def _heading_prompt(
+    subelement_titles: dict[str, str],
+    group_titles: dict[str, str],
+    prompt_version: str,
+) -> str:
+    return (
+        "You are rewriting chapter and section headings for spoken-study clarity. "
+        f"Prompt version: {prompt_version}. "
+        "Return strict JSON with keys subelement_titles and group_titles. "
+        "Keep each heading concise, natural, and technically accurate. "
+        "Do not add or remove keys. "
+        f"Limit each subelement heading to {SUBELEMENT_HEADING_MAX_WORDS} words. "
+        f"Limit each group heading to {GROUP_HEADING_MAX_WORDS} words. "
+        "Avoid trailing punctuation. "
+        f"Input subelement_titles={json.dumps(subelement_titles, ensure_ascii=False)}. "
+        f"Input group_titles={json.dumps(group_titles, ensure_ascii=False)}."
+    )
+
+
+def _sanitize_heading_map(
+    payload: object,
+    allowed_keys: Iterable[str],
+    max_words: int,
+) -> dict[str, str]:
+    if not isinstance(payload, dict):
+        return {}
+
+    allowed = set(allowed_keys)
+    result: dict[str, str] = {}
+    for raw_key, raw_value in cast(dict[object, object], payload).items():
+        if not isinstance(raw_key, str) or raw_key not in allowed:
+            continue
+        if not isinstance(raw_value, str):
+            continue
+        heading = _clean_heading(raw_value, max_words=max_words)
+        if heading:
+            result[raw_key] = heading
+    return result
+
+
+def _clean_heading(value: str, max_words: int) -> str:
+    heading = re.sub(r"\s+", " ", value).strip()
+    heading = heading.rstrip(".,;:!?")
+    if not heading:
+        return ""
+    words = heading.split(" ")
+    if len(words) > max_words:
+        words = words[:max_words]
+    return " ".join(words)
 
 
 def _target_count(pool: QuestionPool, max_questions: int | None, resume: bool) -> int:

@@ -8,7 +8,13 @@ from .extract import extract_text
 from .intermediate import read_question_pool, to_question_pool, write_question_pool
 from .models import AudioScriptSummary, BuildSummary, ExtractSummary
 from .parser import extract_pool_metadata, parse_questions
-from .prose import OpenAIProseClient, ProseProgressUpdate, ProseRunSummary, enrich_pool_with_prose
+from .prose import (
+    OpenAIProseClient,
+    ProseProgressUpdate,
+    ProseRunSummary,
+    enrich_pool_metadata_with_headings,
+    enrich_pool_with_prose,
+)
 from .render import write_audio_script, write_outputs
 
 
@@ -88,6 +94,10 @@ def generate_prose_for_pool(
         workers=workers,
         max_attempts=max_attempts,
         progress_callback=progress_callback,
+    )
+    enriched_pool = enrich_pool_metadata_with_headings(
+        enriched_pool,
+        client=client,
     )
     out_json_path.parent.mkdir(parents=True, exist_ok=True)
     write_question_pool(enriched_pool, out_json_path)

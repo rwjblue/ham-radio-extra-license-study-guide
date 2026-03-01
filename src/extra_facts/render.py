@@ -25,6 +25,7 @@ from .intermediate import group_pool_questions
 from .models import PoolMetadata, PoolQuestion
 
 QUESTION_ID_RE = re.compile(r"^([A-Z]\d[A-Z]\d{2}):\s*(.+)$")
+AUDIO_MAX_LINE_CHARS = 160
 
 
 def write_outputs(
@@ -102,21 +103,133 @@ def _write_audio_text(
 ) -> None:
     lines: list[str] = []
     current_subelement = ""
+    seen_abbreviations: set[str] = set()
 
     for group, questions in groups.items():
         subelement = group[:2]
         if subelement != current_subelement:
-            subelement_title = _subelement_heading(subelement, metadata)
-            lines.append(f"Now starting {subelement_title}.")
+            if current_subelement:
+                lines.append(f"That wraps up chapter {current_subelement}.")
+                lines.append("")
+            lines.extend(_audio_chapter_intro(subelement, metadata))
             current_subelement = subelement
 
-        group_title = _group_heading_text(group, metadata)
-        lines.append(f"{group_title}.")
+        lines.append(_audio_group_intro(group, metadata))
         for question in questions:
-            lines.append(fact_sentence(question, mode=mode, omit_id=omit_id))
+            fact = fact_sentence(question, mode=mode, omit_id=omit_id)
+            fact = _rewrite_first_abbreviation_use(fact, seen_abbreviations)
+            lines.extend(_split_for_audio(fact, max_chars=AUDIO_MAX_LINE_CHARS))
+        lines.append("Section recap: review these rules and examples before moving on.")
         lines.append("")
 
+    if current_subelement:
+        lines.append(f"That wraps up chapter {current_subelement}.")
+        lines.append("End of audio study guide.")
+
     target.write_text("\n".join(lines).rstrip() + "\n", encoding="utf-8")
+
+
+def _audio_chapter_intro(subelement: str, metadata: PoolMetadata | None) -> list[str]:
+    title = _subelement_title_for_display(subelement, metadata)
+    if title:
+        return [
+            f"Chapter {subelement}: {title}.",
+            "Focus on the core ideas and practical limits in this chapter.",
+        ]
+    return [
+        f"Chapter {subelement}.",
+        "Focus on the core ideas and practical limits in this chapter.",
+    ]
+
+
+def _audio_group_intro(group: str, metadata: PoolMetadata | None) -> str:
+    title = _group_title_for_display(group, metadata)
+    if not title:
+        return f"Next section, {group}."
+    short_title = re.split(r"[:;]", title, maxsplit=1)[0].strip()
+    return f"Next section, {group}: {short_title}."
+
+
+def _rewrite_first_abbreviation_use(text: str, seen_abbreviations: set[str]) -> str:
+    def _replace(match: re.Match[str]) -> str:
+        abbreviation = match.group(1)
+        expansion = match.group(2).strip()
+        if abbreviation in seen_abbreviations:
+            return abbreviation
+        seen_abbreviations.add(abbreviation)
+        return f"{expansion} ({abbreviation})"
+
+    return re.sub(r"\b([A-Z]{2,})\s*\(([^)]+)\)", _replace, text)
+
+
+def _split_for_audio(text: str, max_chars: int) -> list[str]:
+    cleaned = re.sub(r"\s+", " ", text).strip()
+    if len(cleaned) <= max_chars:
+        return [cleaned]
+
+    split = _split_once(cleaned, max_chars=max_chars)
+    if split is None:
+        return [cleaned]
+
+    first, second = split
+    lines: list[str] = []
+    lines.extend(_split_for_audio(first, max_chars=max_chars))
+    lines.extend(_split_for_audio(second, max_chars=max_chars))
+    return lines
+
+
+def _split_once(text: str, max_chars: int) -> tuple[str, str] | None:
+    lower_bound = max(60, max_chars // 3)
+    upper_bound = max(len(text) - 40, lower_bound + 1)
+
+    for delimiter in (". ", "; ", ": ", ", "):
+        break_index = _best_break_index(text, delimiter, lower_bound, upper_bound)
+        if break_index is None:
+            continue
+
+        if delimiter == ", ":
+            first = text[:break_index].rstrip()
+            second = text[break_index + len(delimiter) :].lstrip()
+            if first and first[-1] not in ".!?":
+                first += "."
+        else:
+            first = text[: break_index + 1].rstrip()
+            second = text[break_index + len(delimiter) :].lstrip()
+
+        second = _capitalize_sentence_start(second)
+        if not first or not second:
+            return None
+        return first, second
+
+    return None
+
+
+def _best_break_index(
+    text: str,
+    delimiter: str,
+    lower_bound: int,
+    upper_bound: int,
+) -> int | None:
+    midpoint = len(text) // 2
+    best_index: int | None = None
+    best_distance: int | None = None
+
+    index = text.find(delimiter)
+    while index != -1:
+        if lower_bound <= index <= upper_bound:
+            distance = abs(index - midpoint)
+            if best_distance is None or distance < best_distance:
+                best_index = index
+                best_distance = distance
+        index = text.find(delimiter, index + 1)
+
+    return best_index
+
+
+def _capitalize_sentence_start(text: str) -> str:
+    if not text:
+        return text
+    return text[0].upper() + text[1:]
 
 def _write_pdf(
     groups: dict[str, list[PoolQuestion]],
@@ -332,21 +445,35 @@ def _format_pdf_fact(text: str) -> str:
 
 
 def _subelement_heading(subelement: str, metadata: PoolMetadata | None) -> str:
-    if metadata is None:
-        return f"SUBELEMENT {subelement}"
-    title = metadata.subelement_titles.get(subelement)
+    title = _subelement_title_for_display(subelement, metadata)
     if not title:
         return f"SUBELEMENT {subelement}"
     return f"SUBELEMENT {subelement} - {title}"
 
 
 def _group_heading_text(group: str, metadata: PoolMetadata | None) -> str:
-    if metadata is None:
-        return f"Group {group}"
-    title = metadata.group_titles.get(group)
+    title = _group_title_for_display(group, metadata)
     if not title:
         return f"Group {group}"
     return f"Group {group} - {title}"
+
+
+def _subelement_title_for_display(subelement: str, metadata: PoolMetadata | None) -> str:
+    if metadata is None:
+        return ""
+    friendly = metadata.subelement_friendly_titles.get(subelement, "").strip()
+    if friendly:
+        return friendly
+    return metadata.subelement_titles.get(subelement, "").strip()
+
+
+def _group_title_for_display(group: str, metadata: PoolMetadata | None) -> str:
+    if metadata is None:
+        return ""
+    friendly = metadata.group_friendly_titles.get(group, "").strip()
+    if friendly:
+        return friendly
+    return metadata.group_titles.get(group, "").strip()
 
 
 def _draw_footer(canvas: Canvas, doc: BaseDocTemplate, color: colors.Color) -> None:

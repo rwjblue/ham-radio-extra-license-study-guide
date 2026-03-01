@@ -4,9 +4,10 @@ from pathlib import Path
 
 from _pytest.monkeypatch import MonkeyPatch
 
-from extra_facts.models import PoolQuestion, QuestionPool
+from extra_facts.models import PoolMetadata, PoolQuestion, QuestionPool
 from extra_facts.prose import (
     OpenAIProseClient,
+    enrich_pool_metadata_with_headings,
     enrich_pool_with_prose,
     validate_prose,
 )
@@ -58,6 +59,28 @@ class _AlwaysErrorClient:
     ) -> tuple[str, float | None]:
         _ = (question_id, question_text, correct_answer, feedback)
         raise RuntimeError("boom")
+
+
+class _HeadingClient:
+    def __init__(
+        self,
+        subelement_titles: dict[str, str],
+        group_titles: dict[str, str],
+        should_error: bool = False,
+    ) -> None:
+        self._subelement_titles = subelement_titles
+        self._group_titles = group_titles
+        self._should_error = should_error
+
+    def generate_headings(
+        self,
+        subelement_titles: dict[str, str],
+        group_titles: dict[str, str],
+    ) -> tuple[dict[str, str], dict[str, str]]:
+        _ = (subelement_titles, group_titles)
+        if self._should_error:
+            raise RuntimeError("boom")
+        return self._subelement_titles, self._group_titles
 
 
 def _pool(question: PoolQuestion) -> QuestionPool:
@@ -295,3 +318,64 @@ def test_openai_http_cache_dir_env(monkeypatch: MonkeyPatch) -> None:
     monkeypatch.setenv("OPENAI_HTTP_CACHE_DIR", "/tmp/openai-http-cache")
     client = OpenAIProseClient(model="gpt-5-mini", prompt_version="v1")
     assert client.cache_dir == Path("/tmp/openai-http-cache")
+
+
+def test_enrich_pool_metadata_with_headings_sets_friendly_titles() -> None:
+    question = PoolQuestion(
+        question_id="E1A01",
+        question_text="What is true?",
+        choices=["Right", "Wrong", "No", "Never"],
+        correct_choice_index=0,
+        group="E1A",
+        subelement="E1",
+    )
+    pool = QuestionPool(
+        schema_version=1,
+        excluded_count=0,
+        questions=[question],
+        metadata=PoolMetadata(
+            subelement_titles={"E1": "COMMISSION RULES"},
+            group_titles={"E1A": "Frequency privileges; band edges and limits"},
+        ),
+    )
+    enriched = enrich_pool_metadata_with_headings(
+        pool,
+        client=_HeadingClient(
+            subelement_titles={"E1": "Operating Rules"},
+            group_titles={"E1A": "Band Privileges"},
+        ),
+    )
+
+    assert enriched.metadata is not None
+    assert enriched.metadata.subelement_friendly_titles == {"E1": "Operating Rules"}
+    assert enriched.metadata.group_friendly_titles == {"E1A": "Band Privileges"}
+
+
+def test_enrich_pool_metadata_with_headings_falls_back_on_error() -> None:
+    question = PoolQuestion(
+        question_id="E1A01",
+        question_text="What is true?",
+        choices=["Right", "Wrong", "No", "Never"],
+        correct_choice_index=0,
+        group="E1A",
+        subelement="E1",
+    )
+    pool = QuestionPool(
+        schema_version=1,
+        excluded_count=0,
+        questions=[question],
+        metadata=PoolMetadata(
+            subelement_titles={"E1": "COMMISSION RULES"},
+            group_titles={"E1A": "Frequency privileges"},
+        ),
+    )
+
+    enriched = enrich_pool_metadata_with_headings(
+        pool,
+        client=_HeadingClient(
+            subelement_titles={"E1": "Operating Rules"},
+            group_titles={"E1A": "Band Privileges"},
+            should_error=True,
+        ),
+    )
+    assert enriched == pool

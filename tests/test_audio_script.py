@@ -26,6 +26,8 @@ def test_write_audio_script_adds_spoken_headers_and_omits_ids(tmp_path: Path) ->
     metadata = PoolMetadata(
         subelement_titles={"E1": "COMMISSION'S RULES"},
         group_titles={"E1A": "Frequency privileges", "E1B": "Station restrictions"},
+        subelement_friendly_titles={"E1": "Operating Rules"},
+        group_friendly_titles={"E1A": "Band Privileges", "E1B": "Station Limits"},
     )
 
     path = write_audio_script(
@@ -37,9 +39,10 @@ def test_write_audio_script_adds_spoken_headers_and_omits_ids(tmp_path: Path) ->
     )
 
     content = path.read_text(encoding="utf-8")
-    assert "Now starting SUBELEMENT E1 - COMMISSION'S RULES." in content
-    assert "Group E1A - Frequency privileges." in content
-    assert "Group E1B - Station restrictions." in content
+    assert "Chapter E1: Operating Rules." in content
+    assert "Next section, E1A: Band Privileges." in content
+    assert "Next section, E1B: Station Limits." in content
+    assert "Section recap: review these rules and examples before moving on." in content
     assert "E1A01:" not in content
 
 
@@ -55,3 +58,28 @@ def test_write_audio_script_can_include_ids(tmp_path: Path) -> None:
 
     content = path.read_text(encoding="utf-8")
     assert "E1A01: The maximum symbol rate is 1200 baud." in content
+
+
+def test_write_audio_script_splits_overlong_facts(tmp_path: Path) -> None:
+    questions = [
+        _question(
+            "E1A01",
+            (
+                "When using a transceiver that displays the carrier frequency of phone "
+                "signals, what is the lowest frequency at which a properly adjusted LSB "
+                "emission will be totally within the band?"
+            ),
+            "3 kHz above the lower band edge",
+        )
+    ]
+
+    path = write_audio_script(
+        questions,
+        out_dir=tmp_path,
+        mode="literal",
+        omit_id=True,
+    )
+
+    lines = [line for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
+    long_lines = [line for line in lines if len(line) > 160]
+    assert long_lines == []

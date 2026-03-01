@@ -45,6 +45,8 @@ def test_question_pool_round_trip_with_metadata(tmp_path: Path) -> None:
     metadata = PoolMetadata(
         subelement_titles={"E1": "COMMISSION RULES"},
         group_titles={"E1A": "Frequency privileges"},
+        subelement_friendly_titles={"E1": "Operating Rules"},
+        group_friendly_titles={"E1A": "Band Privileges"},
     )
     pool = to_question_pool(parsed_questions, metadata=metadata)
 

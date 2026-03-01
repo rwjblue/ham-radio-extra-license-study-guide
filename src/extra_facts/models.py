@@ -1,8 +1,12 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Literal
+
+
+def _empty_str_map() -> dict[str, str]:
+    return {}
 
 
 @dataclass(frozen=True)
@@ -99,3 +103,5 @@ class ProseMeta:
 class PoolMetadata:
     subelement_titles: dict[str, str]
     group_titles: dict[str, str]
+    subelement_friendly_titles: dict[str, str] = field(default_factory=_empty_str_map)
+    group_friendly_titles: dict[str, str] = field(default_factory=_empty_str_map)
