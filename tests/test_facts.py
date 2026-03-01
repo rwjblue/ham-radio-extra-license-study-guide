@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from extra_facts.facts import fact_sentence
-from extra_facts.models import PoolQuestion
+from extra_facts.models import LlmProse, PoolQuestion, ProseValidation
 
 
 def _question(question_id: str, text: str, answer: str, correct_index: int = 0) -> PoolQuestion:
@@ -55,3 +55,23 @@ def test_tts_expands_units_and_abbreviations() -> None:
     assert "equivalent isotropically radiated power" in line
     assert "1500 watts" in line
     assert "high frequency" in line
+
+
+def test_prose_mode_uses_llm_fact() -> None:
+    q = _question("E2A02", "Which of the following is true?", "Option A")
+    q = PoolQuestion(
+        question_id=q.question_id,
+        question_text=q.question_text,
+        choices=q.choices,
+        correct_choice_index=q.correct_choice_index,
+        group=q.group,
+        subelement=q.subelement,
+        llm=LlmProse(
+            prose_fact="This is cleaner prose.",
+            status="accepted",
+            validation=ProseValidation(True, True, True),
+            source_hash="sha256:test",
+            confidence=0.9,
+        ),
+    )
+    assert fact_sentence(q, mode="prose") == "E2A02: This is cleaner prose."

@@ -2,8 +2,9 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from typing import Any, cast
 
-from .models import ParsedQuestion, PoolQuestion, QuestionPool
+from .models import LlmProse, ParsedQuestion, PoolQuestion, ProseMeta, ProseValidation, QuestionPool
 
 CHOICE_ORDER = ("A", "B", "C", "D")
 SCHEMA_VERSION = 1
@@ -38,6 +39,8 @@ def write_question_pool(pool: QuestionPool, target: Path) -> None:
     payload: dict[str, object] = {
         "schema_version": pool.schema_version,
         "excluded_count": pool.excluded_count,
+        "prose_schema_version": pool.prose_schema_version,
+        "prose_meta": _serialize_prose_meta(pool.prose_meta),
         "questions": [
             {
                 "question_id": question.question_id,
@@ -46,6 +49,7 @@ def write_question_pool(pool: QuestionPool, target: Path) -> None:
                 "correct_choice_index": question.correct_choice_index,
                 "group": question.group,
                 "subelement": question.subelement,
+                "llm": _serialize_llm_prose(question.llm),
             }
             for question in pool.questions
         ],
@@ -57,8 +61,8 @@ def write_question_pool(pool: QuestionPool, target: Path) -> None:
 
 
 def read_question_pool(path: Path) -> QuestionPool:
-    payload = json.loads(path.read_text(encoding="utf-8"))
-    questions_payload = payload["questions"]
+    payload = cast(dict[str, Any], json.loads(path.read_text(encoding="utf-8")))
+    questions_payload = cast(list[dict[str, Any]], payload["questions"])
 
     questions = [
         PoolQuestion(
@@ -68,6 +72,7 @@ def read_question_pool(path: Path) -> QuestionPool:
             correct_choice_index=int(question_payload["correct_choice_index"]),
             group=question_payload["group"],
             subelement=question_payload["subelement"],
+            llm=_deserialize_llm_prose(question_payload.get("llm")),
         )
         for question_payload in questions_payload
     ]
@@ -76,6 +81,10 @@ def read_question_pool(path: Path) -> QuestionPool:
         schema_version=int(payload["schema_version"]),
         excluded_count=int(payload.get("excluded_count", 0)),
         questions=questions,
+        prose_schema_version=(
+            int(payload["prose_schema_version"]) if payload.get("prose_schema_version") else None
+        ),
+        prose_meta=_deserialize_prose_meta(payload.get("prose_meta")),
     )
 
 
@@ -84,3 +93,74 @@ def group_pool_questions(questions: list[PoolQuestion]) -> dict[str, list[PoolQu
     for question in questions:
         grouped.setdefault(question.group, []).append(question)
     return grouped
+
+
+def _serialize_llm_prose(llm: LlmProse | None) -> dict[str, object] | None:
+    if llm is None:
+        return None
+    return {
+        "prose_fact": llm.prose_fact,
+        "status": llm.status,
+        "validation": {
+            "numbers_preserved": llm.validation.numbers_preserved,
+            "units_preserved": llm.validation.units_preserved,
+            "negation_preserved": llm.validation.negation_preserved,
+        },
+        "source_hash": llm.source_hash,
+        "confidence": llm.confidence,
+    }
+
+
+def _deserialize_llm_prose(payload: object) -> LlmProse | None:
+    if not isinstance(payload, dict):
+        return None
+    payload_dict = cast(dict[str, Any], payload)
+
+    validation_payload = payload_dict.get("validation")
+    if not isinstance(validation_payload, dict):
+        return None
+    validation_dict = cast(dict[str, Any], validation_payload)
+
+    raw_status = payload_dict.get("status")
+    status = raw_status if raw_status in {"accepted", "fallback", "error"} else "fallback"
+
+    return LlmProse(
+        prose_fact=str(payload_dict.get("prose_fact", "")),
+        status=status,
+        validation=ProseValidation(
+            numbers_preserved=bool(validation_dict.get("numbers_preserved", False)),
+            units_preserved=bool(validation_dict.get("units_preserved", False)),
+            negation_preserved=bool(validation_dict.get("negation_preserved", False)),
+        ),
+        source_hash=str(payload_dict.get("source_hash", "")),
+        confidence=_to_float_or_none(payload_dict.get("confidence")),
+    )
+
+
+def _serialize_prose_meta(meta: ProseMeta | None) -> dict[str, object] | None:
+    if meta is None:
+        return None
+    return {
+        "provider": meta.provider,
+        "model": meta.model,
+        "prompt_version": meta.prompt_version,
+        "generated_at": meta.generated_at,
+    }
+
+
+def _deserialize_prose_meta(payload: object) -> ProseMeta | None:
+    if not isinstance(payload, dict):
+        return None
+    payload_dict = cast(dict[str, Any], payload)
+    return ProseMeta(
+        provider=str(payload_dict.get("provider", "")),
+        model=str(payload_dict.get("model", "")),
+        prompt_version=str(payload_dict.get("prompt_version", "")),
+        generated_at=str(payload_dict.get("generated_at", "")),
+    )
+
+
+def _to_float_or_none(value: object) -> float | None:
+    if isinstance(value, int | float):
+        return float(value)
+    return None

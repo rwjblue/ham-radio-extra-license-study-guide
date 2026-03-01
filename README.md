@@ -4,6 +4,7 @@ Reproducible CLI pipeline to generate a study guide from the **public NCVEC Elem
 
 Outputs:
 - `extra_pool.json` (typed intermediate question-pool representation)
+- `extra_pool_prose.json` (optional LLM-enriched pool with prose facts + validation metadata)
 - `extra_facts.txt` (UTF-8, one fact per line, blank line between groups)
 - `extra_facts.pdf` (print-friendly)
 
@@ -17,6 +18,10 @@ Each fact line includes the question ID plus a declarative restatement of the qu
 ## Setup
 
 ```bash
+# one-time local env setup for prose generation
+cp .env.example .env
+# then set OPENAI_API_KEY in .env
+
 mise run deps-dev
 # or runtime-only:
 # mise run deps
@@ -64,6 +69,25 @@ mise run -- uv run extra-facts build \
   --omit-id
 ```
 
+Optional Step 3: generate LLM prose facts (requires `OPENAI_API_KEY`):
+
+```bash
+mise run -- uv run extra-facts prose \
+  --pool-json dist/extra_pool.json \
+  --out-json dist/extra_pool_prose.json \
+  --model gpt-5-mini \
+  --prompt-version v1
+```
+
+Build using prose mode:
+
+```bash
+mise run -- uv run extra-facts build \
+  --pool-json dist/extra_pool_prose.json \
+  --out-dir dist \
+  --mode prose
+```
+
 CLI summary includes parsed questions, groups, excluded withdrawn items, and output paths.
 
 ## CLI
@@ -71,7 +95,8 @@ CLI summary includes parsed questions, groups, excluded withdrawn items, and out
 ```bash
 extra-facts extract --source-url <docx-url> --out-json dist/extra_pool.json [--cache .cache]
 extra-facts extract --docx <local.docx> --out-json dist/extra_pool.json
-extra-facts build --pool-json dist/extra_pool.json --out-dir dist --mode literal|tts [--omit-id]
+extra-facts prose --pool-json dist/extra_pool.json --out-json dist/extra_pool_prose.json [--model gpt-5-mini] [--prompt-version v1] [--max-questions N] [--resume]
+extra-facts build --pool-json dist/extra_pool.json --out-dir dist --mode literal|tts|prose [--omit-id]
 ```
 
 ## Determinism
@@ -91,13 +116,16 @@ mise run lint
 mise run typecheck
 mise run test
 mise run extract
+mise run prose
 mise run build
 mise run full-build
+mise run full-prose-build
 # local extract: DOCX=/path/to/pool.docx mise run extract-local
 ```
 
 ## Notes
 
 - Primary extraction path is `.docx` paragraph text.
+- Prose generation is optional and includes automatic validation with deterministic fallback.
 - PDF extraction support remains in the extraction module for fallback experimentation.
 - Withdrawn/removed/deleted questions are excluded when detected in question/answer text.

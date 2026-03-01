@@ -7,6 +7,7 @@ from .extract import extract_text
 from .intermediate import read_question_pool, to_question_pool, write_question_pool
 from .models import BuildSummary, ExtractSummary
 from .parser import parse_questions
+from .prose import OpenAIProseClient, ProseRunSummary, enrich_pool_with_prose
 from .render import write_outputs
 
 
@@ -55,3 +56,27 @@ def build_from_pool_json(
         text_path=text_path,
         pdf_path=pdf_path,
     )
+
+
+def generate_prose_for_pool(
+    pool_json_path: Path,
+    out_json_path: Path,
+    model: str,
+    prompt_version: str,
+    max_questions: int | None,
+    resume: bool,
+) -> ProseRunSummary:
+    pool = read_question_pool(pool_json_path)
+    client = OpenAIProseClient(model=model, prompt_version=prompt_version)
+    enriched_pool, summary = enrich_pool_with_prose(
+        pool,
+        client=client,
+        provider="openai",
+        model=model,
+        prompt_version=prompt_version,
+        max_questions=max_questions,
+        resume=resume,
+    )
+    out_json_path.parent.mkdir(parents=True, exist_ok=True)
+    write_question_pool(enriched_pool, out_json_path)
+    return summary

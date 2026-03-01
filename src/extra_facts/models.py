@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Literal
 
 
 @dataclass(frozen=True)
@@ -22,6 +23,7 @@ class PoolQuestion:
     correct_choice_index: int
     group: str
     subelement: str
+    llm: LlmProse | None = None
 
     @property
     def correct_answer(self) -> str:
@@ -33,6 +35,8 @@ class QuestionPool:
     schema_version: int
     excluded_count: int
     questions: list[PoolQuestion]
+    prose_schema_version: int | None = None
+    prose_meta: ProseMeta | None = None
 
 
 @dataclass(frozen=True)
@@ -51,3 +55,27 @@ class ExtractSummary:
     group_count: int
     excluded_count: int
     intermediate_path: Path
+
+
+@dataclass(frozen=True)
+class ProseValidation:
+    numbers_preserved: bool
+    units_preserved: bool
+    negation_preserved: bool
+
+
+@dataclass(frozen=True)
+class LlmProse:
+    prose_fact: str
+    status: Literal["accepted", "fallback", "error"]
+    validation: ProseValidation
+    source_hash: str
+    confidence: float | None = None
+
+
+@dataclass(frozen=True)
+class ProseMeta:
+    provider: str
+    model: str
+    prompt_version: str
+    generated_at: str

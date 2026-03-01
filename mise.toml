@@ -2,6 +2,9 @@
 python = "3.11"
 uv = "latest"
 
+[env]
+_.file = ".env"
+
 [tasks.sync]
 description = "Install project dependencies"
 run = "uv sync --extra dev"
@@ -45,3 +48,11 @@ run = "uv run extra-facts extract --docx \"$DOCX\" --out-json \"${OUT_JSON:-dist
 [tasks.full-build]
 description = "Extract then build facts"
 run = "uv run extra-facts extract --source-url \"${URL:-https://ncvec.org/downloads/2024-2028%20Extra%20Class%20Question%20Pool%20and%20Syllabus%20Public%20Release%20with%204th%20Errata%20Feb%204%202026.docx}\" --out-json \"${OUT_JSON:-dist/extra_pool.json}\" --cache .cache && uv run extra-facts build --pool-json \"${POOL_JSON:-dist/extra_pool.json}\" --out-dir \"${OUT_DIR:-dist}\" --mode \"${MODE:-tts}\""
+
+[tasks.prose]
+description = "Generate LLM prose from intermediate JSON (requires OPENAI_API_KEY)"
+run = "uv run extra-facts prose --pool-json \"${POOL_JSON:-dist/extra_pool.json}\" --out-json \"${OUT_JSON:-dist/extra_pool_prose.json}\" --model \"${MODEL:-gpt-5-mini}\" --prompt-version \"${PROMPT_VERSION:-v1}\" ${MAX_QUESTIONS:+--max-questions \"$MAX_QUESTIONS\"} ${RESUME:+--resume}"
+
+[tasks.full-prose-build]
+description = "Extract, generate prose, then build prose outputs"
+run = "uv run extra-facts extract --source-url \"${URL:-https://ncvec.org/downloads/2024-2028%20Extra%20Class%20Question%20Pool%20and%20Syllabus%20Public%20Release%20with%204th%20Errata%20Feb%204%202026.docx}\" --out-json \"${POOL_JSON:-dist/extra_pool.json}\" --cache .cache && uv run extra-facts prose --pool-json \"${POOL_JSON:-dist/extra_pool.json}\" --out-json \"${PROSE_JSON:-dist/extra_pool_prose.json}\" --model \"${MODEL:-gpt-5-mini}\" --prompt-version \"${PROMPT_VERSION:-v1}\" && uv run extra-facts build --pool-json \"${PROSE_JSON:-dist/extra_pool_prose.json}\" --out-dir \"${OUT_DIR:-dist}\" --mode prose"

@@ -31,11 +31,14 @@ UNIT_PATTERNS = {
 
 
 def fact_sentence(question: PoolQuestion, mode: str, omit_id: bool = False) -> str:
-    answer = question.correct_answer
-    question_text = question.question_text.strip()
+    if mode == "prose" and question.llm is not None:
+        sentence = _normalize_sentence(question.llm.prose_fact)
+    else:
+        answer = question.correct_answer
+        question_text = question.question_text.strip()
 
-    sentence = _to_declarative(question_text, answer)
-    sentence = _normalize_sentence(sentence)
+        sentence = _to_declarative(question_text, answer)
+        sentence = _normalize_sentence(sentence)
 
     if mode == "tts":
         sentence = _to_tts(sentence)

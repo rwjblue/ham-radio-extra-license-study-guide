@@ -3,7 +3,12 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from .build import build_from_pool_json, extract_pool_from_source, extract_pool_from_url
+from .build import (
+    build_from_pool_json,
+    extract_pool_from_source,
+    extract_pool_from_url,
+    generate_prose_for_pool,
+)
 
 
 def build_command(args: argparse.Namespace) -> int:
@@ -68,11 +73,43 @@ def create_parser() -> argparse.ArgumentParser:
     build = sub.add_parser("build", help="Build facts outputs from intermediate JSON")
     build.add_argument("--pool-json", help="Path to prebuilt intermediate question pool JSON")
     build.add_argument("--out-dir", default="dist", help="Output directory")
-    build.add_argument("--mode", choices=["literal", "tts"], default="literal")
+    build.add_argument("--mode", choices=["literal", "tts", "prose"], default="literal")
     build.add_argument("--omit-id", action="store_true", help="Omit question IDs in output lines")
     build.set_defaults(func=build_command)
 
+    prose = sub.add_parser("prose", help="Generate LLM prose facts into enriched pool JSON")
+    prose.add_argument("--pool-json", required=True, help="Input intermediate question pool JSON")
+    prose.add_argument(
+        "--out-json",
+        default="dist/extra_pool_prose.json",
+        help="Output enriched question pool JSON path",
+    )
+    prose.add_argument("--model", default="gpt-5-mini", help="Model name")
+    prose.add_argument("--prompt-version", default="v1", help="Prompt version label")
+    prose.add_argument("--max-questions", type=int, help="Limit generated questions for tuning")
+    prose.add_argument("--resume", action="store_true", help="Skip already generated entries")
+    prose.set_defaults(func=prose_command)
+
     return parser
+
+
+def prose_command(args: argparse.Namespace) -> int:
+    summary = generate_prose_for_pool(
+        pool_json_path=Path(args.pool_json),
+        out_json_path=Path(args.out_json),
+        model=args.model,
+        prompt_version=args.prompt_version,
+        max_questions=args.max_questions,
+        resume=args.resume,
+    )
+    print("Prose generation complete")
+    print(f"Questions total: {summary.total}")
+    print(f"Questions attempted: {summary.generated}")
+    print(f"Accepted: {summary.accepted}")
+    print(f"Fallback: {summary.fallback}")
+    print(f"Errors: {summary.errors}")
+    print(f"Output JSON: {Path(args.out_json)}")
+    return 0
 
 
 def main() -> int:
