@@ -1,7 +1,15 @@
 from __future__ import annotations
 
+from pathlib import Path
+
+from _pytest.monkeypatch import MonkeyPatch
+
 from extra_facts.models import PoolQuestion, QuestionPool
-from extra_facts.prose import enrich_pool_with_prose, validate_prose
+from extra_facts.prose import (
+    OpenAIProseClient,
+    enrich_pool_with_prose,
+    validate_prose,
+)
 
 
 class _FakeClient:
@@ -266,3 +274,24 @@ def test_enrich_pool_records_error_debug_data() -> None:
     assert enriched.questions[0].llm.attempt_count == 2
     assert enriched.questions[0].llm.failure_reasons == ["llm_error"]
     assert enriched.questions[0].llm.last_error == "boom"
+
+
+def test_openai_http_cache_enabled_defaults_true(monkeypatch: MonkeyPatch) -> None:
+    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
+    monkeypatch.delenv("OPENAI_HTTP_CACHE", raising=False)
+    client = OpenAIProseClient(model="gpt-5-mini", prompt_version="v1")
+    assert client.cache_enabled is True
+
+
+def test_openai_http_cache_enabled_env_false(monkeypatch: MonkeyPatch) -> None:
+    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
+    monkeypatch.setenv("OPENAI_HTTP_CACHE", "false")
+    client = OpenAIProseClient(model="gpt-5-mini", prompt_version="v1")
+    assert client.cache_enabled is False
+
+
+def test_openai_http_cache_dir_env(monkeypatch: MonkeyPatch) -> None:
+    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
+    monkeypatch.setenv("OPENAI_HTTP_CACHE_DIR", "/tmp/openai-http-cache")
+    client = OpenAIProseClient(model="gpt-5-mini", prompt_version="v1")
+    assert client.cache_dir == Path("/tmp/openai-http-cache")

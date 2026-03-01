@@ -66,3 +66,10 @@ mise run release
 - This repository uses jj. Prefer jj-native commands for commit/push flow.
 - Ignore generated outputs and caches (`dist/`, `.cache/`, `__pycache__/`, etc.).
 - See [AGENTS.md](/Users/rwjblue/src/github/rwjblue/ham-radio-extra-license-study-guide/AGENTS.md) for repository agent constraints.
+
+## OpenAI HTTP Cache
+
+- Prose generation uses on-disk HTTP caching for OpenAI requests by default.
+- Default path: `.cache/openai-http` (persisted in GitHub Actions via `actions/cache`).
+- Disable locally with `OPENAI_HTTP_CACHE=0`.
+- Override path with `OPENAI_HTTP_CACHE_DIR=/path/to/cache`.

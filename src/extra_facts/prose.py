@@ -9,10 +9,12 @@ from collections.abc import Callable
 from concurrent.futures import Future, ThreadPoolExecutor, as_completed
 from dataclasses import dataclass
 from datetime import UTC, datetime
+from pathlib import Path
 from typing import Any, Literal, Protocol, cast
 
 import requests
 from requests.adapters import HTTPAdapter
+from requests_cache import CachedSession
 
 from .facts import fact_sentence
 from .models import LlmProse, PoolQuestion, ProseMeta, ProseValidation, QuestionPool
@@ -37,6 +39,8 @@ NEGATION_KEYWORDS = (
     "unless",
     "never",
 )
+DEFAULT_OPENAI_HTTP_CACHE_DIR = Path(".cache/openai-http")
+DEFAULT_OPENAI_HTTP_CACHE_NAME = "responses"
 
 
 class ProseClient(Protocol):
@@ -77,6 +81,8 @@ class OpenAIProseClient:
         model: str,
         prompt_version: str,
         api_key_env: str = "OPENAI_API_KEY",
+        cache_dir: Path | None = None,
+        cache_enabled: bool | None = None,
     ) -> None:
         api_key = os.getenv(api_key_env)
         if not api_key:
@@ -85,6 +91,8 @@ class OpenAIProseClient:
         self.model = model
         self.prompt_version = prompt_version
         self.api_key = api_key
+        self.cache_enabled = _resolve_openai_http_cache_enabled(cache_enabled)
+        self.cache_dir = _resolve_openai_http_cache_dir(cache_dir)
         self._local = threading.local()
 
     def generate(
@@ -128,11 +136,43 @@ class OpenAIProseClient:
         if isinstance(session, requests.Session):
             return session
 
-        new_session = requests.Session()
+        new_session = _build_openai_session(self.cache_dir, self.cache_enabled)
         adapter = HTTPAdapter(pool_connections=10, pool_maxsize=20)
         new_session.mount("https://", adapter)
         self._local.session = new_session
         return new_session
+
+
+def _resolve_openai_http_cache_enabled(config: bool | None) -> bool:
+    if config is not None:
+        return config
+    value = os.getenv("OPENAI_HTTP_CACHE", "1")
+    return value.strip().lower() not in {"0", "false", "no", "off"}
+
+
+def _resolve_openai_http_cache_dir(config: Path | None) -> Path:
+    if config is not None:
+        return config
+    value = os.getenv("OPENAI_HTTP_CACHE_DIR", "").strip()
+    if value:
+        return Path(value)
+    return DEFAULT_OPENAI_HTTP_CACHE_DIR
+
+
+def _build_openai_session(cache_dir: Path, cache_enabled: bool) -> requests.Session:
+    if not cache_enabled:
+        return requests.Session()
+    cache_dir.mkdir(parents=True, exist_ok=True)
+    cache_name = cache_dir / DEFAULT_OPENAI_HTTP_CACHE_NAME
+    return cast(
+        requests.Session,
+        CachedSession(
+            cache_name=str(cache_name),
+            backend="sqlite",
+            expire_after=-1,
+            allowable_methods=("GET", "POST"),
+        ),
+    )
 
 
 def enrich_pool_with_prose(

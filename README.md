@@ -24,6 +24,9 @@ mise run deps-dev
 ```bash
 cp .env.example .env
 # set OPENAI_API_KEY in .env
+# optional: tweak HTTP cache behavior for OpenAI calls
+# OPENAI_HTTP_CACHE=1
+# OPENAI_HTTP_CACHE_DIR=.cache/openai-http
 ```
 
 3. Build:
@@ -79,6 +82,7 @@ extra-facts audio-script --pool-json dist/extra_pool_prose.json --out-dir dist/a
 - Source is the NCVEC public pool DOCX release.
 - Parsing is deterministic and excludes withdrawn/removed/deleted questions.
 - Group order is preserved as published.
+- OpenAI prose calls use on-disk HTTP caching by default at `.cache/openai-http` (override via `OPENAI_HTTP_CACHE_DIR`, disable with `OPENAI_HTTP_CACHE=0`).
 
 ## Contributing
 
