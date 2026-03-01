@@ -81,6 +81,8 @@ mise run lock
 mise run lint
 mise run typecheck
 mise run test
+mise run build
+# local file: DOCX=/path/to/pool.docx mise run build-local
 ```
 
 ## Notes

@@ -31,5 +31,9 @@ description = "Run tests"
 run = "uv run pytest"
 
 [tasks.build]
-description = "Show CLI build help"
-run = "uv run extra-facts build --help"
+description = "Build facts from NCVEC URL (override URL/MODE/OUT_DIR)"
+run = "uv run extra-facts build --source-url \"${URL:-https://ncvec.org/downloads/2024-2028%20Extra%20Class%20Question%20Pool%20and%20Syllabus%20Public%20Release%20with%204th%20Errata%20Feb%204%202026.docx}\" --out-dir \"${OUT_DIR:-dist}\" --mode \"${MODE:-tts}\" --cache .cache"
+
+[tasks.build-local]
+description = "Build facts from local docx (set DOCX=/path/to/file.docx)"
+run = "uv run extra-facts build --docx \"$DOCX\" --out-dir \"${OUT_DIR:-dist}\" --mode \"${MODE:-tts}\""
