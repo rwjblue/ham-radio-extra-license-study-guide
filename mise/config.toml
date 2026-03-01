@@ -3,4 +3,4 @@ python = "3.11"
 uv = "latest"
 
 [env]
-_.file = ".env"
+_.file = "{{config_root}}/.env"
