@@ -22,7 +22,7 @@ from reportlab.platypus import (
 
 from .facts import fact_sentence
 from .intermediate import group_pool_questions
-from .models import PoolQuestion
+from .models import PoolMetadata, PoolQuestion
 
 QUESTION_ID_RE = re.compile(r"^([A-Z]\d[A-Z]\d{2}):\s*(.+)$")
 
@@ -32,6 +32,7 @@ def write_outputs(
     out_dir: Path,
     mode: str,
     omit_id: bool,
+    metadata: PoolMetadata | None = None,
     txt_name: str = "extra_facts.txt",
     pdf_name: str = "extra_facts.pdf",
 ) -> tuple[Path, Path]:
@@ -39,10 +40,10 @@ def write_outputs(
     groups = group_pool_questions(questions)
 
     txt_path = out_dir / txt_name
-    _write_text(groups, txt_path, mode, omit_id)
+    _write_text(groups, txt_path, mode, omit_id, metadata)
 
     pdf_path = out_dir / pdf_name
-    _write_pdf(groups, pdf_path, mode, omit_id)
+    _write_pdf(groups, pdf_path, mode, omit_id, metadata)
 
     return txt_path, pdf_path
 
@@ -52,6 +53,7 @@ def _write_text(
     target: Path,
     mode: str,
     omit_id: bool,
+    metadata: PoolMetadata | None,
 ) -> None:
     lines: list[str] = []
     current_subelement = ""
@@ -61,10 +63,12 @@ def _write_text(
         if subelement != current_subelement:
             if lines:
                 lines.append("")
-            lines.append(f"## {subelement}")
+            subelement_title = _subelement_heading(subelement, metadata)
+            lines.append(f"## {subelement_title}")
             current_subelement = subelement
 
-        lines.append(f"### {group}")
+        group_title = _group_heading_text(group, metadata)
+        lines.append(f"### {group_title}")
         for question in questions:
             lines.append(fact_sentence(question, mode=mode, omit_id=omit_id))
         lines.append("")
@@ -77,6 +81,7 @@ def _write_pdf(
     target: Path,
     mode: str,
     omit_id: bool,
+    metadata: PoolMetadata | None,
 ) -> None:
     palette = {
         "ink": colors.HexColor("#1F2937"),
@@ -163,11 +168,24 @@ def _write_pdf(
         subelement = group[:2]
         if subelement != seen_subelement:
             story.append(Spacer(1, 0.08 * inch))
-            story.append(_subelement_banner(subelement, subelement_style, palette["accent"]))
+            story.append(
+                _subelement_banner(
+                    _subelement_heading(subelement, metadata),
+                    subelement_style,
+                    palette["accent"],
+                )
+            )
             seen_subelement = subelement
 
         story.append(Spacer(1, 0.07 * inch))
-        story.append(_group_heading(group, group_style, palette["group_bg"], palette["line"]))
+        story.append(
+            _group_heading(
+                _group_heading_text(group, metadata),
+                group_style,
+                palette["group_bg"],
+                palette["line"],
+            )
+        )
         story.append(Spacer(1, 0.02 * inch))
         for question in questions:
             text = fact_sentence(question, mode=mode, omit_id=omit_id)
@@ -215,11 +233,11 @@ def _cover_header(
 
 
 def _subelement_banner(
-    subelement: str,
+    label: str,
     style: ParagraphStyle,
     accent: colors.Color,
 ) -> Table:
-    table = Table([[Paragraph(f"SUBELEMENT {subelement}", style)]], colWidths=[7.1 * inch])
+    table = Table([[Paragraph(label, style)]], colWidths=[7.1 * inch])
     table.setStyle(
         TableStyle(
             [
@@ -235,12 +253,12 @@ def _subelement_banner(
 
 
 def _group_heading(
-    group: str,
+    label_text: str,
     style: ParagraphStyle,
     background: colors.Color,
     line: colors.Color,
 ) -> KeepTogether:
-    label = Table([[Paragraph(f"Group {group}", style)]], colWidths=[7.1 * inch])
+    label = Table([[Paragraph(label_text, style)]], colWidths=[7.1 * inch])
     label.setStyle(
         TableStyle(
             [
@@ -269,6 +287,24 @@ def _format_pdf_fact(text: str) -> str:
         return text
     question_id, remainder = match.groups()
     return f"<b>{question_id}:</b> {remainder}"
+
+
+def _subelement_heading(subelement: str, metadata: PoolMetadata | None) -> str:
+    if metadata is None:
+        return f"SUBELEMENT {subelement}"
+    title = metadata.subelement_titles.get(subelement)
+    if not title:
+        return f"SUBELEMENT {subelement}"
+    return f"SUBELEMENT {subelement} - {title}"
+
+
+def _group_heading_text(group: str, metadata: PoolMetadata | None) -> str:
+    if metadata is None:
+        return f"Group {group}"
+    title = metadata.group_titles.get(group)
+    if not title:
+        return f"Group {group}"
+    return f"Group {group} - {title}"
 
 
 def _draw_footer(canvas: Canvas, doc: BaseDocTemplate, color: colors.Color) -> None:

@@ -35,6 +35,7 @@ class QuestionPool:
     schema_version: int
     excluded_count: int
     questions: list[PoolQuestion]
+    metadata: PoolMetadata | None = None
     prose_schema_version: int | None = None
     prose_meta: ProseMeta | None = None
 
@@ -83,3 +84,9 @@ class ProseMeta:
     model: str
     prompt_version: str
     generated_at: str
+
+
+@dataclass(frozen=True)
+class PoolMetadata:
+    subelement_titles: dict[str, str]
+    group_titles: dict[str, str]

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from extra_facts.parser import parse_questions
+from extra_facts.parser import extract_pool_metadata, parse_questions
 
 
 def test_parse_questions_handles_multiline_and_withdrawn() -> None:
@@ -24,3 +24,11 @@ def test_parse_questions_handles_multiline_and_withdrawn() -> None:
     assert second.question_text.startswith("Which of the following")
 
     assert [q.group for q in questions] == ["E1A", "E1A", "E1B"]
+
+
+def test_extract_pool_metadata_captures_subelement_and_group_titles() -> None:
+    fixture = Path("tests/fixtures/pool_snippet_extracted.txt").read_text(encoding="utf-8")
+    metadata = extract_pool_metadata(fixture)
+
+    assert metadata.subelement_titles["E1"] == "COMMISSION'S RULES"
+    assert metadata.group_titles["E1A"].startswith("Frequency privileges")

@@ -4,7 +4,15 @@ import json
 from pathlib import Path
 from typing import Any, cast
 
-from .models import LlmProse, ParsedQuestion, PoolQuestion, ProseMeta, ProseValidation, QuestionPool
+from .models import (
+    LlmProse,
+    ParsedQuestion,
+    PoolMetadata,
+    PoolQuestion,
+    ProseMeta,
+    ProseValidation,
+    QuestionPool,
+)
 
 CHOICE_ORDER = ("A", "B", "C", "D")
 SCHEMA_VERSION = 1
@@ -13,6 +21,7 @@ SCHEMA_VERSION = 1
 def to_question_pool(
     parsed_questions: list[ParsedQuestion],
     excluded_count: int = 0,
+    metadata: PoolMetadata | None = None,
 ) -> QuestionPool:
     questions: list[PoolQuestion] = []
     for parsed in parsed_questions:
@@ -32,6 +41,7 @@ def to_question_pool(
         schema_version=SCHEMA_VERSION,
         excluded_count=excluded_count,
         questions=questions,
+        metadata=metadata,
     )
 
 
@@ -39,6 +49,7 @@ def write_question_pool(pool: QuestionPool, target: Path) -> None:
     payload: dict[str, object] = {
         "schema_version": pool.schema_version,
         "excluded_count": pool.excluded_count,
+        "metadata": _serialize_pool_metadata(pool.metadata),
         "prose_schema_version": pool.prose_schema_version,
         "prose_meta": _serialize_prose_meta(pool.prose_meta),
         "questions": [
@@ -81,6 +92,7 @@ def read_question_pool(path: Path) -> QuestionPool:
         schema_version=int(payload["schema_version"]),
         excluded_count=int(payload.get("excluded_count", 0)),
         questions=questions,
+        metadata=_deserialize_pool_metadata(payload.get("metadata")),
         prose_schema_version=(
             int(payload["prose_schema_version"]) if payload.get("prose_schema_version") else None
         ),
@@ -168,6 +180,25 @@ def _deserialize_prose_meta(payload: object) -> ProseMeta | None:
     )
 
 
+def _serialize_pool_metadata(meta: PoolMetadata | None) -> dict[str, object] | None:
+    if meta is None:
+        return None
+    return {
+        "subelement_titles": meta.subelement_titles,
+        "group_titles": meta.group_titles,
+    }
+
+
+def _deserialize_pool_metadata(payload: object) -> PoolMetadata | None:
+    if not isinstance(payload, dict):
+        return None
+    payload_dict = cast(dict[str, Any], payload)
+    return PoolMetadata(
+        subelement_titles=_to_str_map(payload_dict.get("subelement_titles")),
+        group_titles=_to_str_map(payload_dict.get("group_titles")),
+    )
+
+
 def _to_float_or_none(value: object) -> float | None:
     if isinstance(value, int | float):
         return float(value)
@@ -188,3 +219,13 @@ def _to_str_list_or_none(value: object) -> list[str] | None:
         if isinstance(item, str):
             items.append(item)
     return items
+
+
+def _to_str_map(value: object) -> dict[str, str]:
+    if not isinstance(value, dict):
+        return {}
+    result: dict[str, str] = {}
+    for key, item in cast(dict[object, object], value).items():
+        if isinstance(key, str) and isinstance(item, str):
+            result[key] = item
+    return result

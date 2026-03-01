@@ -221,6 +221,7 @@ def enrich_pool_with_prose(
         schema_version=pool.schema_version,
         excluded_count=pool.excluded_count,
         questions=questions,
+        metadata=pool.metadata,
         prose_schema_version=PROSE_SCHEMA_VERSION,
         prose_meta=ProseMeta(
             provider=provider,

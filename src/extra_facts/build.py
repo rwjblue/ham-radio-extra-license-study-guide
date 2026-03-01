@@ -7,7 +7,7 @@ from .downloader import download_source
 from .extract import extract_text
 from .intermediate import read_question_pool, to_question_pool, write_question_pool
 from .models import BuildSummary, ExtractSummary
-from .parser import parse_questions
+from .parser import extract_pool_metadata, parse_questions
 from .prose import OpenAIProseClient, ProseProgressUpdate, ProseRunSummary, enrich_pool_with_prose
 from .render import write_outputs
 
@@ -15,7 +15,8 @@ from .render import write_outputs
 def extract_pool_from_source(source_path: Path, pool_json_path: Path) -> ExtractSummary:
     text = extract_text(source_path)
     parsed_questions, excluded_count = parse_questions(text)
-    pool = to_question_pool(parsed_questions, excluded_count=excluded_count)
+    metadata = extract_pool_metadata(text)
+    pool = to_question_pool(parsed_questions, excluded_count=excluded_count, metadata=metadata)
     pool_json_path.parent.mkdir(parents=True, exist_ok=True)
     write_question_pool(pool, pool_json_path)
     return ExtractSummary(
@@ -48,6 +49,7 @@ def build_from_pool_json(
         out_dir=out_dir,
         mode=mode,
         omit_id=omit_id,
+        metadata=loaded_pool.metadata,
     )
     return BuildSummary(
         question_count=len(loaded_pool.questions),

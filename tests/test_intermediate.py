@@ -3,7 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from extra_facts.intermediate import read_question_pool, to_question_pool, write_question_pool
-from extra_facts.models import LlmProse, ParsedQuestion, PoolQuestion, ProseValidation
+from extra_facts.models import LlmProse, ParsedQuestion, PoolMetadata, PoolQuestion, ProseValidation
 
 
 def test_question_pool_round_trip(tmp_path: Path) -> None:
@@ -27,6 +27,29 @@ def test_question_pool_round_trip(tmp_path: Path) -> None:
     target = tmp_path / "pool.json"
     write_question_pool(pool, target)
 
+    loaded = read_question_pool(target)
+    assert loaded == pool
+
+
+def test_question_pool_round_trip_with_metadata(tmp_path: Path) -> None:
+    parsed_questions = [
+        ParsedQuestion(
+            question_id="E1A01",
+            correct_choice="B",
+            question_text="What is true?",
+            choices={"A": "wrong", "B": "right", "C": "no", "D": "never"},
+            group="E1A",
+            subelement="E1",
+        )
+    ]
+    metadata = PoolMetadata(
+        subelement_titles={"E1": "COMMISSION RULES"},
+        group_titles={"E1A": "Frequency privileges"},
+    )
+    pool = to_question_pool(parsed_questions, metadata=metadata)
+
+    target = tmp_path / "pool_with_meta.json"
+    write_question_pool(pool, target)
     loaded = read_question_pool(target)
     assert loaded == pool
 
