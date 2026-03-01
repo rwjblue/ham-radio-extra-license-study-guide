@@ -5,8 +5,8 @@ Reproducible CLI pipeline to generate a study guide from the **public NCVEC Elem
 Outputs:
 - `extra_pool.json` (typed intermediate question-pool representation)
 - `extra_pool_prose.json` (optional LLM-enriched pool with prose facts + validation metadata)
-- `extra_facts.txt` (UTF-8, one fact per line, blank line between groups)
-- `extra_facts.pdf` (print-friendly)
+- `dist/static/extra_facts.txt` + `dist/static/extra_facts.pdf` (always generated)
+- `dist/prose/extra_facts.txt` + `dist/prose/extra_facts.pdf` (generated when `OPENAI_API_KEY` is set)
 
 Each fact line includes the question ID plus a declarative restatement of the question meaning and the correct answer.
 
@@ -32,6 +32,23 @@ mise run sync
 ```
 
 ## Usage
+
+Recommended one-shot pipeline (static always, prose if API key exists):
+
+```bash
+mise run full-build
+```
+
+This writes static outputs to `dist/static/`.
+If `OPENAI_API_KEY` is present, it also writes prose outputs to `dist/prose/`.
+
+Quick text comparison:
+
+```bash
+mise run compare
+```
+
+Manual flow:
 
 Step 1: extract source into intermediate JSON (no fact generation):
 
@@ -126,6 +143,7 @@ mise run prose
 mise run build
 mise run full-build
 mise run full-prose-build
+mise run compare
 # local extract: DOCX=/path/to/pool.docx mise run extract-local
 ```
 
