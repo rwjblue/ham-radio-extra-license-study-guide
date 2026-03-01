@@ -4,12 +4,15 @@ import hashlib
 import json
 import os
 import re
+import threading
 from collections.abc import Callable
+from concurrent.futures import Future, ThreadPoolExecutor, as_completed
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from typing import Any, Literal, Protocol, cast
 
 import requests
+from requests.adapters import HTTPAdapter
 
 from .facts import fact_sentence
 from .models import LlmProse, PoolQuestion, ProseMeta, ProseValidation, QuestionPool
@@ -84,6 +87,7 @@ class OpenAIProseClient:
         self.model = model
         self.prompt_version = prompt_version
         self.api_key = api_key
+        self._local = threading.local()
 
     def generate(
         self,
@@ -92,7 +96,7 @@ class OpenAIProseClient:
         correct_answer: str,
     ) -> tuple[str, float | None]:
         prompt = _prompt(question_id, question_text, correct_answer, self.prompt_version)
-        response = requests.post(
+        response = self._session().post(
             "https://api.openai.com/v1/responses",
             headers={
                 "Authorization": f"Bearer {self.api_key}",
@@ -114,6 +118,17 @@ class OpenAIProseClient:
         confidence = _parse_confidence(data.get("confidence"))
         return prose_fact, confidence
 
+    def _session(self) -> requests.Session:
+        session = getattr(self._local, "session", None)
+        if isinstance(session, requests.Session):
+            return session
+
+        new_session = requests.Session()
+        adapter = HTTPAdapter(pool_connections=10, pool_maxsize=20)
+        new_session.mount("https://", adapter)
+        self._local.session = new_session
+        return new_session
+
 
 def enrich_pool_with_prose(
     pool: QuestionPool,
@@ -123,70 +138,63 @@ def enrich_pool_with_prose(
     prompt_version: str,
     max_questions: int | None = None,
     resume: bool = False,
+    workers: int = 6,
     progress_callback: Callable[[ProseProgressUpdate], None] | None = None,
 ) -> tuple[QuestionPool, ProseRunSummary]:
-    questions: list[PoolQuestion] = []
+    questions = list(pool.questions)
     generated = 0
     accepted = 0
     fallback = 0
     errors = 0
 
     target = _target_count(pool=pool, max_questions=max_questions, resume=resume)
+    candidates = _candidate_indices(pool=pool, target=target, resume=resume)
 
-    for question in pool.questions:
-        if generated >= target:
-            questions.append(question)
-            continue
-
-        source_hash = _source_hash(question)
-        if resume and question.llm is not None and question.llm.source_hash == source_hash:
-            questions.append(question)
-            continue
-
-        generated += 1
-        try:
-            candidate, confidence = client.generate(
+    if workers <= 1:
+        for index in candidates:
+            question = pool.questions[index]
+            llm = _generate_llm_prose(question, client)
+            generated, accepted, fallback, errors = _update_counters(
+                generated=generated,
+                accepted=accepted,
+                fallback=fallback,
+                errors=errors,
+                llm=llm,
+            )
+            questions[index] = _with_llm(question, llm)
+            _emit_progress(
+                progress_callback=progress_callback,
+                generated=generated,
+                total=target,
+                accepted=accepted,
+                fallback=fallback,
+                errors=errors,
                 question_id=question.question_id,
-                question_text=question.question_text,
-                correct_answer=question.correct_answer,
+                status=llm.status,
             )
-            validation = validate_prose(
-                question_text=question.question_text,
-                correct_answer=question.correct_answer,
-                prose_fact=candidate,
-            )
+    else:
+        max_workers = max(1, workers)
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            futures: dict[Future[LlmProse], int] = {
+                executor.submit(_generate_llm_prose, pool.questions[index], client): index
+                for index in candidates
+            }
 
-            if _is_valid(validation):
-                llm = LlmProse(
-                    prose_fact=candidate,
-                    status="accepted",
-                    validation=validation,
-                    source_hash=source_hash,
-                    confidence=confidence,
+            for future in as_completed(futures):
+                index = futures[future]
+                question = pool.questions[index]
+                llm = future.result()
+                generated, accepted, fallback, errors = _update_counters(
+                    generated=generated,
+                    accepted=accepted,
+                    fallback=fallback,
+                    errors=errors,
+                    llm=llm,
                 )
-                accepted += 1
-            else:
-                llm = _fallback_llm_prose(question, source_hash=source_hash, validation=validation)
-                fallback += 1
-
-        except Exception:
-            validation = ProseValidation(
-                numbers_preserved=False,
-                units_preserved=False,
-                negation_preserved=False,
-            )
-            llm = _fallback_llm_prose(
-                question,
-                source_hash=source_hash,
-                validation=validation,
-                status="error",
-            )
-            errors += 1
-
-        if progress_callback is not None:
-            progress_callback(
-                ProseProgressUpdate(
-                    completed=generated,
+                questions[index] = _with_llm(question, llm)
+                _emit_progress(
+                    progress_callback=progress_callback,
+                    generated=generated,
                     total=target,
                     accepted=accepted,
                     fallback=fallback,
@@ -194,19 +202,6 @@ def enrich_pool_with_prose(
                     question_id=question.question_id,
                     status=llm.status,
                 )
-            )
-
-        questions.append(
-            PoolQuestion(
-                question_id=question.question_id,
-                question_text=question.question_text,
-                choices=question.choices,
-                correct_choice_index=question.correct_choice_index,
-                group=question.group,
-                subelement=question.subelement,
-                llm=llm,
-            )
-        )
 
     enriched = QuestionPool(
         schema_version=pool.schema_version,
@@ -327,13 +322,109 @@ def _prompt(question_id: str, question_text: str, correct_answer: str, prompt_ve
 
 
 def _target_count(pool: QuestionPool, max_questions: int | None, resume: bool) -> int:
-    pending = 0
-    for question in pool.questions:
-        source_hash = _source_hash(question)
-        if resume and question.llm is not None and question.llm.source_hash == source_hash:
-            continue
-        pending += 1
-
+    pending = len(_candidate_indices(pool=pool, target=None, resume=resume))
     if max_questions is None:
         return pending
     return min(max_questions, pending)
+
+
+def _candidate_indices(pool: QuestionPool, target: int | None, resume: bool) -> list[int]:
+    indices: list[int] = []
+    for index, question in enumerate(pool.questions):
+        if target is not None and len(indices) >= target:
+            break
+        source_hash = _source_hash(question)
+        if resume and question.llm is not None and question.llm.source_hash == source_hash:
+            continue
+        indices.append(index)
+    return indices
+
+
+def _generate_llm_prose(question: PoolQuestion, client: ProseClient) -> LlmProse:
+    source_hash = _source_hash(question)
+    try:
+        candidate, confidence = client.generate(
+            question_id=question.question_id,
+            question_text=question.question_text,
+            correct_answer=question.correct_answer,
+        )
+        validation = validate_prose(
+            question_text=question.question_text,
+            correct_answer=question.correct_answer,
+            prose_fact=candidate,
+        )
+        if _is_valid(validation):
+            return LlmProse(
+                prose_fact=candidate,
+                status="accepted",
+                validation=validation,
+                source_hash=source_hash,
+                confidence=confidence,
+            )
+        return _fallback_llm_prose(question, source_hash=source_hash, validation=validation)
+    except Exception:
+        validation = ProseValidation(
+            numbers_preserved=False,
+            units_preserved=False,
+            negation_preserved=False,
+        )
+        return _fallback_llm_prose(
+            question,
+            source_hash=source_hash,
+            validation=validation,
+            status="error",
+        )
+
+
+def _with_llm(question: PoolQuestion, llm: LlmProse) -> PoolQuestion:
+    return PoolQuestion(
+        question_id=question.question_id,
+        question_text=question.question_text,
+        choices=question.choices,
+        correct_choice_index=question.correct_choice_index,
+        group=question.group,
+        subelement=question.subelement,
+        llm=llm,
+    )
+
+
+def _update_counters(
+    generated: int,
+    accepted: int,
+    fallback: int,
+    errors: int,
+    llm: LlmProse,
+) -> tuple[int, int, int, int]:
+    generated += 1
+    if llm.status == "accepted":
+        accepted += 1
+    elif llm.status == "fallback":
+        fallback += 1
+    else:
+        errors += 1
+    return generated, accepted, fallback, errors
+
+
+def _emit_progress(
+    progress_callback: Callable[[ProseProgressUpdate], None] | None,
+    generated: int,
+    total: int,
+    accepted: int,
+    fallback: int,
+    errors: int,
+    question_id: str,
+    status: Literal["accepted", "fallback", "error"],
+) -> None:
+    if progress_callback is None:
+        return
+    progress_callback(
+        ProseProgressUpdate(
+            completed=generated,
+            total=total,
+            accepted=accepted,
+            fallback=fallback,
+            errors=errors,
+            question_id=question_id,
+            status=status,
+        )
+    )

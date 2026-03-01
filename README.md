@@ -102,6 +102,8 @@ extra-facts prose --pool-json dist/extra_pool.json --out-json dist/extra_pool_pr
 extra-facts build --pool-json dist/extra_pool.json --out-dir dist --mode literal|tts|prose [--omit-id]
 ```
 
+`prose` uses parallel API requests with `--workers` (default: `6`).
+
 ## Determinism
 
 - Parsing is rule-based and deterministic.
