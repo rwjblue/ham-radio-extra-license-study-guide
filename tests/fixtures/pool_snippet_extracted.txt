@@ -1,0 +1,29 @@
+SUBELEMENT E1 - COMMISSION'S RULES
+E1A01 (A) On which HF bands is a General class license holder granted all amateur frequency
+privileges?
+A. 160, 75, 40, 20, 15, and 10 meters
+B. 160, 30, 17, 12 and 10 meters
+C. 80, 40, 20, and 15 meters
+D. 60, 30, 17, and 12 meters
+
+E1A02 (C) Which of the following is required before an amateur station may provide information
+regarding hazardous road conditions?
+A. Nothing special is required
+B. Permission from the local police
+C. There must be an immediate threat to human life or property
+that is not available via normal communication systems
+D. Coordination with FEMA
+
+E1E10 (C) [97.509(m)]
+
+E1B01 (D) How many volunteer examiners are required to administer an amateur operator license examination?
+A. Two
+B. Four
+C. Five
+D. Three
+
+E1C01 (B) Which of the following has been withdrawn from use in the current question pool?
+A. Question bank A
+B. Withdrawn
+C. Nothing has been withdrawn
+D. Supplemental material only

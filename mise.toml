@@ -1,0 +1,35 @@
+[tools]
+python = "3.11"
+uv = "latest"
+
+[tasks.sync]
+description = "Install project dependencies"
+run = "uv sync --extra dev"
+
+[tasks.deps]
+description = "Install runtime Python dependencies"
+run = "uv sync --no-dev"
+
+[tasks.deps-dev]
+description = "Install runtime + development Python dependencies"
+run = "uv sync --extra dev"
+
+[tasks.lock]
+description = "Update uv lockfile"
+run = "uv lock"
+
+[tasks.lint]
+description = "Run Ruff lint checks"
+run = "uv run ruff check ."
+
+[tasks.typecheck]
+description = "Run Pyright"
+run = "uv run pyright"
+
+[tasks.test]
+description = "Run tests"
+run = "uv run pytest"
+
+[tasks.build]
+description = "Show CLI build help"
+run = "uv run extra-facts build --help"

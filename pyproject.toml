@@ -1,0 +1,45 @@
+[project]
+name = "extra-facts"
+version = "0.1.0"
+description = "Generate FCC Amateur Extra question-pool statements of fact"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "pdfplumber>=0.11.0",
+  "pymupdf>=1.24.0",
+  "python-docx>=1.1.2",
+  "reportlab>=4.0.0",
+  "requests>=2.32.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.0.0",
+  "ruff>=0.11.0",
+  "pyright>=1.1.395",
+]
+
+[project.scripts]
+extra-facts = "extra_facts.cli:main"
+
+[build-system]
+requires = ["hatchling>=1.25.0"]
+build-backend = "hatchling.build"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "N", "ARG", "RUF"]
+ignore = ["ARG001"]
+
+[tool.pyright]
+include = ["src", "tests"]
+typeCheckingMode = "strict"
+pythonVersion = "3.11"
+reportMissingTypeStubs = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

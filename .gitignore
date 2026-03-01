@@ -1,0 +1,24 @@
+# Python bytecode/cache
+__pycache__/
+*.py[cod]
+
+# Virtual envs
+.venv/
+venv/
+
+# Tool caches
+.pytest_cache/
+.ruff_cache/
+.pyright/
+.mypy_cache/
+
+# Build/output artifacts
+dist/
+build/
+*.egg-info/
+
+# Local/download caches
+.cache/
+
+# OS/editor noise
+.DS_Store
