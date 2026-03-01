@@ -1,15 +1,15 @@
 from __future__ import annotations
 
 from extra_facts.facts import fact_sentence
-from extra_facts.models import Question
+from extra_facts.models import PoolQuestion
 
 
-def _question(question_id: str, text: str, answer: str, correct: str = "A") -> Question:
-    return Question(
+def _question(question_id: str, text: str, answer: str, correct_index: int = 0) -> PoolQuestion:
+    return PoolQuestion(
         question_id=question_id,
-        correct_choice=correct,
         question_text=text,
-        choices={"A": answer, "B": "no", "C": "no", "D": "no"},
+        choices=[answer, "no", "no", "no"],
+        correct_choice_index=correct_index,
         group=question_id[:3],
         subelement=question_id[:2],
     )

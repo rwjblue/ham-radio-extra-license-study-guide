@@ -4,30 +4,54 @@ from pathlib import Path
 
 from .downloader import download_source
 from .extract import extract_text
-from .models import BuildSummary
+from .intermediate import read_question_pool, to_question_pool, write_question_pool
+from .models import BuildSummary, ExtractSummary
 from .parser import parse_questions
 from .render import write_outputs
 
 
-def build_from_source(source_path: Path, out_dir: Path, mode: str, omit_id: bool) -> BuildSummary:
+def extract_pool_from_source(source_path: Path, pool_json_path: Path) -> ExtractSummary:
     text = extract_text(source_path)
-    questions, excluded_count = parse_questions(text)
-    text_path, pdf_path = write_outputs(questions, out_dir=out_dir, mode=mode, omit_id=omit_id)
-    return BuildSummary(
-        question_count=len(questions),
-        group_count=len({q.group for q in questions}),
+    parsed_questions, excluded_count = parse_questions(text)
+    pool = to_question_pool(parsed_questions, excluded_count=excluded_count)
+    pool_json_path.parent.mkdir(parents=True, exist_ok=True)
+    write_question_pool(pool, pool_json_path)
+    return ExtractSummary(
+        question_count=len(pool.questions),
+        group_count=len({q.group for q in pool.questions}),
         excluded_count=excluded_count,
-        text_path=text_path,
-        pdf_path=pdf_path,
+        intermediate_path=pool_json_path,
     )
 
 
-def build_from_url(
+def extract_pool_from_url(
     source_url: str,
+    pool_json_path: Path,
+    cache: Path | None,
+) -> ExtractSummary:
+    source_path = download_source(source_url, cache_dir=cache)
+    return extract_pool_from_source(source_path, pool_json_path=pool_json_path)
+
+
+def build_from_pool_json(
+    pool_json_path: Path,
     out_dir: Path,
     mode: str,
     omit_id: bool,
-    cache: Path | None,
 ) -> BuildSummary:
-    source_path = download_source(source_url, cache_dir=cache)
-    return build_from_source(source_path, out_dir=out_dir, mode=mode, omit_id=omit_id)
+    loaded_pool = read_question_pool(pool_json_path)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    text_path, pdf_path = write_outputs(
+        loaded_pool.questions,
+        out_dir=out_dir,
+        mode=mode,
+        omit_id=omit_id,
+    )
+    return BuildSummary(
+        question_count=len(loaded_pool.questions),
+        group_count=len({q.group for q in loaded_pool.questions}),
+        excluded_count=loaded_pool.excluded_count,
+        intermediate_path=pool_json_path,
+        text_path=text_path,
+        pdf_path=pdf_path,
+    )

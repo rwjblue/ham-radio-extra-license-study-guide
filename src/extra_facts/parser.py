@@ -3,7 +3,7 @@ from __future__ import annotations
 import re
 from collections.abc import Iterable
 
-from .models import Question
+from .models import ParsedQuestion
 
 QUESTION_RE = re.compile(r"^(E\d[A-Z]\d{2})\s*\(([ABCD])\)\s*(.*)$")
 CHOICE_RE = re.compile(r"^([ABCD])\.\s+(.*)$")
@@ -16,9 +16,9 @@ class ParseError(RuntimeError):
     pass
 
 
-def parse_questions(raw_text: str) -> tuple[list[Question], int]:
+def parse_questions(raw_text: str) -> tuple[list[ParsedQuestion], int]:
     lines = _normalize_lines(raw_text)
-    questions: list[Question] = []
+    questions: list[ParsedQuestion] = []
     excluded = 0
 
     i = 0
@@ -70,7 +70,7 @@ def parse_questions(raw_text: str) -> tuple[list[Question], int]:
         group = question_id[:3]
         subelement = question_id[:2]
         questions.append(
-            Question(
+            ParsedQuestion(
                 question_id=question_id,
                 correct_choice=correct_choice,
                 question_text=question_text,
@@ -115,8 +115,8 @@ def _is_withdrawn(question_text: str, choices: dict[str, str]) -> bool:
     return any(REMOVE_MARKER_RE.search(text) for text in choices.values())
 
 
-def group_questions(questions: Iterable[Question]) -> dict[str, list[Question]]:
-    grouped: dict[str, list[Question]] = {}
+def group_questions(questions: Iterable[ParsedQuestion]) -> dict[str, list[ParsedQuestion]]:
+    grouped: dict[str, list[ParsedQuestion]] = {}
     for question in questions:
         grouped.setdefault(question.group, []).append(question)
     return grouped

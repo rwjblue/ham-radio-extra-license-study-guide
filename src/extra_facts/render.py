@@ -8,12 +8,12 @@ from reportlab.lib.units import inch
 from reportlab.platypus import Flowable, Paragraph, SimpleDocTemplate, Spacer
 
 from .facts import fact_sentence
-from .models import Question
-from .parser import group_questions
+from .intermediate import group_pool_questions
+from .models import PoolQuestion
 
 
 def write_outputs(
-    questions: list[Question],
+    questions: list[PoolQuestion],
     out_dir: Path,
     mode: str,
     omit_id: bool,
@@ -21,7 +21,7 @@ def write_outputs(
     pdf_name: str = "extra_facts.pdf",
 ) -> tuple[Path, Path]:
     out_dir.mkdir(parents=True, exist_ok=True)
-    groups = group_questions(questions)
+    groups = group_pool_questions(questions)
 
     txt_path = out_dir / txt_name
     _write_text(groups, txt_path, mode, omit_id)
@@ -32,7 +32,12 @@ def write_outputs(
     return txt_path, pdf_path
 
 
-def _write_text(groups: dict[str, list[Question]], target: Path, mode: str, omit_id: bool) -> None:
+def _write_text(
+    groups: dict[str, list[PoolQuestion]],
+    target: Path,
+    mode: str,
+    omit_id: bool,
+) -> None:
     lines: list[str] = []
     current_subelement = ""
 
@@ -52,7 +57,12 @@ def _write_text(groups: dict[str, list[Question]], target: Path, mode: str, omit
     target.write_text("\n".join(lines).rstrip() + "\n", encoding="utf-8")
 
 
-def _write_pdf(groups: dict[str, list[Question]], target: Path, mode: str, omit_id: bool) -> None:
+def _write_pdf(
+    groups: dict[str, list[PoolQuestion]],
+    target: Path,
+    mode: str,
+    omit_id: bool,
+) -> None:
     styles = getSampleStyleSheet()
     body = ParagraphStyle(
         "FactsBody",

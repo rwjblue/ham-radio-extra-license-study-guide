@@ -31,9 +31,17 @@ description = "Run tests"
 run = "uv run pytest"
 
 [tasks.build]
-description = "Build facts from NCVEC URL (override URL/MODE/OUT_DIR)"
-run = "uv run extra-facts build --source-url \"${URL:-https://ncvec.org/downloads/2024-2028%20Extra%20Class%20Question%20Pool%20and%20Syllabus%20Public%20Release%20with%204th%20Errata%20Feb%204%202026.docx}\" --out-dir \"${OUT_DIR:-dist}\" --mode \"${MODE:-tts}\" --cache .cache"
+description = "Build facts from intermediate JSON (set POOL_JSON if needed)"
+run = "uv run extra-facts build --pool-json \"${POOL_JSON:-dist/extra_pool.json}\" --out-dir \"${OUT_DIR:-dist}\" --mode \"${MODE:-tts}\""
 
-[tasks.build-local]
-description = "Build facts from local docx (set DOCX=/path/to/file.docx)"
-run = "uv run extra-facts build --docx \"$DOCX\" --out-dir \"${OUT_DIR:-dist}\" --mode \"${MODE:-tts}\""
+[tasks.extract]
+description = "Extract NCVEC source URL into intermediate JSON"
+run = "uv run extra-facts extract --source-url \"${URL:-https://ncvec.org/downloads/2024-2028%20Extra%20Class%20Question%20Pool%20and%20Syllabus%20Public%20Release%20with%204th%20Errata%20Feb%204%202026.docx}\" --out-json \"${OUT_JSON:-dist/extra_pool.json}\" --cache .cache"
+
+[tasks.extract-local]
+description = "Extract local docx into intermediate JSON (set DOCX)"
+run = "uv run extra-facts extract --docx \"$DOCX\" --out-json \"${OUT_JSON:-dist/extra_pool.json}\""
+
+[tasks.full-build]
+description = "Extract then build facts"
+run = "uv run extra-facts extract --source-url \"${URL:-https://ncvec.org/downloads/2024-2028%20Extra%20Class%20Question%20Pool%20and%20Syllabus%20Public%20Release%20with%204th%20Errata%20Feb%204%202026.docx}\" --out-json \"${OUT_JSON:-dist/extra_pool.json}\" --cache .cache && uv run extra-facts build --pool-json \"${POOL_JSON:-dist/extra_pool.json}\" --out-dir \"${OUT_DIR:-dist}\" --mode \"${MODE:-tts}\""

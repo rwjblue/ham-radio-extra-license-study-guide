@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import re
 
-from .models import Question
+from .models import PoolQuestion
 
 ABBREVIATIONS = {
     "FCC": "Federal Communications Commission",
@@ -30,8 +30,8 @@ UNIT_PATTERNS = {
 }
 
 
-def fact_sentence(question: Question, mode: str, omit_id: bool = False) -> str:
-    answer = question.choices[question.correct_choice]
+def fact_sentence(question: PoolQuestion, mode: str, omit_id: bool = False) -> str:
+    answer = question.correct_answer
     question_text = question.question_text.strip()
 
     sentence = _to_declarative(question_text, answer)
