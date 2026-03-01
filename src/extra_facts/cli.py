@@ -5,6 +5,7 @@ import os
 from pathlib import Path
 
 from .build import (
+    build_audio_script_from_pool_json,
     build_from_pool_json,
     extract_pool_from_source,
     extract_pool_from_url,
@@ -33,6 +34,27 @@ def build_command(args: argparse.Namespace) -> int:
     print(f"PDF output: {summary.pdf_path}")
     return 0
 
+
+
+
+def audio_script_command(args: argparse.Namespace) -> int:
+    if not args.pool_json:
+        raise SystemExit("Provide --pool-json from the extract command")
+
+    summary = build_audio_script_from_pool_json(
+        pool_json_path=Path(args.pool_json),
+        out_dir=Path(args.out_dir),
+        mode=args.mode,
+        omit_id=args.omit_id,
+    )
+
+    print("Audio script build complete")
+    print(f"Questions parsed: {summary.question_count}")
+    print(f"Groups: {summary.group_count}")
+    print(f"Excluded items: {summary.excluded_count}")
+    print(f"Intermediate JSON: {summary.intermediate_path}")
+    print(f"Audio script: {summary.script_path}")
+    return 0
 
 def extract_command(args: argparse.Namespace) -> int:
     if not args.source_url and not args.docx:
@@ -78,6 +100,27 @@ def create_parser() -> argparse.ArgumentParser:
     build.add_argument("--mode", choices=["literal", "tts", "prose"], default="literal")
     build.add_argument("--omit-id", action="store_true", help="Omit question IDs in output lines")
     build.set_defaults(func=build_command)
+
+    audio = sub.add_parser(
+        "audio-script",
+        help="Build listenable audio script text from intermediate JSON",
+    )
+    audio.add_argument("--pool-json", help="Path to prebuilt intermediate question pool JSON")
+    audio.add_argument("--out-dir", default="dist/audio", help="Output directory")
+    audio.add_argument("--mode", choices=["literal", "tts", "prose"], default="prose")
+    audio.add_argument(
+        "--omit-id",
+        action="store_true",
+        default=True,
+        help="Omit question IDs in output lines (default: true)",
+    )
+    audio.add_argument(
+        "--include-id",
+        action="store_false",
+        dest="omit_id",
+        help="Include question IDs in output lines",
+    )
+    audio.set_defaults(func=audio_script_command)
 
     prose = sub.add_parser("prose", help="Generate LLM prose facts into enriched pool JSON")
     prose.add_argument("--pool-json", required=True, help="Input intermediate question pool JSON")

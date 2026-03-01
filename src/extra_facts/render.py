@@ -76,6 +76,48 @@ def _write_text(
     target.write_text("\n".join(lines).rstrip() + "\n", encoding="utf-8")
 
 
+
+
+def write_audio_script(
+    questions: list[PoolQuestion],
+    out_dir: Path,
+    mode: str,
+    omit_id: bool,
+    metadata: PoolMetadata | None = None,
+    txt_name: str = "extra_facts_audio.txt",
+) -> Path:
+    out_dir.mkdir(parents=True, exist_ok=True)
+    groups = group_pool_questions(questions)
+    txt_path = out_dir / txt_name
+    _write_audio_text(groups, txt_path, mode, omit_id, metadata)
+    return txt_path
+
+
+def _write_audio_text(
+    groups: dict[str, list[PoolQuestion]],
+    target: Path,
+    mode: str,
+    omit_id: bool,
+    metadata: PoolMetadata | None,
+) -> None:
+    lines: list[str] = []
+    current_subelement = ""
+
+    for group, questions in groups.items():
+        subelement = group[:2]
+        if subelement != current_subelement:
+            subelement_title = _subelement_heading(subelement, metadata)
+            lines.append(f"Now starting {subelement_title}.")
+            current_subelement = subelement
+
+        group_title = _group_heading_text(group, metadata)
+        lines.append(f"{group_title}.")
+        for question in questions:
+            lines.append(fact_sentence(question, mode=mode, omit_id=omit_id))
+        lines.append("")
+
+    target.write_text("\n".join(lines).rstrip() + "\n", encoding="utf-8")
+
 def _write_pdf(
     groups: dict[str, list[PoolQuestion]],
     target: Path,
