@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+#MISE description="Generate prose only when OPENAI_API_KEY is set"
+#MISE depends=["extract"]
+#MISE sources=["dist/extra_pool.json", "src/**/*.py", "pyproject.toml"]
+#MISE outputs={auto=true}
+set -euo pipefail
+
+if [ -z "${OPENAI_API_KEY:-}" ]; then
+  echo "OPENAI_API_KEY not set; skipping prose generation"
+  exit 0
+fi
+
+mise run prose

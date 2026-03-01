@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+#MISE description="Run tests"
+#MISE depends=["deps-dev"]
+#MISE sources=["src/**/*.py", "tests/**/*.py", "pyproject.toml"]
+set -euo pipefail
+
+uv run pytest

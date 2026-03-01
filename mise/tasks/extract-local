@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+#MISE description="Extract local docx into intermediate JSON"
+#MISE depends=["deps-dev"]
+#MISE outputs=["dist/extra_pool.json"]
+#USAGE arg "<docx>" help="Local path to question pool DOCX"
+#USAGE flag "--out-json <out_json>" help="Output JSON path" default="dist/extra_pool.json"
+set -euo pipefail
+
+uv run extra-facts extract --docx "${usage_docx?}" --out-json "${usage_out_json?}"

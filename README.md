@@ -35,19 +35,15 @@ cp .env.example .env
 mise run full-build
 ```
 
-4. Optional: build listenable audio script text:
+`mise run full-build` now also generates the listenable audio script.
 
-```bash
-mise run audio-script
-```
-
-If prose JSON is not available, generate audio script from the static pool instead:
+If you want to regenerate only the audio script from the static pool:
 
 ```bash
 POOL_JSON=dist/extra_pool.json MODE=tts mise run audio-script
 ```
 
-5. Compare static vs prose text:
+4. Compare static vs prose text:
 
 ```bash
 mise run compare

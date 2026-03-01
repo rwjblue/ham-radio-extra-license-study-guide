@@ -23,6 +23,8 @@ mise run typecheck
 mise run test
 ```
 
+Task implementations live in `mise/tasks/` and are composed with task dependencies.
+
 Pipeline tasks:
 
 ```bash

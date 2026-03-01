@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+#MISE description="Build listenable audio script text from intermediate JSON"
+#MISE depends=["deps-dev"]
+set -euo pipefail
+
+uv run extra-facts audio-script \
+  --pool-json "${POOL_JSON:-dist/extra_pool_prose.json}" \
+  --out-dir "${OUT_DIR:-dist/audio}" \
+  --mode "${MODE:-prose}"

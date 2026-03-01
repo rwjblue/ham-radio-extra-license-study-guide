@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+#MISE description="Build facts from intermediate JSON (set POOL_JSON if needed)"
+#MISE depends=["deps-dev"]
+set -euo pipefail
+
+uv run extra-facts build \
+  --pool-json "${POOL_JSON:-dist/extra_pool.json}" \
+  --out-dir "${OUT_DIR:-dist}" \
+  --mode "${MODE:-tts}"

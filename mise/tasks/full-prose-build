@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+#MISE description="Extract, generate prose, then build prose outputs"
+#MISE depends=["build-prose"]
+#MISE outputs={auto=true}
+set -euo pipefail
+
+echo "full-prose-build complete"

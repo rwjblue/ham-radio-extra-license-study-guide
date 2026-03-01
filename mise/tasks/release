@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+#MISE description="Bump project version with uv, commit, tag, and push"
+#MISE depends=["deps-dev", "lint", "typecheck", "test"]
+#USAGE arg "[bump]" help="Version bump type (patch|minor|major)"
+set -euo pipefail
+
+bump="${usage_bump:-${BUMP:-patch}}"
+uv version --bump "${bump}"
+new_version="$(uv version --short)"
+echo "New project version: ${new_version}"
+git add pyproject.toml uv.lock
+jj commit -m "Bump version to ${new_version}"
+jj tug
+jj git push --tracked
+tag="v${new_version}"
+echo "Creating release tag: ${tag}"
+git tag "${tag}"
+git push origin "refs/tags/${tag}:refs/tags/${tag}"

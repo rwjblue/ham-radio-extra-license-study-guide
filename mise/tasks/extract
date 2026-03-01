@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+#MISE description="Extract NCVEC source URL into intermediate JSON"
+#MISE depends=["deps-dev"]
+#MISE sources=["src/**/*.py", "pyproject.toml", "uv.lock"]
+#MISE outputs=["dist/extra_pool.json"]
+set -euo pipefail
+
+uv run extra-facts extract \
+  --source-url "${URL:-https://ncvec.org/downloads/2024-2028%20Extra%20Class%20Question%20Pool%20and%20Syllabus%20Public%20Release%20with%204th%20Errata%20Feb%204%202026.docx}" \
+  --out-json "${OUT_JSON:-dist/extra_pool.json}" \
+  --cache .cache

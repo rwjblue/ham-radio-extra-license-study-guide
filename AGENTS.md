@@ -3,6 +3,9 @@
 ## Repo Workflow Rules
 
 - Use `mise` tasks for all developer commands; do not add or use `Makefile`.
+- Prefer standalone task scripts in `mise/tasks/` over inline bash in `mise.toml`.
+- Compose higher-level tasks from smaller tasks using task dependencies.
+- Add `sources` and `outputs` metadata to tasks where practical so mise can skip up-to-date work.
 - Preferred commands:
   - `mise run deps-dev`
   - `mise run lint`

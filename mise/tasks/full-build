@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+#MISE description="Extract, build static/prose outputs, and generate audio script"
+#MISE depends=["audio-script-auto"]
+#MISE outputs={auto=true}
+set -euo pipefail
+
+echo "full-build complete"
