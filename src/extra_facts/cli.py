@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import argparse
 import os
+import sys
+import time
 from pathlib import Path
 
 from .build import (
@@ -142,11 +144,33 @@ def create_parser() -> argparse.ArgumentParser:
 
 def prose_command(args: argparse.Namespace) -> int:
     ci_mode = _is_ci()
+    use_bar = not ci_mode and sys.stdout.isatty()
+    non_tty_emit_interval_seconds = 5.0
+    last_non_tty_emit = 0.0
 
     def _render_progress(update: ProseProgressUpdate) -> None:
+        nonlocal last_non_tty_emit
         if update.total == 0:
             return
         if ci_mode:
+            status = update.status.upper()
+            print(
+                (
+                    f"[{update.completed}/{update.total}] "
+                    f"ok={update.accepted} fb={update.fallback} err={update.errors} "
+                    f"{update.question_id} {status}"
+                ),
+                flush=True,
+            )
+            return
+        if not use_bar:
+            now = time.monotonic()
+            if (
+                update.completed < update.total
+                and (now - last_non_tty_emit) < non_tty_emit_interval_seconds
+            ):
+                return
+            last_non_tty_emit = now
             status = update.status.upper()
             print(
                 (
@@ -183,7 +207,7 @@ def prose_command(args: argparse.Namespace) -> int:
         resume=args.resume,
         progress_callback=_render_progress,
     )
-    if summary.target > 0 and not ci_mode:
+    if summary.target > 0 and use_bar:
         print()
     print("Prose generation complete")
     print(f"Questions total: {summary.total}")
