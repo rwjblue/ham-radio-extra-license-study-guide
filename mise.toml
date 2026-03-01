@@ -68,7 +68,7 @@ run = "uv run extra-facts extract --source-url \"${URL:-https://ncvec.org/downlo
 
 [tasks.compare]
 description = "Compare static and prose text outputs"
-run = "diff -u \"${STATIC_TXT:-dist/static/extra_facts.txt}\" \"${PROSE_TXT:-dist/prose/extra_facts.txt}\" || true"
+run = "diff -u \"${STATIC_TXT:-dist/static/static-extra_facts.txt}\" \"${PROSE_TXT:-dist/prose/prose-extra_facts.txt}\" || true"
 
 [tasks.release]
 description = "Bump project version with uv, commit, tag, and push"

@@ -5,8 +5,8 @@ Reproducible CLI pipeline to generate a study guide from the **public NCVEC Elem
 Outputs:
 - `extra_pool.json` (typed intermediate question-pool representation)
 - `extra_pool_prose.json` (optional LLM-enriched pool with prose facts + validation metadata)
-- `dist/static/extra_facts.txt` + `dist/static/extra_facts.pdf` (always generated)
-- `dist/prose/extra_facts.txt` + `dist/prose/extra_facts.pdf` (generated when `OPENAI_API_KEY` is set)
+- `dist/static/static-extra_facts.txt` + `dist/static/static-extra_facts.pdf` (always generated)
+- `dist/prose/prose-extra_facts.txt` + `dist/prose/prose-extra_facts.pdf` (generated when `OPENAI_API_KEY` is set)
 
 Each fact line includes the question ID plus a declarative restatement of the question meaning and the correct answer.
 

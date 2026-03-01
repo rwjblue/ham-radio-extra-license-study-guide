@@ -71,9 +71,9 @@ jobs:
           files: |
             ham-radio-extra-study-guide-${{ env.RELEASE_TAG }}.tar.gz
             ham-radio-extra-study-guide-${{ env.RELEASE_TAG }}.sha256
-            dist/static/extra_facts.txt
-            dist/static/extra_facts.pdf
-            dist/prose/extra_facts.txt
-            dist/prose/extra_facts.pdf
+            dist/static/static-extra_facts.txt
+            dist/static/static-extra_facts.pdf
+            dist/prose/prose-extra_facts.txt
+            dist/prose/prose-extra_facts.pdf
             dist/extra_pool.json
             dist/extra_pool_prose.json
