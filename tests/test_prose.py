@@ -98,6 +98,23 @@ def test_validate_prose_accepts_meter_abbreviation_equivalence() -> None:
     assert validation.units_preserved is True
 
 
+def test_validate_prose_does_not_infer_negation_from_notifications_word() -> None:
+    validation = validate_prose(
+        question_text=(
+            "What notifications must be given before transmitting on the 630- or 2200-meter bands?"
+        ),
+        correct_answer=(
+            "Operators must inform the Utilities Technology Council (UTC) "
+            "of their call sign and coordinates of the station"
+        ),
+        prose_fact=(
+            "Operators must inform the Utilities Technology Council (UTC) "
+            "of their call sign and coordinates of the station."
+        ),
+    )
+    assert validation.negation_preserved is True
+
+
 def test_enrich_pool_uses_fallback_when_validation_fails() -> None:
     question = PoolQuestion(
         question_id="E1A07",

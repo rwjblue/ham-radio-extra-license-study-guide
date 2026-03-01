@@ -250,8 +250,9 @@ def validate_prose(question_text: str, correct_answer: str, prose_fact: str) -> 
     prose_units = _extract_units(prose)
     units_preserved = source_units.issubset(prose_units)
 
-    required_negations = {token for token in NEGATION_KEYWORDS if token in source}
-    negation_preserved = all(token in prose for token in required_negations)
+    required_negations = _extract_negations(source)
+    prose_negations = _extract_negations(prose)
+    negation_preserved = required_negations.issubset(prose_negations)
 
     return ProseValidation(
         numbers_preserved=numbers_preserved,
@@ -267,6 +268,15 @@ def _extract_units(text: str) -> set[str]:
     for match in UNIT_WORD_RE.finditer(text):
         units.add(_canonical_unit(match.group(1)))
     return units
+
+
+def _extract_negations(text: str) -> set[str]:
+    found: set[str] = set()
+    for token in NEGATION_KEYWORDS:
+        pattern = r"\b" + re.escape(token) + r"\b"
+        if re.search(pattern, text):
+            found.add(token)
+    return found
 
 
 def _canonical_unit(raw: str) -> str:
@@ -473,6 +483,8 @@ def _generate_llm_prose(
                 candidate=candidate,
                 attempt=attempt,
                 max_attempts=attempts,
+                question_text=question.question_text,
+                correct_answer=question.correct_answer,
             )
 
     return _fallback_llm_prose(
@@ -513,19 +525,29 @@ def _validation_feedback(
     candidate: str,
     attempt: int,
     max_attempts: int,
+    question_text: str,
+    correct_answer: str,
 ) -> str:
     failure_map = {
         "numbers": "Missing or changed numeric values",
         "units": "Missing or changed units",
         "negation": "Missing or changed negation or constraint wording",
     }
-    failures = [failure_map[failure] for failure in _validation_failures(validation)]
+    failure_keys = _validation_failures(validation)
+    failures = [failure_map[failure] for failure in failure_keys]
+    details = _validation_feedback_details(
+        failure_keys=failure_keys,
+        question_text=question_text,
+        correct_answer=correct_answer,
+        candidate=candidate,
+    )
 
     joined_failures = "; ".join(failures) if failures else "Validation did not pass"
+    detail_suffix = f" Missing details: {details}." if details else ""
     return (
         f"Attempt {attempt}/{max_attempts} failed validation: {joined_failures}. "
         f"Previous prose was: {candidate!r} "
-        "Revise to preserve all numbers, units, negations, and constraints exactly."
+        f"Revise to preserve all numbers, units, negations, and constraints exactly.{detail_suffix}"
     )
 
 
@@ -534,6 +556,32 @@ def _error_feedback(error: Exception, attempt: int, max_attempts: int) -> str:
         f"Attempt {attempt}/{max_attempts} failed with API/parsing error: {error}. "
         "Retry with strict JSON and one valid prose_fact sentence."
     )
+
+
+def _validation_feedback_details(
+    failure_keys: list[str],
+    question_text: str,
+    correct_answer: str,
+    candidate: str,
+) -> str:
+    source = f"{question_text} {correct_answer}".lower()
+    prose = candidate.lower()
+    details: list[str] = []
+    if "numbers" in failure_keys:
+        source_numbers = {num.replace(",", "") for num in NUM_RE.findall(source)}
+        prose_numbers = {num.replace(",", "") for num in NUM_RE.findall(prose)}
+        missing_numbers = sorted(source_numbers - prose_numbers)
+        if missing_numbers:
+            details.append("numbers=" + ", ".join(missing_numbers))
+    if "units" in failure_keys:
+        missing_units = sorted(_extract_units(source) - _extract_units(prose))
+        if missing_units:
+            details.append("units=" + ", ".join(missing_units))
+    if "negation" in failure_keys:
+        missing_negations = sorted(_extract_negations(source) - _extract_negations(prose))
+        if missing_negations:
+            details.append("negations=" + ", ".join(missing_negations))
+    return "; ".join(details)
 
 
 def _with_llm(question: PoolQuestion, llm: LlmProse) -> PoolQuestion:
