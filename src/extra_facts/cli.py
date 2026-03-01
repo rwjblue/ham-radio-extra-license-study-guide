@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import os
 from pathlib import Path
 
 from .build import (
@@ -97,8 +98,21 @@ def create_parser() -> argparse.ArgumentParser:
 
 
 def prose_command(args: argparse.Namespace) -> int:
+    ci_mode = _is_ci()
+
     def _render_progress(update: ProseProgressUpdate) -> None:
         if update.total == 0:
+            return
+        if ci_mode:
+            status = update.status.upper()
+            print(
+                (
+                    f"[{update.completed}/{update.total}] "
+                    f"ok={update.accepted} fb={update.fallback} err={update.errors} "
+                    f"{update.question_id} {status}"
+                ),
+                flush=True,
+            )
             return
         width = 28
         ratio = update.completed / update.total
@@ -126,7 +140,7 @@ def prose_command(args: argparse.Namespace) -> int:
         resume=args.resume,
         progress_callback=_render_progress,
     )
-    if summary.target > 0:
+    if summary.target > 0 and not ci_mode:
         print()
     print("Prose generation complete")
     print(f"Questions total: {summary.total}")
@@ -137,6 +151,11 @@ def prose_command(args: argparse.Namespace) -> int:
     print(f"Errors: {summary.errors}")
     print(f"Output JSON: {Path(args.out_json)}")
     return 0
+
+
+def _is_ci() -> bool:
+    value = os.getenv("CI", "").strip().lower()
+    return value in {"1", "true", "yes", "on"}
 
 
 def main() -> int:
