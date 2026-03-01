@@ -1,115 +1,53 @@
 # FCC Amateur Extra Statements of Fact Generator
 
-Reproducible CLI pipeline to generate a study guide from the **public NCVEC Element 4 (Amateur Extra) question pool DOCX**.
+Generate a clean study guide from the public NCVEC Element 4 (Amateur Extra) pool.
 
-Outputs:
-- `extra_pool.json` (typed intermediate question-pool representation)
-- `extra_pool_prose.json` (optional LLM-enriched pool with prose facts + validation metadata)
-- `dist/static/static-extra_facts.txt` + `dist/static/static-extra_facts.pdf` (always generated)
-- `dist/prose/prose-extra_facts.txt` + `dist/prose/prose-extra_facts.pdf` (generated when `OPENAI_API_KEY` is set)
+This project produces:
+- static facts (`dist/static/static-extra_facts.txt` and `dist/static/static-extra_facts.pdf`)
+- optional LLM prose facts (`dist/prose/prose-extra_facts.txt` and `dist/prose/prose-extra_facts.pdf`)
+- intermediate JSON files (`dist/extra_pool.json`, `dist/extra_pool_prose.json`)
 
-Each fact line includes the question ID plus a declarative restatement of the question meaning and the correct answer.
+Each fact line includes the question ID and a declarative restatement of the correct answer.
 
-## Requirements
+## Quick Start
 
-- Python 3.11+
-- [uv](https://docs.astral.sh/uv/)
-
-## Setup
+1. Install tooling:
 
 ```bash
-# one-time local env setup for prose generation
-cp .env.example .env
-# then set OPENAI_API_KEY in .env
-
+mise install
 mise run deps-dev
-# or runtime-only:
-# mise run deps
 ```
+
+2. Optional: enable prose generation:
 
 ```bash
-mise run sync
+cp .env.example .env
+# set OPENAI_API_KEY in .env
 ```
 
-## Usage
-
-Recommended one-shot pipeline (static always, prose if API key exists):
+3. Build:
 
 ```bash
 mise run full-build
 ```
 
-This writes static outputs to `dist/static/`.
-If `OPENAI_API_KEY` is present, it also writes prose outputs to `dist/prose/`.
-
-Quick text comparison:
+4. Compare static vs prose text:
 
 ```bash
 mise run compare
 ```
 
-Manual flow:
+## Output Locations
 
-Step 1: extract source into intermediate JSON (no fact generation):
-
-```bash
-mise run -- uv run extra-facts extract \
-  --source-url "https://ncvec.org/downloads/2024-2028%20Extra%20Class%20Question%20Pool%20and%20Syllabus%20Public%20Release%20with%204th%20Errata%20Feb%204%202026.docx" \
-  --out-json dist/extra_pool.json \
-  --cache .cache
-```
-
-Step 2: build facts from intermediate JSON:
-
-```bash
-mise run -- uv run extra-facts build \
-  --pool-json dist/extra_pool.json \
-  --out-dir dist \
-  --mode literal
-```
-
-Extract from local DOCX:
-
-```bash
-mise run -- uv run extra-facts extract \
-  --docx /path/to/ncvec-extra-question-pool.docx \
-  --out-json dist/extra_pool.json
-```
-
-TTS mode without question IDs:
-
-```bash
-mise run -- uv run extra-facts build \
-  --pool-json dist/extra_pool.json \
-  --out-dir dist \
-  --mode tts \
-  --omit-id
-```
-
-Optional Step 3: generate LLM prose facts (requires `OPENAI_API_KEY`):
-
-```bash
-mise run -- uv run extra-facts prose \
-  --pool-json dist/extra_pool.json \
-  --out-json dist/extra_pool_prose.json \
-  --model gpt-5-mini \
-  --prompt-version v1 \
-  --max-attempts 3
-```
-
-The prose command prints per-question progress with running acceptance,
-fallback, and error counts.
-
-Build using prose mode:
-
-```bash
-mise run -- uv run extra-facts build \
-  --pool-json dist/extra_pool_prose.json \
-  --out-dir dist \
-  --mode prose
-```
-
-CLI summary includes parsed questions, groups, excluded withdrawn items, and output paths.
+- Static outputs:
+  `dist/static/static-extra_facts.txt`
+  `dist/static/static-extra_facts.pdf`
+- Prose outputs (only when `OPENAI_API_KEY` is set):
+  `dist/prose/prose-extra_facts.txt`
+  `dist/prose/prose-extra_facts.pdf`
+- Intermediate pool JSON:
+  `dist/extra_pool.json`
+  `dist/extra_pool_prose.json`
 
 ## CLI
 
@@ -120,51 +58,12 @@ extra-facts prose --pool-json dist/extra_pool.json --out-json dist/extra_pool_pr
 extra-facts build --pool-json dist/extra_pool.json --out-dir dist --mode literal|tts|prose [--omit-id]
 ```
 
-`prose` uses parallel API requests with `--workers` (default: `6`) and can retry failed validations per question with `--max-attempts` (default: `3`).
-
-## Determinism
-
-- Parsing is rule-based and deterministic.
-- Group ordering is preserved from source order (`E1A`, `E1B`, etc.).
-- No remote scraping beyond an explicit NCVEC source URL.
-
-## Development Commands
-
-```bash
-mise run sync
-mise run deps
-mise run deps-dev
-mise run lock
-mise run lint
-mise run typecheck
-mise run test
-mise run extract
-mise run prose
-mise run build
-mise run full-build
-mise run full-prose-build
-mise run compare
-# local extract: DOCX=/path/to/pool.docx mise run extract-local
-```
-
-## GitHub Releases
-
-This repo includes a release workflow at `.github/workflows/release.yml`.
-
-- Push a tag like `v0.1.0` to build and publish a GitHub Release with `dist/` outputs.
-- Optional: set repository secret `OPENAI_API_KEY` if you want prose artifacts included.
-  If the secret is missing, the workflow still publishes static outputs.
-
-Example:
-
-```bash
-git tag v0.1.0
-git push origin v0.1.0
-```
-
 ## Notes
 
-- Primary extraction path is `.docx` paragraph text.
-- Prose generation is optional and includes automatic validation with deterministic fallback.
-- PDF extraction support remains in the extraction module for fallback experimentation.
-- Withdrawn/removed/deleted questions are excluded when detected in question/answer text.
+- Source is the NCVEC public pool DOCX release.
+- Parsing is deterministic and excludes withdrawn/removed/deleted questions.
+- Group order is preserved as published.
+
+## Contributing
+
+Development, testing, repository workflow, and release-maintainer details are in [CONTRIBUTING.md](/Users/rwjblue/src/github/rwjblue/ham-radio-extra-license-study-guide/CONTRIBUTING.md).
