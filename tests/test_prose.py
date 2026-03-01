@@ -65,6 +65,39 @@ def test_validate_prose_detects_missing_number() -> None:
     assert validation.numbers_preserved is False
 
 
+def test_validate_prose_does_not_treat_plain_letter_as_unit() -> None:
+    validation = validate_prose(
+        question_text=(
+            "If an amateur station is installed aboard a ship or aircraft, "
+            "what condition must be met before the station is operated?"
+        ),
+        correct_answer=(
+            "Its operation must be approved by the master of the ship "
+            "or the pilot in command of the aircraft"
+        ),
+        prose_fact=(
+            "If an amateur station is installed aboard a ship or aircraft, "
+            "its operation must be approved by the master of the ship "
+            "or the pilot in command of the aircraft."
+        ),
+    )
+    assert validation.units_preserved is True
+
+
+def test_validate_prose_accepts_meter_abbreviation_equivalence() -> None:
+    validation = validate_prose(
+        question_text=(
+            "Which of the following HF amateur bands include allocations for space stations?"
+        ),
+        correct_answer="40 meters, 20 meters, 15 meters, and 10 meters",
+        prose_fact=(
+            "The HF amateur bands that include allocations for space stations "
+            "are 40 m, 20 m, 15 m, and 10 m."
+        ),
+    )
+    assert validation.units_preserved is True
+
+
 def test_enrich_pool_uses_fallback_when_validation_fails() -> None:
     question = PoolQuestion(
         question_id="E1A07",

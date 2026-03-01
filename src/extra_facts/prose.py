@@ -19,18 +19,15 @@ from .models import LlmProse, PoolQuestion, ProseMeta, ProseValidation, Question
 
 PROSE_SCHEMA_VERSION = 1
 NUM_RE = re.compile(r"\b\d+(?:\.\d+)?\b")
-UNIT_KEYWORDS = (
-    "khz",
-    "mhz",
-    "ghz",
-    "db",
-    "w",
-    "v",
-    "a",
-    "meter",
-    "meters",
-    "percent",
-    "%",
+UNIT_WITH_NUMBER_RE = re.compile(
+    r"\b\d+(?:\.\d+)?(?:\s*|-)?"
+    r"(hz|khz|mhz|ghz|dbm|dbi|db|w|kw|mw|v|kv|a|ma|ua|ohm|ohms|kohm|mohm|"
+    r"meter|meters|m|%|percent)\b",
+    re.IGNORECASE,
+)
+UNIT_WORD_RE = re.compile(
+    r"\b(hz|khz|mhz|ghz|dbm|dbi|db|meter|meters|percent|ohm|ohms|kohm|mohm)\b",
+    re.IGNORECASE,
 )
 NEGATION_KEYWORDS = (
     "not",
@@ -249,8 +246,9 @@ def validate_prose(question_text: str, correct_answer: str, prose_fact: str) -> 
     prose_numbers = {num.replace(",", "") for num in NUM_RE.findall(prose)}
     numbers_preserved = source_numbers.issubset(prose_numbers)
 
-    source_units = {unit for unit in UNIT_KEYWORDS if unit in source}
-    units_preserved = all(unit in prose for unit in source_units)
+    source_units = _extract_units(source)
+    prose_units = _extract_units(prose)
+    units_preserved = source_units.issubset(prose_units)
 
     required_negations = {token for token in NEGATION_KEYWORDS if token in source}
     negation_preserved = all(token in prose for token in required_negations)
@@ -260,6 +258,26 @@ def validate_prose(question_text: str, correct_answer: str, prose_fact: str) -> 
         units_preserved=units_preserved,
         negation_preserved=negation_preserved,
     )
+
+
+def _extract_units(text: str) -> set[str]:
+    units: set[str] = set()
+    for match in UNIT_WITH_NUMBER_RE.finditer(text):
+        units.add(_canonical_unit(match.group(1)))
+    for match in UNIT_WORD_RE.finditer(text):
+        units.add(_canonical_unit(match.group(1)))
+    return units
+
+
+def _canonical_unit(raw: str) -> str:
+    unit = raw.lower()
+    if unit in {"m", "meter", "meters"}:
+        return "meter"
+    if unit in {"%", "percent"}:
+        return "percent"
+    if unit == "ohms":
+        return "ohm"
+    return unit
 
 
 def _fallback_llm_prose(
