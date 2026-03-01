@@ -21,5 +21,6 @@ def test_parse_questions_handles_multiline_and_withdrawn() -> None:
     second = questions[1]
     assert second.correct_choice == "C"
     assert "normal communication systems" in second.choices["C"]
+    assert second.question_text.startswith("Which of the following")
 
     assert [q.group for q in questions] == ["E1A", "E1A", "E1B"]

@@ -46,28 +46,57 @@ def fact_sentence(question: Question, mode: str, omit_id: bool = False) -> str:
 
 
 def _to_declarative(question_text: str, answer: str) -> str:
-    lower = question_text.lower()
+    stem = _strip_qmark(question_text)
+    lower = stem.lower()
 
     if lower.startswith("what is "):
-        stem = _strip_qmark(question_text)
-        stem = re.sub(r"^What is\s+", "", stem, flags=re.IGNORECASE)
-        return f"{_capitalize_first(stem)} is {answer}."
+        if lower.startswith("what is meant by "):
+            subject = re.sub(r"^What is meant by\s+", "", stem, flags=re.IGNORECASE)
+            return f"{_capitalize_first(subject)} means {answer}."
 
-    if lower.startswith("which of the following"):
-        stem = _strip_qmark(question_text)
-        return f"For '{stem}', the correct choice is {answer}."
+        if lower.startswith("what is required to "):
+            subject = re.sub(r"^What is required to\s+", "", stem, flags=re.IGNORECASE)
+            return f"The requirement to {subject} is {answer}."
 
-    if lower.startswith("how many"):
-        stem = _strip_qmark(question_text)
-        return f"For '{stem}', the number is {answer}."
+        if lower.startswith("what is required in "):
+            subject = re.sub(r"^What is required in\s+", "", stem, flags=re.IGNORECASE)
+            return f"The required item in {subject} is {answer}."
 
-    if lower.startswith("when must"):
-        stem = _strip_qmark(question_text)
-        stem = re.sub(r"^When must\s+", "", stem, flags=re.IGNORECASE)
-        return f"You must {stem} when {answer}."
+        subject = re.sub(r"^What is\s+", "", stem, flags=re.IGNORECASE)
+        return f"{_capitalize_first(subject)} is {answer}."
 
-    stem = _strip_qmark(question_text)
-    return f"For '{stem}', the correct answer is {answer}."
+    if lower.startswith("what are "):
+        subject = re.sub(r"^What are\s+", "", stem, flags=re.IGNORECASE)
+        return f"{_capitalize_first(subject)} are {answer}."
+
+    if lower.startswith("which of the following "):
+        return f"{stem}: {answer}."
+
+    if lower.startswith("how many "):
+        return f"{stem}: {answer}."
+
+    if lower.startswith("when must "):
+        return f"{stem}: {answer}."
+
+    if lower.startswith("when may "):
+        return f"{stem}: {answer}."
+
+    if lower.startswith("under what circumstances may "):
+        return f"{stem}: {answer}."
+
+    if lower.startswith("why "):
+        if lower.startswith("why is "):
+            clause = re.sub(r"^Why is\s+", "", stem, flags=re.IGNORECASE)
+            clause = re.sub(r"^this\s+", "", clause, flags=re.IGNORECASE)
+            clause = re.sub(r"^it\s+", "", clause, flags=re.IGNORECASE)
+            return f"It is {clause} because {answer}."
+        if lower.startswith("why are "):
+            clause = re.sub(r"^Why are\s+", "", stem, flags=re.IGNORECASE)
+            return f"They are {clause} because {answer}."
+        clause = re.sub(r"^Why\s+", "", stem, flags=re.IGNORECASE)
+        return f"Because {clause}, {answer}."
+
+    return f"{stem}: {answer}."
 
 
 def _strip_qmark(text: str) -> str:
@@ -82,6 +111,7 @@ def _capitalize_first(text: str) -> str:
 
 def _normalize_sentence(text: str) -> str:
     text = re.sub(r"\s+", " ", text).strip()
+    text = re.sub(r"\s+:", ":", text)
     if not text.endswith("."):
         text += "."
     return text
@@ -96,9 +126,15 @@ def _to_tts(text: str) -> str:
     for short, expanded in ABBREVIATIONS.items():
         out = re.sub(rf"\b{re.escape(short)}\b", expanded, out)
 
+    out = re.sub(
+        r"equivalent isotropically radiated power\s*\(equivalent isotropic radiated power\)",
+        "equivalent isotropically radiated power",
+        out,
+        flags=re.IGNORECASE,
+    )
+    out = re.sub(r"\ban Federal\b", "a Federal", out)
     out = out.replace(";", ",")
-    out = out.replace("/", " or ")
-    out = re.sub(r"\((.*?)\)", r", \1,", out)
+    out = out.replace("/", " slash ")
     out = re.sub(r"\s+", " ", out)
     out = re.sub(r"\s+,", ",", out)
     return out.strip()

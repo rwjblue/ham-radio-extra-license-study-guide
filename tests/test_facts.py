@@ -22,18 +22,30 @@ def test_what_is_transform() -> None:
 
 def test_which_following_transform() -> None:
     q = _question("E1A02", "Which of the following is true?", "Option A")
-    assert "the correct choice is Option A" in fact_sentence(q, mode="literal")
+    assert fact_sentence(q, mode="literal") == "E1A02: Which of the following is true: Option A."
 
 
 def test_how_many_transform() -> None:
     q = _question("E1B01", "How many operators may transmit?", "Three")
-    assert "the number is Three" in fact_sentence(q, mode="literal")
+    assert fact_sentence(q, mode="literal") == "E1B01: How many operators may transmit: Three."
 
 
 def test_when_must_transform() -> None:
     q = _question("E1C01", "When must control operators identify?", "every 10 minutes")
     assert fact_sentence(q, mode="literal") == (
-        "E1C01: You must control operators identify when every 10 minutes."
+        "E1C01: When must control operators identify: every 10 minutes."
+    )
+
+
+def test_why_transform() -> None:
+    q = _question("E1D01", "Why is this illegal?", "it exceeds the limit")
+    assert fact_sentence(q, mode="literal") == "E1D01: It is illegal because it exceeds the limit."
+
+
+def test_what_is_meant_by_transform() -> None:
+    q = _question("E2A04", "What is meant by the mode of a satellite?", "uplink and downlink bands")
+    assert fact_sentence(q, mode="literal") == (
+        "E2A04: The mode of a satellite means uplink and downlink bands."
     )
 
 

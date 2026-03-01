@@ -7,6 +7,8 @@ from .models import Question
 
 QUESTION_RE = re.compile(r"^(E\d[A-Z]\d{2})\s*\(([ABCD])\)\s*(.*)$")
 CHOICE_RE = re.compile(r"^([ABCD])\.\s+(.*)$")
+GROUP_HEADING_RE = re.compile(r"^E\d[A-Z]\s+")
+LEADING_CITATION_RE = re.compile(r"^(?:\[[^\]]+\]\s*)+")
 REMOVE_MARKER_RE = re.compile(r"\b(withdrawn|removed|cancelled|deleted)\b", re.IGNORECASE)
 
 
@@ -88,13 +90,21 @@ def _normalize_lines(raw_text: str) -> list[str]:
         stripped = line.strip()
         if not stripped:
             continue
+        if "~~" in stripped:
+            stripped = stripped.replace("~~", "").strip()
+            if not stripped:
+                continue
         if stripped.startswith("SUBELEMENT") or stripped.startswith("Group"):
+            continue
+        if GROUP_HEADING_RE.match(stripped):
             continue
         result.append(stripped)
     return result
 
 
 def _clean_text(value: str) -> str:
+    value = LEADING_CITATION_RE.sub("", value)
+    value = value.replace("~~", "")
     value = re.sub(r"\s+", " ", value)
     return value.strip()
 
