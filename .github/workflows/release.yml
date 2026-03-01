@@ -1,0 +1,60 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Existing tag to release (for example v0.1.0)"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    env:
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.RELEASE_TAG }}
+
+      - name: Setup mise
+        uses: jdx/mise-action@v2
+
+      - name: Install tools and deps
+        run: |
+          mise install
+          mise run sync
+
+      - name: Build release artifacts
+        run: mise run full-build
+
+      - name: Package dist outputs
+        run: |
+          tar -czf "ham-radio-extra-study-guide-${RELEASE_TAG}.tar.gz" dist
+          sha256sum "ham-radio-extra-study-guide-${RELEASE_TAG}.tar.gz" > "ham-radio-extra-study-guide-${RELEASE_TAG}.sha256"
+
+      - name: Publish GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.RELEASE_TAG }}
+          generate_release_notes: true
+          fail_on_unmatched_files: false
+          files: |
+            ham-radio-extra-study-guide-${{ env.RELEASE_TAG }}.tar.gz
+            ham-radio-extra-study-guide-${{ env.RELEASE_TAG }}.sha256
+            dist/static/extra_facts.txt
+            dist/static/extra_facts.pdf
+            dist/prose/extra_facts.txt
+            dist/prose/extra_facts.pdf
+            dist/extra_pool.json
+            dist/extra_pool_prose.json

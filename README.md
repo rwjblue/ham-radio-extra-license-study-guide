@@ -147,6 +147,21 @@ mise run compare
 # local extract: DOCX=/path/to/pool.docx mise run extract-local
 ```
 
+## GitHub Releases
+
+This repo includes a release workflow at `.github/workflows/release.yml`.
+
+- Push a tag like `v0.1.0` to build and publish a GitHub Release with `dist/` outputs.
+- Optional: set repository secret `OPENAI_API_KEY` if you want prose artifacts included.
+  If the secret is missing, the workflow still publishes static outputs.
+
+Example:
+
+```bash
+git tag v0.1.0
+git push origin v0.1.0
+```
+
 ## Notes
 
 - Primary extraction path is `.docx` paragraph text.
