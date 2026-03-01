@@ -51,6 +51,15 @@ class BuildSummary:
 
 
 @dataclass(frozen=True)
+class AudioScriptSummary:
+    question_count: int
+    group_count: int
+    excluded_count: int
+    intermediate_path: Path
+    script_path: Path
+
+
+@dataclass(frozen=True)
 class ExtractSummary:
     question_count: int
     group_count: int

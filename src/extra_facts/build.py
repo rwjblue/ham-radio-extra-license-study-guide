@@ -6,10 +6,10 @@ from pathlib import Path
 from .downloader import download_source
 from .extract import extract_text
 from .intermediate import read_question_pool, to_question_pool, write_question_pool
-from .models import BuildSummary, ExtractSummary
+from .models import AudioScriptSummary, BuildSummary, ExtractSummary
 from .parser import extract_pool_metadata, parse_questions
 from .prose import OpenAIProseClient, ProseProgressUpdate, ProseRunSummary, enrich_pool_with_prose
-from .render import write_outputs
+from .render import write_audio_script, write_outputs
 
 
 def extract_pool_from_source(source_path: Path, pool_json_path: Path) -> ExtractSummary:
@@ -92,3 +92,27 @@ def generate_prose_for_pool(
     out_json_path.parent.mkdir(parents=True, exist_ok=True)
     write_question_pool(enriched_pool, out_json_path)
     return summary
+
+
+def build_audio_script_from_pool_json(
+    pool_json_path: Path,
+    out_dir: Path,
+    mode: str,
+    omit_id: bool,
+) -> AudioScriptSummary:
+    loaded_pool = read_question_pool(pool_json_path)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    script_path = write_audio_script(
+        loaded_pool.questions,
+        out_dir=out_dir,
+        mode=mode,
+        omit_id=omit_id,
+        metadata=loaded_pool.metadata,
+    )
+    return AudioScriptSummary(
+        question_count=len(loaded_pool.questions),
+        group_count=len({q.group for q in loaded_pool.questions}),
+        excluded_count=loaded_pool.excluded_count,
+        intermediate_path=pool_json_path,
+        script_path=script_path,
+    )
