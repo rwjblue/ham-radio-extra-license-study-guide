@@ -67,32 +67,51 @@ jobs:
         run: |
           set -euo pipefail
 
-          assets=(
+          mkdir -p dist/release-assets
+
+          required_sources=(
             "ham-radio-extra-study-guide-${RELEASE_TAG}.tar.gz"
             "ham-radio-extra-study-guide-${RELEASE_TAG}.sha256"
+            "dist/extra_pool.json"
             "dist/static/extra_facts.txt"
             "dist/static/extra_facts.pdf"
-            "dist/extra_pool.json"
           )
 
-          optional_assets=(
-            "dist/prose/extra_facts.txt"
-            "dist/prose/extra_facts.pdf"
-            "dist/extra_pool_prose.json"
-          )
-
-          for path in "${optional_assets[@]}"; do
-            if [ -f "${path}" ]; then
-              assets+=("${path}")
-            fi
-          done
-
-          for path in "${assets[@]}"; do
+          for path in "${required_sources[@]}"; do
             if [ ! -f "${path}" ]; then
               echo "Required release asset is missing: ${path}" >&2
               exit 1
             fi
           done
+
+          assets=(
+            "ham-radio-extra-study-guide-${RELEASE_TAG}.tar.gz"
+            "ham-radio-extra-study-guide-${RELEASE_TAG}.sha256"
+          )
+
+          cp dist/extra_pool.json dist/release-assets/static-extra_pool.json
+          cp dist/static/extra_facts.txt dist/release-assets/static-extra_facts.txt
+          cp dist/static/extra_facts.pdf dist/release-assets/static-extra_facts.pdf
+          assets+=(
+            "dist/release-assets/static-extra_pool.json"
+            "dist/release-assets/static-extra_facts.txt"
+            "dist/release-assets/static-extra_facts.pdf"
+          )
+
+          if [ -f "dist/extra_pool_prose.json" ]; then
+            cp dist/extra_pool_prose.json dist/release-assets/prose-extra_pool.json
+            assets+=("dist/release-assets/prose-extra_pool.json")
+          fi
+
+          if [ -f "dist/prose/extra_facts.txt" ]; then
+            cp dist/prose/extra_facts.txt dist/release-assets/prose-extra_facts.txt
+            assets+=("dist/release-assets/prose-extra_facts.txt")
+          fi
+
+          if [ -f "dist/prose/extra_facts.pdf" ]; then
+            cp dist/prose/extra_facts.pdf dist/release-assets/prose-extra_facts.pdf
+            assets+=("dist/release-assets/prose-extra_facts.pdf")
+          fi
 
           {
             echo 'files<<EOF'
