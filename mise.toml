@@ -78,7 +78,9 @@ uv version --bump "${bump}"
 new_version="$(uv version --short)"
 echo "New project version: ${new_version}"
 git add pyproject.toml uv.lock
-git commit -m "Bump version to ${new_version}"
+jj commit -m "Bump version to ${new_version}"
+jj tug
+jj git push --tracked
 tag="v${new_version}"
 echo "Creating release tag: ${tag}"
 git tag "${tag}"
