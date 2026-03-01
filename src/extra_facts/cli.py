@@ -9,6 +9,7 @@ from .build import (
     extract_pool_from_url,
     generate_prose_for_pool,
 )
+from .prose import ProseProgressUpdate
 
 
 def build_command(args: argparse.Namespace) -> int:
@@ -94,6 +95,24 @@ def create_parser() -> argparse.ArgumentParser:
 
 
 def prose_command(args: argparse.Namespace) -> int:
+    def _render_progress(update: ProseProgressUpdate) -> None:
+        if update.total == 0:
+            return
+        width = 28
+        ratio = update.completed / update.total
+        filled = int(width * ratio)
+        bar = "#" * filled + "-" * (width - filled)
+        status = update.status.upper()
+        print(
+            (
+                f"\r[{bar}] {update.completed}/{update.total} "
+                f"ok={update.accepted} fb={update.fallback} err={update.errors} "
+                f"{update.question_id} {status}"
+            ),
+            end="",
+            flush=True,
+        )
+
     summary = generate_prose_for_pool(
         pool_json_path=Path(args.pool_json),
         out_json_path=Path(args.out_json),
@@ -101,9 +120,13 @@ def prose_command(args: argparse.Namespace) -> int:
         prompt_version=args.prompt_version,
         max_questions=args.max_questions,
         resume=args.resume,
+        progress_callback=_render_progress,
     )
+    if summary.target > 0:
+        print()
     print("Prose generation complete")
     print(f"Questions total: {summary.total}")
+    print(f"Questions targeted: {summary.target}")
     print(f"Questions attempted: {summary.generated}")
     print(f"Accepted: {summary.accepted}")
     print(f"Fallback: {summary.fallback}")

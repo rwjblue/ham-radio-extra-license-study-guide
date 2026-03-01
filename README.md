@@ -79,6 +79,9 @@ mise run -- uv run extra-facts prose \
   --prompt-version v1
 ```
 
+The prose command prints per-question progress with running acceptance,
+fallback, and error counts.
+
 Build using prose mode:
 
 ```bash

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Callable
 from pathlib import Path
 
 from .downloader import download_source
@@ -7,7 +8,7 @@ from .extract import extract_text
 from .intermediate import read_question_pool, to_question_pool, write_question_pool
 from .models import BuildSummary, ExtractSummary
 from .parser import parse_questions
-from .prose import OpenAIProseClient, ProseRunSummary, enrich_pool_with_prose
+from .prose import OpenAIProseClient, ProseProgressUpdate, ProseRunSummary, enrich_pool_with_prose
 from .render import write_outputs
 
 
@@ -65,6 +66,7 @@ def generate_prose_for_pool(
     prompt_version: str,
     max_questions: int | None,
     resume: bool,
+    progress_callback: Callable[[ProseProgressUpdate], None] | None = None,
 ) -> ProseRunSummary:
     pool = read_question_pool(pool_json_path)
     client = OpenAIProseClient(model=model, prompt_version=prompt_version)
@@ -76,6 +78,7 @@ def generate_prose_for_pool(
         prompt_version=prompt_version,
         max_questions=max_questions,
         resume=resume,
+        progress_callback=progress_callback,
     )
     out_json_path.parent.mkdir(parents=True, exist_ok=True)
     write_question_pool(enriched_pool, out_json_path)

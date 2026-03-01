@@ -4,6 +4,7 @@ import hashlib
 import json
 import os
 import re
+from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from typing import Any, Literal, Protocol, cast
@@ -51,10 +52,22 @@ class ProseClient(Protocol):
 @dataclass(frozen=True)
 class ProseRunSummary:
     total: int
+    target: int
     generated: int
     accepted: int
     fallback: int
     errors: int
+
+
+@dataclass(frozen=True)
+class ProseProgressUpdate:
+    completed: int
+    total: int
+    accepted: int
+    fallback: int
+    errors: int
+    question_id: str
+    status: Literal["accepted", "fallback", "error"]
 
 
 class OpenAIProseClient:
@@ -110,6 +123,7 @@ def enrich_pool_with_prose(
     prompt_version: str,
     max_questions: int | None = None,
     resume: bool = False,
+    progress_callback: Callable[[ProseProgressUpdate], None] | None = None,
 ) -> tuple[QuestionPool, ProseRunSummary]:
     questions: list[PoolQuestion] = []
     generated = 0
@@ -117,8 +131,10 @@ def enrich_pool_with_prose(
     fallback = 0
     errors = 0
 
+    target = _target_count(pool=pool, max_questions=max_questions, resume=resume)
+
     for question in pool.questions:
-        if max_questions is not None and generated >= max_questions:
+        if generated >= target:
             questions.append(question)
             continue
 
@@ -167,6 +183,19 @@ def enrich_pool_with_prose(
             )
             errors += 1
 
+        if progress_callback is not None:
+            progress_callback(
+                ProseProgressUpdate(
+                    completed=generated,
+                    total=target,
+                    accepted=accepted,
+                    fallback=fallback,
+                    errors=errors,
+                    question_id=question.question_id,
+                    status=llm.status,
+                )
+            )
+
         questions.append(
             PoolQuestion(
                 question_id=question.question_id,
@@ -193,6 +222,7 @@ def enrich_pool_with_prose(
     )
     summary = ProseRunSummary(
         total=len(pool.questions),
+        target=target,
         generated=generated,
         accepted=accepted,
         fallback=fallback,
@@ -294,3 +324,16 @@ def _prompt(question_id: str, question_text: str, correct_answer: str, prompt_ve
         "Do not add information, do not mention wrong choices, do not speculate. "
         f"Question ID: {question_id}. Question: {question_text}. Correct answer: {correct_answer}."
     )
+
+
+def _target_count(pool: QuestionPool, max_questions: int | None, resume: bool) -> int:
+    pending = 0
+    for question in pool.questions:
+        source_hash = _source_hash(question)
+        if resume and question.llm is not None and question.llm.source_hash == source_hash:
+            continue
+        pending += 1
+
+    if max_questions is None:
+        return pending
+    return min(max_questions, pending)
