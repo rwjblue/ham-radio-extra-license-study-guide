@@ -62,66 +62,18 @@ jobs:
           tar -czf "ham-radio-extra-study-guide-${RELEASE_TAG}.tar.gz" dist
           sha256sum "ham-radio-extra-study-guide-${RELEASE_TAG}.tar.gz" > "ham-radio-extra-study-guide-${RELEASE_TAG}.sha256"
 
-      - name: Collect release assets
-        id: release-assets
-        run: |
-          set -euo pipefail
-
-          mkdir -p dist/release-assets
-
-          required_sources=(
-            "ham-radio-extra-study-guide-${RELEASE_TAG}.tar.gz"
-            "ham-radio-extra-study-guide-${RELEASE_TAG}.sha256"
-            "dist/extra_pool.json"
-            "dist/static/extra_facts.txt"
-            "dist/static/extra_facts.pdf"
-          )
-
-          for path in "${required_sources[@]}"; do
-            if [ ! -f "${path}" ]; then
-              echo "Required release asset is missing: ${path}" >&2
-              exit 1
-            fi
-          done
-
-          assets=(
-            "ham-radio-extra-study-guide-${RELEASE_TAG}.tar.gz"
-            "ham-radio-extra-study-guide-${RELEASE_TAG}.sha256"
-          )
-
-          cp dist/extra_pool.json dist/release-assets/static-extra_pool.json
-          cp dist/static/extra_facts.txt dist/release-assets/static-extra_facts.txt
-          cp dist/static/extra_facts.pdf dist/release-assets/static-extra_facts.pdf
-          assets+=(
-            "dist/release-assets/static-extra_pool.json"
-            "dist/release-assets/static-extra_facts.txt"
-            "dist/release-assets/static-extra_facts.pdf"
-          )
-
-          if [ -f "dist/extra_pool_prose.json" ]; then
-            cp dist/extra_pool_prose.json dist/release-assets/prose-extra_pool.json
-            assets+=("dist/release-assets/prose-extra_pool.json")
-          fi
-
-          if [ -f "dist/prose/extra_facts.txt" ]; then
-            cp dist/prose/extra_facts.txt dist/release-assets/prose-extra_facts.txt
-            assets+=("dist/release-assets/prose-extra_facts.txt")
-          fi
-
-          if [ -f "dist/prose/extra_facts.pdf" ]; then
-            cp dist/prose/extra_facts.pdf dist/release-assets/prose-extra_facts.pdf
-            assets+=("dist/release-assets/prose-extra_facts.pdf")
-          fi
-
-          {
-            echo 'files<<EOF'
-            printf '%s\n' "${assets[@]}"
-            echo 'EOF'
-          } >> "$GITHUB_OUTPUT"
-
       - name: Publish GitHub release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.RELEASE_TAG }}
           generate_release_notes: true
-          files: ${{ steps.release-assets.outputs.files }}
+          fail_on_unmatched_files: false
+          files: |
+            ham-radio-extra-study-guide-${{ env.RELEASE_TAG }}.tar.gz
+            ham-radio-extra-study-guide-${{ env.RELEASE_TAG }}.sha256
+            dist/static/static-extra_facts.txt
+            dist/static/static-extra_facts.pdf
+            dist/prose/prose-extra_facts.txt
+            dist/prose/prose-extra_facts.pdf
+            dist/extra_pool.json
+            dist/extra_pool_prose.json
