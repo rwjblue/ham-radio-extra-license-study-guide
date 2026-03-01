@@ -67,6 +67,7 @@ def generate_prose_for_pool(
     max_questions: int | None,
     resume: bool,
     workers: int,
+    max_attempts: int,
     progress_callback: Callable[[ProseProgressUpdate], None] | None = None,
 ) -> ProseRunSummary:
     pool = read_question_pool(pool_json_path)
@@ -80,6 +81,7 @@ def generate_prose_for_pool(
         max_questions=max_questions,
         resume=resume,
         workers=workers,
+        max_attempts=max_attempts,
         progress_callback=progress_callback,
     )
     out_json_path.parent.mkdir(parents=True, exist_ok=True)

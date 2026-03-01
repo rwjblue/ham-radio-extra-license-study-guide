@@ -108,6 +108,10 @@ def _serialize_llm_prose(llm: LlmProse | None) -> dict[str, object] | None:
         },
         "source_hash": llm.source_hash,
         "confidence": llm.confidence,
+        "attempt_count": llm.attempt_count,
+        "failure_reasons": llm.failure_reasons,
+        "last_candidate": llm.last_candidate,
+        "last_error": llm.last_error,
     }
 
 
@@ -134,6 +138,10 @@ def _deserialize_llm_prose(payload: object) -> LlmProse | None:
         ),
         source_hash=str(payload_dict.get("source_hash", "")),
         confidence=_to_float_or_none(payload_dict.get("confidence")),
+        attempt_count=int(payload_dict.get("attempt_count", 1)),
+        failure_reasons=_to_str_list_or_none(payload_dict.get("failure_reasons")),
+        last_candidate=_to_str_or_none(payload_dict.get("last_candidate")),
+        last_error=_to_str_or_none(payload_dict.get("last_error")),
     )
 
 
@@ -164,3 +172,19 @@ def _to_float_or_none(value: object) -> float | None:
     if isinstance(value, int | float):
         return float(value)
     return None
+
+
+def _to_str_or_none(value: object) -> str | None:
+    if isinstance(value, str):
+        return value
+    return None
+
+
+def _to_str_list_or_none(value: object) -> list[str] | None:
+    if not isinstance(value, list):
+        return None
+    items: list[str] = []
+    for item in cast(list[object], value):
+        if isinstance(item, str):
+            items.append(item)
+    return items

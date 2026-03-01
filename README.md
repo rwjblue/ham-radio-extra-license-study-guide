@@ -76,7 +76,8 @@ mise run -- uv run extra-facts prose \
   --pool-json dist/extra_pool.json \
   --out-json dist/extra_pool_prose.json \
   --model gpt-5-mini \
-  --prompt-version v1
+  --prompt-version v1 \
+  --max-attempts 3
 ```
 
 The prose command prints per-question progress with running acceptance,
@@ -98,11 +99,11 @@ CLI summary includes parsed questions, groups, excluded withdrawn items, and out
 ```bash
 extra-facts extract --source-url <docx-url> --out-json dist/extra_pool.json [--cache .cache]
 extra-facts extract --docx <local.docx> --out-json dist/extra_pool.json
-extra-facts prose --pool-json dist/extra_pool.json --out-json dist/extra_pool_prose.json [--model gpt-5-mini] [--prompt-version v1] [--max-questions N] [--resume]
+extra-facts prose --pool-json dist/extra_pool.json --out-json dist/extra_pool_prose.json [--model gpt-5-mini] [--prompt-version v1] [--workers 6] [--max-attempts 3] [--max-questions N] [--resume]
 extra-facts build --pool-json dist/extra_pool.json --out-dir dist --mode literal|tts|prose [--omit-id]
 ```
 
-`prose` uses parallel API requests with `--workers` (default: `6`).
+`prose` uses parallel API requests with `--workers` (default: `6`) and can retry failed validations per question with `--max-attempts` (default: `3`).
 
 ## Determinism
 

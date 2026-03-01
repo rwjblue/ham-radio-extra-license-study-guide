@@ -71,6 +71,10 @@ class LlmProse:
     validation: ProseValidation
     source_hash: str
     confidence: float | None = None
+    attempt_count: int = 1
+    failure_reasons: list[str] | None = None
+    last_candidate: str | None = None
+    last_error: str | None = None
 
 
 @dataclass(frozen=True)

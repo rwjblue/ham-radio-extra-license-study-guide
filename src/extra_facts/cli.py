@@ -88,6 +88,7 @@ def create_parser() -> argparse.ArgumentParser:
     prose.add_argument("--model", default="gpt-5-mini", help="Model name")
     prose.add_argument("--prompt-version", default="v1", help="Prompt version label")
     prose.add_argument("--workers", type=int, default=6, help="Parallel worker count")
+    prose.add_argument("--max-attempts", type=int, default=3, help="Retry attempts per question")
     prose.add_argument("--max-questions", type=int, help="Limit generated questions for tuning")
     prose.add_argument("--resume", action="store_true", help="Skip already generated entries")
     prose.set_defaults(func=prose_command)
@@ -120,6 +121,7 @@ def prose_command(args: argparse.Namespace) -> int:
         model=args.model,
         prompt_version=args.prompt_version,
         workers=args.workers,
+        max_attempts=args.max_attempts,
         max_questions=args.max_questions,
         resume=args.resume,
         progress_callback=_render_progress,

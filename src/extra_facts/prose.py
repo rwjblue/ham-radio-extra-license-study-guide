@@ -48,6 +48,7 @@ class ProseClient(Protocol):
         question_id: str,
         question_text: str,
         correct_answer: str,
+        feedback: str | None = None,
     ) -> tuple[str, float | None]:
         ...
 
@@ -94,8 +95,15 @@ class OpenAIProseClient:
         question_id: str,
         question_text: str,
         correct_answer: str,
+        feedback: str | None = None,
     ) -> tuple[str, float | None]:
-        prompt = _prompt(question_id, question_text, correct_answer, self.prompt_version)
+        prompt = _prompt(
+            question_id,
+            question_text,
+            correct_answer,
+            self.prompt_version,
+            feedback=feedback,
+        )
         response = self._session().post(
             "https://api.openai.com/v1/responses",
             headers={
@@ -139,6 +147,7 @@ def enrich_pool_with_prose(
     max_questions: int | None = None,
     resume: bool = False,
     workers: int = 6,
+    max_attempts: int = 3,
     progress_callback: Callable[[ProseProgressUpdate], None] | None = None,
 ) -> tuple[QuestionPool, ProseRunSummary]:
     questions = list(pool.questions)
@@ -153,7 +162,7 @@ def enrich_pool_with_prose(
     if workers <= 1:
         for index in candidates:
             question = pool.questions[index]
-            llm = _generate_llm_prose(question, client)
+            llm = _generate_llm_prose(question, client, max_attempts=max_attempts)
             generated, accepted, fallback, errors = _update_counters(
                 generated=generated,
                 accepted=accepted,
@@ -176,7 +185,12 @@ def enrich_pool_with_prose(
         max_workers = max(1, workers)
         with ThreadPoolExecutor(max_workers=max_workers) as executor:
             futures: dict[Future[LlmProse], int] = {
-                executor.submit(_generate_llm_prose, pool.questions[index], client): index
+                executor.submit(
+                    _generate_llm_prose,
+                    pool.questions[index],
+                    client,
+                    max_attempts,
+                ): index
                 for index in candidates
             }
 
@@ -252,6 +266,10 @@ def _fallback_llm_prose(
     source_hash: str,
     validation: ProseValidation,
     status: Literal["fallback", "error"] = "fallback",
+    attempt_count: int = 1,
+    failure_reasons: list[str] | None = None,
+    last_candidate: str | None = None,
+    last_error: str | None = None,
 ) -> LlmProse:
     return LlmProse(
         prose_fact=fact_sentence(question, mode="literal", omit_id=True),
@@ -259,6 +277,10 @@ def _fallback_llm_prose(
         validation=validation,
         source_hash=source_hash,
         confidence=None,
+        attempt_count=attempt_count,
+        failure_reasons=failure_reasons,
+        last_candidate=last_candidate,
+        last_error=last_error,
     )
 
 
@@ -309,8 +331,14 @@ def _extract_output_text(payload: dict[str, object]) -> str:
     raise RuntimeError("No text output returned by model")
 
 
-def _prompt(question_id: str, question_text: str, correct_answer: str, prompt_version: str) -> str:
-    return (
+def _prompt(
+    question_id: str,
+    question_text: str,
+    correct_answer: str,
+    prompt_version: str,
+    feedback: str | None = None,
+) -> str:
+    prompt = (
         "You are rewriting ham radio exam facts for study clarity. "
         f"Prompt version: {prompt_version}. "
         "Return strict JSON with keys prose_fact and confidence. "
@@ -319,6 +347,9 @@ def _prompt(question_id: str, question_text: str, correct_answer: str, prompt_ve
         "Do not add information, do not mention wrong choices, do not speculate. "
         f"Question ID: {question_id}. Question: {question_text}. Correct answer: {correct_answer}."
     )
+    if feedback:
+        prompt += f" Validator feedback for retry: {feedback}."
+    return prompt
 
 
 def _target_count(pool: QuestionPool, max_questions: int | None, resume: bool) -> int:
@@ -340,14 +371,60 @@ def _candidate_indices(pool: QuestionPool, target: int | None, resume: bool) -> 
     return indices
 
 
-def _generate_llm_prose(question: PoolQuestion, client: ProseClient) -> LlmProse:
+def _generate_llm_prose(
+    question: PoolQuestion,
+    client: ProseClient,
+    max_attempts: int = 3,
+) -> LlmProse:
     source_hash = _source_hash(question)
-    try:
-        candidate, confidence = client.generate(
-            question_id=question.question_id,
-            question_text=question.question_text,
-            correct_answer=question.correct_answer,
-        )
+    attempts = max(1, max_attempts)
+    saw_validation_failure = False
+    last_validation = ProseValidation(
+        numbers_preserved=False,
+        units_preserved=False,
+        negation_preserved=False,
+    )
+    last_candidate: str | None = None
+    last_error: str | None = None
+    failure_reasons_seen: list[str] = []
+    feedback: str | None = None
+
+    for attempt in range(1, attempts + 1):
+        try:
+            candidate, confidence = client.generate(
+                question_id=question.question_id,
+                question_text=question.question_text,
+                correct_answer=question.correct_answer,
+                feedback=feedback,
+            )
+        except Exception as error:
+            last_error = str(error)
+            if attempt >= attempts:
+                if saw_validation_failure:
+                    reasons = failure_reasons_seen or _validation_failures(last_validation)
+                    return _fallback_llm_prose(
+                        question,
+                        source_hash=source_hash,
+                        validation=last_validation,
+                        attempt_count=attempt,
+                        failure_reasons=reasons,
+                        last_candidate=last_candidate,
+                        last_error=last_error,
+                    )
+                return _fallback_llm_prose(
+                    question,
+                    source_hash=source_hash,
+                    validation=last_validation,
+                    status="error",
+                    attempt_count=attempt,
+                    failure_reasons=failure_reasons_seen or ["llm_error"],
+                    last_candidate=last_candidate,
+                    last_error=last_error,
+                )
+            feedback = _error_feedback(error, attempt=attempt, max_attempts=attempts)
+            continue
+
+        last_candidate = candidate
         validation = validate_prose(
             question_text=question.question_text,
             correct_answer=question.correct_answer,
@@ -360,20 +437,84 @@ def _generate_llm_prose(question: PoolQuestion, client: ProseClient) -> LlmProse
                 validation=validation,
                 source_hash=source_hash,
                 confidence=confidence,
+                attempt_count=attempt,
+                failure_reasons=failure_reasons_seen or None,
+                last_candidate=last_candidate,
+                last_error=last_error,
             )
-        return _fallback_llm_prose(question, source_hash=source_hash, validation=validation)
-    except Exception:
-        validation = ProseValidation(
-            numbers_preserved=False,
-            units_preserved=False,
-            negation_preserved=False,
+        saw_validation_failure = True
+        last_validation = validation
+        failure_reasons_seen = _merge_failure_reasons(
+            failure_reasons_seen,
+            _validation_failures(validation),
         )
-        return _fallback_llm_prose(
-            question,
-            source_hash=source_hash,
-            validation=validation,
-            status="error",
-        )
+        if attempt < attempts:
+            feedback = _validation_feedback(
+                validation=validation,
+                candidate=candidate,
+                attempt=attempt,
+                max_attempts=attempts,
+            )
+
+    return _fallback_llm_prose(
+        question,
+        source_hash=source_hash,
+        validation=last_validation,
+        attempt_count=attempts,
+        failure_reasons=failure_reasons_seen or _validation_failures(last_validation),
+        last_candidate=last_candidate,
+        last_error=last_error,
+    )
+
+
+def _merge_failure_reasons(existing: list[str], new_reasons: list[str]) -> list[str]:
+    merged = list(existing)
+    seen = set(merged)
+    for reason in new_reasons:
+        if reason in seen:
+            continue
+        merged.append(reason)
+        seen.add(reason)
+    return merged
+
+
+def _validation_failures(validation: ProseValidation) -> list[str]:
+    failures: list[str] = []
+    if not validation.numbers_preserved:
+        failures.append("numbers")
+    if not validation.units_preserved:
+        failures.append("units")
+    if not validation.negation_preserved:
+        failures.append("negation")
+    return failures
+
+
+def _validation_feedback(
+    validation: ProseValidation,
+    candidate: str,
+    attempt: int,
+    max_attempts: int,
+) -> str:
+    failure_map = {
+        "numbers": "Missing or changed numeric values",
+        "units": "Missing or changed units",
+        "negation": "Missing or changed negation or constraint wording",
+    }
+    failures = [failure_map[failure] for failure in _validation_failures(validation)]
+
+    joined_failures = "; ".join(failures) if failures else "Validation did not pass"
+    return (
+        f"Attempt {attempt}/{max_attempts} failed validation: {joined_failures}. "
+        f"Previous prose was: {candidate!r} "
+        "Revise to preserve all numbers, units, negations, and constraints exactly."
+    )
+
+
+def _error_feedback(error: Exception, attempt: int, max_attempts: int) -> str:
+    return (
+        f"Attempt {attempt}/{max_attempts} failed with API/parsing error: {error}. "
+        "Retry with strict JSON and one valid prose_fact sentence."
+    )
 
 
 def _with_llm(question: PoolQuestion, llm: LlmProse) -> PoolQuestion:
