@@ -62,18 +62,47 @@ jobs:
           tar -czf "ham-radio-extra-study-guide-${RELEASE_TAG}.tar.gz" dist
           sha256sum "ham-radio-extra-study-guide-${RELEASE_TAG}.tar.gz" > "ham-radio-extra-study-guide-${RELEASE_TAG}.sha256"
 
+      - name: Collect release assets
+        id: release-assets
+        run: |
+          set -euo pipefail
+
+          assets=(
+            "ham-radio-extra-study-guide-${RELEASE_TAG}.tar.gz"
+            "ham-radio-extra-study-guide-${RELEASE_TAG}.sha256"
+            "dist/static/extra_facts.txt"
+            "dist/static/extra_facts.pdf"
+            "dist/extra_pool.json"
+          )
+
+          optional_assets=(
+            "dist/prose/extra_facts.txt"
+            "dist/prose/extra_facts.pdf"
+            "dist/extra_pool_prose.json"
+          )
+
+          for path in "${optional_assets[@]}"; do
+            if [ -f "${path}" ]; then
+              assets+=("${path}")
+            fi
+          done
+
+          for path in "${assets[@]}"; do
+            if [ ! -f "${path}" ]; then
+              echo "Required release asset is missing: ${path}" >&2
+              exit 1
+            fi
+          done
+
+          {
+            echo 'files<<EOF'
+            printf '%s\n' "${assets[@]}"
+            echo 'EOF'
+          } >> "$GITHUB_OUTPUT"
+
       - name: Publish GitHub release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.RELEASE_TAG }}
           generate_release_notes: true
-          fail_on_unmatched_files: false
-          files: |
-            ham-radio-extra-study-guide-${{ env.RELEASE_TAG }}.tar.gz
-            ham-radio-extra-study-guide-${{ env.RELEASE_TAG }}.sha256
-            dist/static/extra_facts.txt
-            dist/static/extra_facts.pdf
-            dist/prose/extra_facts.txt
-            dist/prose/extra_facts.pdf
-            dist/extra_pool.json
-            dist/extra_pool_prose.json
+          files: ${{ steps.release-assets.outputs.files }}
