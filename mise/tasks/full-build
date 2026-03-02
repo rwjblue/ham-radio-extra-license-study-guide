@@ -1,8 +1,14 @@
 #!/usr/bin/env bash
-#MISE description="Extract/build all outputs, render audio, and verify artifacts when enabled"
+#MISE description="Extract/build all outputs, with optional audio render/verify"
 #MISE depends=["audio-script-auto"]
 #MISE outputs={auto=true}
 set -euo pipefail
+
+if [ -n "${SKIP_AUDIO_RENDER:-}" ]; then
+  echo "SKIP_AUDIO_RENDER set; skipping audio-render and audio-verify"
+  echo "full-build complete"
+  exit 0
+fi
 
 provider="${TTS_PROVIDER:-}"
 
