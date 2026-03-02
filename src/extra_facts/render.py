@@ -255,7 +255,10 @@ def _audio_group_intro(
 ) -> str:
     _ = metadata
     if removed_figure_questions == 1:
-        return f"Section {group}. One question that requires a figure was removed from this section."
+        return (
+            f"Section {group}. "
+            "One question that requires a figure was removed from this section."
+        )
     if removed_figure_questions > 1:
         return (
             f"Section {group}. {removed_figure_questions} questions that require figures "
