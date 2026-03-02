@@ -7,7 +7,12 @@ from extra_facts.models import PoolMetadata, PoolQuestion
 from extra_facts.render import write_audio_script
 
 
-def _question(question_id: str, text: str, answer: str) -> PoolQuestion:
+def _question(
+    question_id: str,
+    text: str,
+    answer: str,
+    image_paths: list[str] | None = None,
+) -> PoolQuestion:
     return PoolQuestion(
         question_id=question_id,
         question_text=text,
@@ -15,6 +20,7 @@ def _question(question_id: str, text: str, answer: str) -> PoolQuestion:
         correct_choice_index=0,
         group=question_id[:3],
         subelement=question_id[:2],
+        image_paths=image_paths or [],
     )
 
 
@@ -203,3 +209,29 @@ def test_write_audio_script_emits_chapter_files_in_order(tmp_path: Path) -> None
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     assert manifest["chapter_count"] == 2
     assert [chapter["code"] for chapter in manifest["chapters"]] == ["E1", "E2"]
+
+
+def test_write_audio_script_removes_figure_questions_and_reports_count(tmp_path: Path) -> None:
+    questions = [
+        _question("E1A01", "What is true?", "A", image_paths=["media/image1.png"]),
+        _question("E1A02", "What is also true?", "B"),
+        _question("E1A03", "What is another true thing?", "C", image_paths=["media/image2.png"]),
+        _question("E1B01", "How many operators may transmit?", "Three"),
+    ]
+
+    path, _chapters_dir, _manifest_path = write_audio_script(
+        questions,
+        out_dir=tmp_path,
+        mode="literal",
+        omit_id=True,
+    )
+
+    content = path.read_text(encoding="utf-8")
+    assert (
+        "Section E1A. 2 questions that require figures were removed from this section."
+        in content
+    )
+    assert "Section E1B." in content
+    assert "True is A." not in content
+    assert "Another true thing is C." not in content
+    assert "Also true is B." in content

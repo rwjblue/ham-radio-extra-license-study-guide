@@ -163,10 +163,18 @@ def _build_audio_chapters(
             chapter_groups = []
             current_subelement = subelement
 
+        spoken_questions = [question for question in questions if not _requires_figure(question)]
+        removed_figure_questions = len(questions) - len(spoken_questions)
         chapter_groups.append(group)
-        chapter_lines.append(_audio_group_intro(group, metadata))
+        chapter_lines.append(
+            _audio_group_intro(
+                group,
+                metadata,
+                removed_figure_questions=removed_figure_questions,
+            )
+        )
         chapter_lines.append("")
-        for question in questions:
+        for question in spoken_questions:
             fact = fact_sentence(question, mode=mode, omit_id=omit_id)
             fact = _rewrite_first_abbreviation_use(fact, seen_abbreviations)
             fact = _expand_terms_for_tts(fact)
@@ -240,8 +248,19 @@ def _audio_chapter_intro(subelement: str, metadata: PoolMetadata | None) -> list
     return [f"Chapter {subelement}.", ""]
 
 
-def _audio_group_intro(group: str, metadata: PoolMetadata | None) -> str:
+def _audio_group_intro(
+    group: str,
+    metadata: PoolMetadata | None,
+    removed_figure_questions: int = 0,
+) -> str:
     _ = metadata
+    if removed_figure_questions == 1:
+        return f"Section {group}. One question that requires a figure was removed from this section."
+    if removed_figure_questions > 1:
+        return (
+            f"Section {group}. {removed_figure_questions} questions that require figures "
+            "were removed from this section."
+        )
     return f"Section {group}."
 
 
@@ -269,6 +288,10 @@ def _expand_terms_for_tts(text: str) -> str:
 
 def _normalize_audio_paragraph(text: str) -> str:
     return re.sub(r"\s+", " ", text).strip()
+
+
+def _requires_figure(question: PoolQuestion) -> bool:
+    return bool(question.image_paths) or bool(question.images)
 
 
 class _AudioChapter:
