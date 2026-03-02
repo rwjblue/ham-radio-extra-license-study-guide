@@ -121,32 +121,32 @@ cat > "${out_dir}/index.html" <<'HTML'
         <h1>Ham Radio Extra Study Guide Assets</h1>
         <p class="pipeline">
           New here? Start with the
-          <a href="https://ncvec.org/">official NCVEC question pool</a>. This project turns that source into structured JSON, adds clear LLM-assisted summaries with rule-based validation checks, and uses the validated results to produce both the audio script and the PDF study workbook.
+          <a href="https://ncvec.org/">official NCVEC question pool</a>. This site provides study materials generated from the official NCVEC Amateur Extra pool: printable PDFs, audio, and machine-readable JSON.
         </p>
         <div class="assets">
           <a class="asset" href="./amateur-extra-license-prep-study-workbook.pdf">
             <strong>Study Workbook PDF</strong>
-            <span>Printable workbook derived from the same validated source data.</span>
+            <span>Printable workbook built from the official question pool.</span>
           </a>
           <a class="asset" href="./amateur-extra-license-prep-study-workbook-dark.pdf">
             <strong>Study Workbook PDF (Dark)</strong>
-            <span>Dark-mode workbook using the same validated source data.</span>
+            <span>Dark-theme version of the workbook for easier on-screen reading.</span>
           </a>
           <a class="asset" href="./amateur-extra-license-prep.mp3">
             <strong>Audio Book</strong>
-            <span>Rendered listening version for on-the-go study.</span>
+            <span>Audio version of the study guide for listening practice.</span>
           </a>
           <a class="asset" href="./amateur-extra-license-prep-script.txt">
             <strong>Audio Script (Automation)</strong>
-            <span>Full narration text, primarily useful for downstream automation.</span>
+            <span>Full narration text used to generate the audio.</span>
           </a>
           <a class="asset" href="./amateur-extra-license-prep-pool.json">
             <strong>Question Pool JSON (Automation)</strong>
-            <span>Structured validated data for programmatic processing and integrations. Requires <code>assets/</code> for image references.</span>
+            <span>Structured question data for integrations. Figure image files are in <code>assets/</code>.</span>
           </a>
           <a class="asset" href="https://github.com/rwjblue/ham-radio-extra-license-study-guide/releases/latest">
             <strong>Release Bundles</strong>
-            <span>Download self-contained JSON+assets tarballs from the latest GitHub release.</span>
+            <span>Download complete JSON + image bundles from the latest GitHub release.</span>
           </a>
         </div>
         <p>
