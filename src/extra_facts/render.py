@@ -13,6 +13,7 @@ from reportlab.platypus import (
     BaseDocTemplate,
     Flowable,
     HRFlowable,
+    Image,
     KeepTogether,
     Paragraph,
     SimpleDocTemplate,
@@ -362,6 +363,9 @@ def _write_pdf(
         for question in questions:
             text = fact_sentence(question, mode=mode, omit_id=omit_id)
             story.append(_fact_item(text, body, palette["line"]))
+            image_flowables = _question_image_flowables(question, target.parent)
+            if image_flowables:
+                story.extend(image_flowables)
         story.append(Spacer(1, 0.07 * inch))
 
     doc = SimpleDocTemplate(
@@ -545,3 +549,27 @@ def _draw_footer(
         f"Page {doc.page}",
     )
     page_canvas.restoreState()
+
+
+def _question_image_flowables(question: PoolQuestion, root_dir: Path) -> list[Flowable]:
+    flowables: list[Flowable] = []
+    for image_path in question.image_paths:
+        resolved = root_dir / image_path
+        if not resolved.exists():
+            continue
+        flowables.append(_pdf_image(resolved))
+        flowables.append(Spacer(1, 0.05 * inch))
+    return flowables
+
+
+def _pdf_image(path: Path) -> Image:
+    image = Image(str(path))
+    max_width = 5.6 * inch
+    max_height = 2.8 * inch
+    width = float(image.imageWidth)
+    height = float(image.imageHeight)
+    if width > 0 and height > 0:
+        scale = min(max_width / width, max_height / height, 1.0)
+        image.drawWidth = width * scale
+        image.drawHeight = height * scale
+    return image

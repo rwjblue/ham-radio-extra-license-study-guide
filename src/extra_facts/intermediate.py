@@ -35,6 +35,7 @@ def to_question_pool(
                 correct_choice_index=correct_choice_index,
                 group=parsed.group,
                 subelement=parsed.subelement,
+                image_paths=parsed.image_paths,
             )
         )
     return QuestionPool(
@@ -60,6 +61,7 @@ def write_question_pool(pool: QuestionPool, target: Path) -> None:
                 "correct_choice_index": question.correct_choice_index,
                 "group": question.group,
                 "subelement": question.subelement,
+                "image_paths": question.image_paths,
                 "llm": _serialize_llm_prose(question.llm),
             }
             for question in pool.questions
@@ -83,6 +85,7 @@ def read_question_pool(path: Path) -> QuestionPool:
             correct_choice_index=int(question_payload["correct_choice_index"]),
             group=question_payload["group"],
             subelement=question_payload["subelement"],
+            image_paths=_to_str_list(question_payload.get("image_paths")),
             llm=_deserialize_llm_prose(question_payload.get("llm")),
         )
         for question_payload in questions_payload
@@ -224,6 +227,17 @@ def _to_str_list_or_none(value: object) -> list[str] | None:
             items.append(item)
     return items
 
+
+
+
+def _to_str_list(value: object) -> list[str]:
+    if not isinstance(value, list):
+        return []
+    items: list[str] = []
+    for item in cast(list[object], value):
+        if isinstance(item, str):
+            items.append(item)
+    return items
 
 def _to_str_map(value: object) -> dict[str, str]:
     if not isinstance(value, dict):
