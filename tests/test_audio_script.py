@@ -86,6 +86,23 @@ def test_write_audio_script_expands_khz_and_mhz_for_audio(tmp_path: Path) -> Non
     assert "MHz" not in content
 
 
+def test_write_audio_script_expands_ghz_for_audio(tmp_path: Path) -> None:
+    questions = [
+        _question("E1A01", "What is the uplink frequency?", "5.8 GHz"),
+    ]
+
+    path, _chapters_dir, _manifest_path = write_audio_script(
+        questions,
+        out_dir=tmp_path,
+        mode="prose",
+        omit_id=True,
+    )
+
+    content = path.read_text(encoding="utf-8")
+    assert "5.8 gigahertz" in content
+    assert "GHz" not in content
+
+
 def test_write_audio_script_expands_usb_lsb_ssb_for_audio(tmp_path: Path) -> None:
     questions = [
         _question("E1A01", "What modulation is used?", "USB"),

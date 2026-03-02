@@ -57,6 +57,13 @@ def test_tts_expands_units_and_abbreviations() -> None:
     assert "high frequency" in line
 
 
+def test_tts_expands_ghz_unit() -> None:
+    q = _question("E2A03", "What is the frequency?", "5.8 GHz")
+    line = fact_sentence(q, mode="tts", omit_id=True)
+    assert "5.8 gigahertz" in line
+    assert "GHz" not in line
+
+
 def test_prose_mode_uses_llm_fact() -> None:
     q = _question("E2A02", "Which of the following is true?", "Option A")
     q = PoolQuestion(

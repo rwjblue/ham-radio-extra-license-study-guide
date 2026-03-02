@@ -260,6 +260,7 @@ def _rewrite_first_abbreviation_use(text: str, seen_abbreviations: set[str]) -> 
 def _expand_terms_for_tts(text: str) -> str:
     out = re.sub(r"\bkHz\b", "kilohertz", text)
     out = re.sub(r"\bMHz\b", "megahertz", out)
+    out = re.sub(r"\bGHz\b", "gigahertz", out)
     out = re.sub(r"\bUSB\b", "upper side band", out)
     out = re.sub(r"\bLSB\b", "lower side band", out)
     out = re.sub(r"\bSSB\b", "single side band", out)
