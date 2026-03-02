@@ -16,6 +16,7 @@ venv/
 dist/
 build/
 *.egg-info/
+*.tar.gz
 
 # Local/download caches
 .cache/

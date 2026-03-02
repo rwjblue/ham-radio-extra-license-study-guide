@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+#MISE description="Create a timestamped tar.gz backup of dist outputs"
+set -euo pipefail
+
+dist_dir="${DIST_DIR:-dist}"
+if [[ ! -d "${dist_dir}" ]]; then
+  echo "Directory not found: ${dist_dir}" >&2
+  exit 1
+fi
+
+timestamp="$(date +%Y%m%d-%H%M%S)"
+archive="${ARCHIVE:-dist-backup-${timestamp}.tar.gz}"
+
+tar -czf "${archive}" "${dist_dir}"
+
+echo "Created ${archive}"
+ls -lh "${archive}"
+shasum -a 256 "${archive}"
