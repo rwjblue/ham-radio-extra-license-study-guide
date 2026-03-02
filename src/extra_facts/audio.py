@@ -132,6 +132,7 @@ class ElevenLabsTtsClient:
         model: str,
         voice_id: str,
         response_format: str = DEFAULT_ELEVENLABS_OUTPUT_FORMAT,
+        language_code: str = "en",
         speed: float = 1.0,
         api_key_env: str = "ELEVENLABS_API_KEY",
         cache_dir: Path | None = None,
@@ -148,6 +149,7 @@ class ElevenLabsTtsClient:
         self.model = model
         self.voice_id = voice_id
         self.response_format = response_format
+        self.language_code = language_code.strip() or "en"
         self.speed = speed
         self.cache_enabled = _resolve_elevenlabs_http_cache_enabled(cache_enabled)
         self.cache_dir = _resolve_elevenlabs_http_cache_dir(cache_dir)
@@ -159,6 +161,7 @@ class ElevenLabsTtsClient:
         payload: dict[str, Any] = {
             "text": text,
             "model_id": self.model,
+            "language_code": self.language_code,
         }
 
         speech_response = self._post_audio_speech(self._session, payload)

@@ -84,6 +84,7 @@ def audio_render_command(args: argparse.Namespace) -> int:
         voice=voice,
         output_format=args.output_format,
         elevenlabs_output_format=args.elevenlabs_output_format,
+        elevenlabs_language_code=args.elevenlabs_language_code,
         speed=args.speed,
         instructions=args.instructions,
         merge_output=args.merge,
@@ -225,6 +226,11 @@ def create_parser() -> argparse.ArgumentParser:
         "--elevenlabs-output-format",
         default=DEFAULT_ELEVENLABS_OUTPUT_FORMAT,
         help="ElevenLabs output format value (for example mp3_44100_128)",
+    )
+    render_audio.add_argument(
+        "--elevenlabs-language-code",
+        default="en",
+        help="ElevenLabs language_code value (for example en)",
     )
     render_audio.add_argument(
         "--no-merge",

@@ -153,6 +153,7 @@ def render_audio_from_chapter_manifest(
     voice: str,
     output_format: str,
     elevenlabs_output_format: str,
+    elevenlabs_language_code: str,
     speed: float,
     instructions: str | None,
     merge_output: bool,
@@ -178,11 +179,16 @@ def render_audio_from_chapter_manifest(
             if elevenlabs_output_format
             else DEFAULT_ELEVENLABS_OUTPUT_FORMAT
         )
-        render_fingerprint = f"elevenlabs:{model}:{voice}:{speed}:{resolved_output_format}"
+        resolved_language_code = elevenlabs_language_code.strip() or "en"
+        render_fingerprint = (
+            "elevenlabs:"
+            f"{model}:{voice}:{speed}:{resolved_output_format}:{resolved_language_code}"
+        )
         client = ElevenLabsTtsClient(
             model=model,
             voice_id=voice,
             response_format=resolved_output_format,
+            language_code=resolved_language_code,
             speed=speed,
         )
     else:

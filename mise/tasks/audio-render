@@ -11,6 +11,7 @@ cmd=(
   --model "${TTS_MODEL:-eleven_multilingual_v2}"
   --voice "${TTS_VOICE:-JBFqnCBsd6RMkjVDRZzb}"
   --elevenlabs-output-format "${ELEVENLABS_OUTPUT_FORMAT:-mp3_44100_128}"
+  --elevenlabs-language-code "${ELEVENLABS_LANGUAGE_CODE:-en}"
   --speed "${SPEED:-1.0}"
 )
 

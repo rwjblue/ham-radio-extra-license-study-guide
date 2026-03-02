@@ -502,8 +502,31 @@ def test_elevenlabs_tts_synthesize_uses_tts_endpoint(monkeypatch: MonkeyPatch) -
     request_payload = cast(dict[str, object], session.calls[0]["json"])
     assert request_payload["model_id"] == "eleven_multilingual_v2"
     assert request_payload["text"] == "hello"
+    assert request_payload["language_code"] == "en"
     request_params = cast(dict[str, object], session.calls[0]["params"])
     assert request_params["output_format"] == DEFAULT_ELEVENLABS_OUTPUT_FORMAT
+
+
+def test_elevenlabs_tts_synthesize_supports_custom_language_code(monkeypatch: MonkeyPatch) -> None:
+    monkeypatch.setenv("ELEVENLABS_API_KEY", "test-key")
+    client = ElevenLabsTtsClient(
+        model="eleven_multilingual_v2",
+        voice_id="voice-id",
+        language_code="es",
+    )
+    session = _RecordingSession(
+        _RecordingResponse(
+            status_code=200,
+            content=b"audio-bytes",
+            headers={"Content-Type": "audio/mpeg"},
+        )
+    )
+    client._session = cast(requests.Session, session)  # pyright: ignore[reportPrivateUsage]
+
+    _ = client.synthesize("hola")
+
+    request_payload = cast(dict[str, object], session.calls[0]["json"])
+    assert request_payload["language_code"] == "es"
 
 
 def test_elevenlabs_tts_retries_uncached_when_cached_error_returned(
