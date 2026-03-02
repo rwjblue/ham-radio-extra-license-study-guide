@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #MISE description="Package pool JSON files with required image assets for release"
 #MISE depends=["deps-dev"]
-#MISE sources=["dist/extra_pool.json", "dist/extra_pool_prose.json", "dist/assets/**"]
+#MISE sources=["dist/pool/extra_pool.json", "dist/pool/extra_pool_prose.json", "dist/pool/assets/**"]
 #MISE outputs={auto=true}
 set -euo pipefail
 
@@ -11,7 +11,7 @@ mkdir -p "${release_dir}"
 bundle_pool_json() {
   local json_name="$1"
   local bundle_name="$2"
-  local json_path="dist/${json_name}"
+  local json_path="dist/pool/${json_name}"
   local json_dir
   local json_file
   local assets_dir

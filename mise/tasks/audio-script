@@ -4,6 +4,6 @@
 set -euo pipefail
 
 uv run extra-facts audio-script \
-  --pool-json "${POOL_JSON:-dist/extra_pool_prose.json}" \
+  --pool-json "${POOL_JSON:-dist/pool/extra_pool_prose.json}" \
   --out-dir "${OUT_DIR:-dist/audio}" \
   --mode "${MODE:-prose}"

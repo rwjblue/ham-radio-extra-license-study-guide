@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #MISE description="Build GitHub Pages site payload from existing dist artifacts"
 #MISE depends=["deps-dev"]
-#MISE sources=["dist/extra_pool_prose.json", "dist/audio/extra_facts_audio.txt", "dist/audio/extra_facts_audio.mp3", "dist/prose/prose-extra_facts.pdf", "dist/prose/prose-extra_facts-dark.pdf", "dist/assets/**"]
+#MISE sources=["dist/pool/extra_pool_prose.json", "dist/audio/extra_facts_audio.txt", "dist/audio/extra_facts_audio.mp3", "dist/prose/prose-extra_facts.pdf", "dist/prose/prose-extra_facts-dark.pdf", "dist/pool/assets/**"]
 #MISE outputs={auto=true}
 set -euo pipefail
 
@@ -10,7 +10,7 @@ dist_dir="${DIST_DIR:-${repo_root}/dist}"
 out_dir="${PAGES_DIR:-${repo_root}/docs}"
 
 required_files=(
-  "${dist_dir}/extra_pool_prose.json"
+  "${dist_dir}/pool/extra_pool_prose.json"
   "${dist_dir}/audio/extra_facts_audio.txt"
   "${dist_dir}/audio/extra_facts_audio.mp3"
   "${dist_dir}/prose/prose-extra_facts.pdf"
@@ -24,7 +24,7 @@ for file in "${required_files[@]}"; do
   fi
 done
 
-pool_json="${dist_dir}/extra_pool_prose.json"
+pool_json="${dist_dir}/pool/extra_pool_prose.json"
 assets_dir="$(dirname "${pool_json}")/assets"
 if [ ! -d "${assets_dir}" ]; then
   echo "Missing required assets directory next to JSON: ${assets_dir}" >&2

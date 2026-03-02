@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 #MISE description="Build static facts outputs"
 #MISE depends=["extract"]
-#MISE sources=["dist/extra_pool.json", "src/**/*.py", "pyproject.toml"]
+#MISE sources=["dist/pool/extra_pool.json", "src/**/*.py", "pyproject.toml"]
 #MISE outputs=["dist/static/static-extra_facts.txt", "dist/static/static-extra_facts.pdf"]
 set -euo pipefail
 
 uv run extra-facts build \
-  --pool-json "${POOL_JSON:-dist/extra_pool.json}" \
+  --pool-json "${POOL_JSON:-dist/pool/extra_pool.json}" \
   --out-dir "${STATIC_OUT_DIR:-dist/static}" \
   --mode "${STATIC_MODE:-tts}"

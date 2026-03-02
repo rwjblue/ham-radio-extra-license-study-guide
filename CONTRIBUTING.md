@@ -39,7 +39,7 @@ mise run compare
 
 - Canonical source: NCVEC public Extra Class `.docx`.
 - Extraction and parsing are deterministic and rule-based.
-- Intermediate format is JSON (`dist/extra_pool.json`) and is the source for downstream build steps.
+- Intermediate format is JSON (`dist/pool/extra_pool.json`) and is the source for downstream build steps.
 - Withdrawn/removed/deleted questions are excluded.
 - Group ordering is preserved from source publication order.
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #MISE description="Build prose outputs only when prose JSON exists"
 #MISE depends=["prose-if-enabled"]
-#MISE sources=["dist/extra_pool_prose.json", "src/**/*.py", "pyproject.toml"]
+#MISE sources=["dist/pool/extra_pool_prose.json", "src/**/*.py", "pyproject.toml"]
 #MISE outputs={auto=true}
 set -euo pipefail
 
@@ -10,7 +10,7 @@ if [ -z "${OPENAI_API_KEY:-}" ]; then
   exit 0
 fi
 
-if [ ! -f "${PROSE_JSON:-dist/extra_pool_prose.json}" ]; then
+if [ ! -f "${PROSE_JSON:-dist/pool/extra_pool_prose.json}" ]; then
   echo "Prose JSON not found; skipping prose build"
   exit 0
 fi

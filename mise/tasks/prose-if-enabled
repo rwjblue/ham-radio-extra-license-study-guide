@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #MISE description="Generate prose only when OPENAI_API_KEY is set"
 #MISE depends=["extract"]
-#MISE sources=["dist/extra_pool.json", "src/**/*.py", "pyproject.toml"]
+#MISE sources=["dist/pool/extra_pool.json", "src/**/*.py", "pyproject.toml"]
 #MISE outputs={auto=true}
 set -euo pipefail
 

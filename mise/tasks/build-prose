@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 #MISE description="Build prose facts outputs"
 #MISE depends=["prose"]
-#MISE sources=["dist/extra_pool_prose.json", "src/**/*.py", "pyproject.toml"]
+#MISE sources=["dist/pool/extra_pool_prose.json", "src/**/*.py", "pyproject.toml"]
 #MISE outputs=["dist/prose/prose-extra_facts.txt", "dist/prose/prose-extra_facts.pdf"]
 set -euo pipefail
 
 uv run extra-facts build \
-  --pool-json "${PROSE_JSON:-dist/extra_pool_prose.json}" \
+  --pool-json "${PROSE_JSON:-dist/pool/extra_pool_prose.json}" \
   --out-dir "${PROSE_OUT_DIR:-dist/prose}" \
   --mode prose

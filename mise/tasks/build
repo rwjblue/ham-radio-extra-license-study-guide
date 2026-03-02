@@ -4,6 +4,6 @@
 set -euo pipefail
 
 uv run extra-facts build \
-  --pool-json "${POOL_JSON:-dist/extra_pool.json}" \
+  --pool-json "${POOL_JSON:-dist/pool/extra_pool.json}" \
   --out-dir "${OUT_DIR:-dist}" \
   --mode "${MODE:-tts}"

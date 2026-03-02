@@ -10,7 +10,7 @@ This project produces:
 - audio chapter manifest (`dist/audio/audio_chapters_manifest.json`)
 - optional rendered chapter audio (`dist/audio/chapters/chapter-01.mp3`, ...)
 - optional merged audio (`dist/audio/extra_facts_audio.mp3`)
-- intermediate JSON files (`dist/extra_pool.json`, `dist/extra_pool_prose.json`)
+- intermediate JSON files (`dist/pool/extra_pool.json`, `dist/pool/extra_pool_prose.json`)
 
 Each fact line includes the question ID and a declarative restatement of the correct answer.
 
@@ -50,7 +50,7 @@ chapter/merged MP3 outputs.
 If you want to regenerate only the audio script from the static pool:
 
 ```bash
-POOL_JSON=dist/extra_pool.json MODE=tts mise run audio-script
+POOL_JSON=dist/pool/extra_pool.json MODE=tts mise run audio-script
 ```
 
 Render MP3 audio from chapter text files:
@@ -88,8 +88,8 @@ mise run compare
   `dist/audio/chapters/chapter-01.mp3` ... `chapter-10.mp3`
   `dist/audio/extra_facts_audio.mp3`
 - Intermediate pool JSON:
-  `dist/extra_pool.json`
-  `dist/extra_pool_prose.json`
+  `dist/pool/extra_pool.json`
+  `dist/pool/extra_pool_prose.json`
   `dist/release/extra_pool_with_assets.tar.gz`
   `dist/release/extra_pool_prose_with_assets.tar.gz`
 
@@ -117,11 +117,11 @@ The repository workflow `.github/workflows/pages.yml` deploys `docs/` to GitHub 
 ## CLI
 
 ```bash
-extra-facts extract --source-url <docx-url> --out-json dist/extra_pool.json [--cache .cache]
-extra-facts extract --docx <local.docx> --out-json dist/extra_pool.json
-extra-facts prose --pool-json dist/extra_pool.json --out-json dist/extra_pool_prose.json [--model gpt-5-mini] [--prompt-version v1] [--workers 6] [--max-attempts 3] [--max-questions N] [--resume]
-extra-facts build --pool-json dist/extra_pool.json --out-dir dist --mode literal|tts|prose [--omit-id]
-extra-facts audio-script --pool-json dist/extra_pool_prose.json --out-dir dist/audio --mode prose [--include-id]
+extra-facts extract --source-url <docx-url> --out-json dist/pool/extra_pool.json [--cache .cache]
+extra-facts extract --docx <local.docx> --out-json dist/pool/extra_pool.json
+extra-facts prose --pool-json dist/pool/extra_pool.json --out-json dist/pool/extra_pool_prose.json [--model gpt-5-mini] [--prompt-version v1] [--workers 6] [--max-attempts 3] [--max-questions N] [--resume]
+extra-facts build --pool-json dist/pool/extra_pool.json --out-dir dist --mode literal|tts|prose [--omit-id]
+extra-facts audio-script --pool-json dist/pool/extra_pool_prose.json --out-dir dist/audio --mode prose [--include-id]
 extra-facts audio-render --manifest dist/audio/audio_chapters_manifest.json --out-dir dist/audio [--provider elevenlabs|openai] [--model <provider-model>] [--voice <provider-voice>] [--elevenlabs-output-format mp3_44100_128] [--elevenlabs-language-code en] [--speed 1.0] [--instructions "Custom style override"] [--no-merge] [--no-chapter-markers]
 extra-facts audio-verify --manifest dist/audio/audio_chapters_manifest.json [--allow-missing-merged] [--skip-chapter-marker-check]
 ```

@@ -94,8 +94,8 @@ jobs:
             dist/audio/audio_chapters_manifest.json
             dist/audio/chapters/chapter-*.txt
             dist/audio/chapters/chapter-*.mp3
-            dist/extra_pool.json
-            dist/extra_pool_prose.json
+            dist/pool/extra_pool.json
+            dist/pool/extra_pool_prose.json
 
       - name: Save OpenAI HTTP responses cache
         if: ${{ always() }}

@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 #MISE description="Generate LLM prose from intermediate JSON (requires OPENAI_API_KEY)"
 #MISE depends=["extract"]
-#MISE sources=["dist/extra_pool.json", "src/**/*.py", "pyproject.toml"]
-#MISE outputs=["dist/extra_pool_prose.json"]
+#MISE sources=["dist/pool/extra_pool.json", "src/**/*.py", "pyproject.toml"]
+#MISE outputs=["dist/pool/extra_pool_prose.json"]
 set -euo pipefail
 
 if [ -z "${OPENAI_API_KEY:-}" ]; then
@@ -11,8 +11,8 @@ if [ -z "${OPENAI_API_KEY:-}" ]; then
 fi
 
 uv run extra-facts prose \
-  --pool-json "${POOL_JSON:-dist/extra_pool.json}" \
-  --out-json "${OUT_JSON:-dist/extra_pool_prose.json}" \
+  --pool-json "${POOL_JSON:-dist/pool/extra_pool.json}" \
+  --out-json "${OUT_JSON:-dist/pool/extra_pool_prose.json}" \
   --model "${MODEL:-gpt-5-mini}" \
   --prompt-version "${PROMPT_VERSION:-v1}" \
   --workers "${WORKERS:-6}" \

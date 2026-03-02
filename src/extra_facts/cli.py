@@ -172,7 +172,7 @@ def create_parser() -> argparse.ArgumentParser:
     extract = sub.add_parser("extract", help="Extract question pool into intermediate JSON only")
     extract.add_argument("--source-url", help="URL for question pool DOCX")
     extract.add_argument("--docx", help="Local path to question pool DOCX")
-    extract.add_argument("--out-json", default="dist/extra_pool.json", help="Output JSON path")
+    extract.add_argument("--out-json", default="dist/pool/extra_pool.json", help="Output JSON path")
     extract.add_argument("--cache", help="Download cache directory")
     extract.set_defaults(func=extract_command)
 
@@ -300,7 +300,7 @@ def create_parser() -> argparse.ArgumentParser:
     prose.add_argument("--pool-json", required=True, help="Input intermediate question pool JSON")
     prose.add_argument(
         "--out-json",
-        default="dist/extra_pool_prose.json",
+        default="dist/pool/extra_pool_prose.json",
         help="Output enriched question pool JSON path",
     )
     prose.add_argument("--model", default="gpt-5-mini", help="Model name")
