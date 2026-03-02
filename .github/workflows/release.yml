@@ -66,14 +66,6 @@ jobs:
       - name: Build release artifacts
         run: mise run full-build
 
-      - name: Render release audio artifacts
-        if: ${{ env.OPENAI_API_KEY != '' }}
-        run: mise run audio-render
-
-      - name: Verify release audio artifacts
-        if: ${{ env.OPENAI_API_KEY != '' }}
-        run: mise run audio-verify
-
       - name: Package dist outputs
         run: |
           tar -czf "ham-radio-extra-study-guide-${RELEASE_TAG}.tar.gz" dist
