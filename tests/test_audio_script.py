@@ -41,9 +41,10 @@ def test_write_audio_script_adds_spoken_headers_and_omits_ids(tmp_path: Path) ->
 
     content = path.read_text(encoding="utf-8")
     assert "Chapter E1: Operating Rules." in content
-    assert "Next section, E1A: Band Privileges." in content
-    assert "Next section, E1B: Station Limits." in content
-    assert "Section recap: review these rules and examples before moving on." in content
+    assert "Section E1A." in content
+    assert "Section E1B." in content
+    assert "Focus on the core ideas and practical limits in this chapter." not in content
+    assert "Section recap: review these rules and examples before moving on." not in content
     assert "E1A01:" not in content
     assert (chapters_dir / "chapter-01.txt").exists()
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
@@ -65,7 +66,7 @@ def test_write_audio_script_can_include_ids(tmp_path: Path) -> None:
     assert "E1A01: The maximum symbol rate is 1200 baud." in content
 
 
-def test_write_audio_script_splits_overlong_facts(tmp_path: Path) -> None:
+def test_write_audio_script_does_not_force_newline_within_fact_paragraph(tmp_path: Path) -> None:
     questions = [
         _question(
             "E1A01",
@@ -85,9 +86,37 @@ def test_write_audio_script_splits_overlong_facts(tmp_path: Path) -> None:
         omit_id=True,
     )
 
-    lines = [line for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
-    long_lines = [line for line in lines if len(line) > 160]
-    assert long_lines == []
+    content = path.read_text(encoding="utf-8")
+    assert (
+        "When using a transceiver that displays the carrier frequency of phone signals.\n"
+        "The lowest frequency"
+    ) not in content
+    assert (
+        "\n\nWhen using a transceiver that displays the carrier frequency of phone signals, "
+        "what is the lowest frequency at which a properly adjusted LSB emission will be "
+        "totally within the band: 3 kHz above the lower band edge.\n\n"
+    ) in content
+
+
+def test_write_audio_script_uses_blank_lines_between_sections_and_facts(tmp_path: Path) -> None:
+    questions = [
+        _question("E1A01", "What is the maximum symbol rate?", "1200 baud"),
+        _question("E1A02", "Which of the following is true?", "Option A"),
+    ]
+
+    path, _chapters_dir, _manifest_path = write_audio_script(
+        questions,
+        out_dir=tmp_path,
+        mode="literal",
+        omit_id=True,
+    )
+
+    content = path.read_text(encoding="utf-8")
+    assert "Section E1A.\n\nThe maximum symbol rate is 1200 baud.\n\n" in content
+    assert (
+        "The maximum symbol rate is 1200 baud.\n\n"
+        "Which of the following is true: Option A.\n\n"
+    ) in content
 
 
 def test_write_audio_script_emits_chapter_files_in_order(tmp_path: Path) -> None:

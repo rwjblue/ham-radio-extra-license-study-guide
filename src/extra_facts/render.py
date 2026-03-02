@@ -26,7 +26,6 @@ from .intermediate import group_pool_questions
 from .models import PoolMetadata, PoolQuestion
 
 QUESTION_ID_RE = re.compile(r"^([A-Z]\d[A-Z]\d{2}):\s*(.+)$")
-AUDIO_MAX_LINE_CHARS = 160
 
 
 def write_outputs(
@@ -137,12 +136,12 @@ def _build_audio_chapters(
 
         chapter_groups.append(group)
         chapter_lines.append(_audio_group_intro(group, metadata))
+        chapter_lines.append("")
         for question in questions:
             fact = fact_sentence(question, mode=mode, omit_id=omit_id)
             fact = _rewrite_first_abbreviation_use(fact, seen_abbreviations)
-            chapter_lines.extend(_split_for_audio(fact, max_chars=AUDIO_MAX_LINE_CHARS))
-        chapter_lines.append("Section recap: review these rules and examples before moving on.")
-        chapter_lines.append("")
+            chapter_lines.append(_normalize_audio_paragraph(fact))
+            chapter_lines.append("")
 
     if current_subelement:
         chapter_lines.append(f"That wraps up chapter {current_subelement}.")
@@ -207,22 +206,13 @@ def _chapter_txt_name(number: int) -> str:
 def _audio_chapter_intro(subelement: str, metadata: PoolMetadata | None) -> list[str]:
     title = _subelement_title_for_display(subelement, metadata)
     if title:
-        return [
-            f"Chapter {subelement}: {title}.",
-            "Focus on the core ideas and practical limits in this chapter.",
-        ]
-    return [
-        f"Chapter {subelement}.",
-        "Focus on the core ideas and practical limits in this chapter.",
-    ]
+        return [f"Chapter {subelement}: {title}.", ""]
+    return [f"Chapter {subelement}.", ""]
 
 
 def _audio_group_intro(group: str, metadata: PoolMetadata | None) -> str:
-    title = _group_title_for_display(group, metadata)
-    if not title:
-        return f"Next section, {group}."
-    short_title = re.split(r"[:;]", title, maxsplit=1)[0].strip()
-    return f"Next section, {group}: {short_title}."
+    _ = metadata
+    return f"Section {group}."
 
 
 def _rewrite_first_abbreviation_use(text: str, seen_abbreviations: set[str]) -> str:
@@ -237,74 +227,8 @@ def _rewrite_first_abbreviation_use(text: str, seen_abbreviations: set[str]) -> 
     return re.sub(r"\b([A-Z]{2,})\s*\(([^)]+)\)", _replace, text)
 
 
-def _split_for_audio(text: str, max_chars: int) -> list[str]:
-    cleaned = re.sub(r"\s+", " ", text).strip()
-    if len(cleaned) <= max_chars:
-        return [cleaned]
-
-    split = _split_once(cleaned, max_chars=max_chars)
-    if split is None:
-        return [cleaned]
-
-    first, second = split
-    lines: list[str] = []
-    lines.extend(_split_for_audio(first, max_chars=max_chars))
-    lines.extend(_split_for_audio(second, max_chars=max_chars))
-    return lines
-
-
-def _split_once(text: str, max_chars: int) -> tuple[str, str] | None:
-    lower_bound = max(60, max_chars // 3)
-    upper_bound = max(len(text) - 40, lower_bound + 1)
-
-    for delimiter in (". ", "; ", ": ", ", "):
-        break_index = _best_break_index(text, delimiter, lower_bound, upper_bound)
-        if break_index is None:
-            continue
-
-        if delimiter == ", ":
-            first = text[:break_index].rstrip()
-            second = text[break_index + len(delimiter) :].lstrip()
-            if first and first[-1] not in ".!?":
-                first += "."
-        else:
-            first = text[: break_index + 1].rstrip()
-            second = text[break_index + len(delimiter) :].lstrip()
-
-        second = _capitalize_sentence_start(second)
-        if not first or not second:
-            return None
-        return first, second
-
-    return None
-
-
-def _best_break_index(
-    text: str,
-    delimiter: str,
-    lower_bound: int,
-    upper_bound: int,
-) -> int | None:
-    midpoint = len(text) // 2
-    best_index: int | None = None
-    best_distance: int | None = None
-
-    index = text.find(delimiter)
-    while index != -1:
-        if lower_bound <= index <= upper_bound:
-            distance = abs(index - midpoint)
-            if best_distance is None or distance < best_distance:
-                best_index = index
-                best_distance = distance
-        index = text.find(delimiter, index + 1)
-
-    return best_index
-
-
-def _capitalize_sentence_start(text: str) -> str:
-    if not text:
-        return text
-    return text[0].upper() + text[1:]
+def _normalize_audio_paragraph(text: str) -> str:
+    return re.sub(r"\s+", " ", text).strip()
 
 
 class _AudioChapter:
