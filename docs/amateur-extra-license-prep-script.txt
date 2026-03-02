@@ -940,7 +940,7 @@ Unwanted ringing and audio instability in an op-amp audio filter can be prevente
 
 The gain-bandwidth of an operational amplifier is the frequency at which the open-loop gain of the amplifier equals one.
 
-The voltage gain expected from the circuit in Figure E7-3 when R1 is 10 ohms and RF is 470 ohms is 47.
+The voltage gain from the circuit in Figure E7-3 is 47 when R1 is 10 ohms and RF is 470 ohms.
 
 The gain of an ideal operational amplifier does not vary with frequency.
 

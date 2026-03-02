@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 #MISE description="Build GitHub Pages site payload from existing dist artifacts"
 #MISE depends=["deps-dev"]
-#MISE sources=["dist/extra_pool_prose.json", "dist/audio/extra_facts_audio.txt", "dist/audio/extra_facts_audio.mp3", "dist/prose/prose-extra_facts.pdf"]
-#MISE outputs=["docs/index.html", "docs/amateur-extra-license-prep-pool-prose.json", "docs/amateur-extra-license-prep-script.txt", "docs/amateur-extra-license-prep.mp3", "docs/amateur-extra-license-prep-study-workbook.pdf"]
+#MISE sources=["dist/extra_pool_prose.json", "dist/audio/extra_facts_audio.txt", "dist/audio/extra_facts_audio.mp3", "dist/prose/prose-extra_facts.pdf", "dist/assets/**"]
+#MISE outputs={auto=true}
 set -euo pipefail
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
@@ -26,10 +26,11 @@ done
 rm -rf "${out_dir}"
 mkdir -p "${out_dir}"
 
-cp "${dist_dir}/extra_pool_prose.json" "${out_dir}/amateur-extra-license-prep-pool-prose.json"
+cp "${dist_dir}/extra_pool_prose.json" "${out_dir}/amateur-extra-license-prep-pool.json"
 cp "${dist_dir}/audio/extra_facts_audio.txt" "${out_dir}/amateur-extra-license-prep-script.txt"
 cp "${dist_dir}/audio/extra_facts_audio.mp3" "${out_dir}/amateur-extra-license-prep.mp3"
 cp "${dist_dir}/prose/prose-extra_facts.pdf" "${out_dir}/amateur-extra-license-prep-study-workbook.pdf"
+cp -R "${dist_dir}/assets" "${out_dir}/assets"
 
 cat > "${out_dir}/index.html" <<'HTML'
 <!doctype html>
@@ -133,9 +134,13 @@ cat > "${out_dir}/index.html" <<'HTML'
             <strong>Audio Script (Automation)</strong>
             <span>Full narration text, primarily useful for downstream automation.</span>
           </a>
-          <a class="asset" href="./amateur-extra-license-prep-pool-prose.json">
-            <strong>Prose Question Pool JSON (Automation)</strong>
-            <span>Structured validated data for programmatic processing and integrations.</span>
+          <a class="asset" href="./amateur-extra-license-prep-pool.json">
+            <strong>Question Pool JSON (Automation)</strong>
+            <span>Structured validated data for programmatic processing and integrations. Requires <code>assets/</code> for image references.</span>
+          </a>
+          <a class="asset" href="https://github.com/rwjblue/ham-radio-extra-license-study-guide/releases/latest">
+            <strong>Release Bundles</strong>
+            <span>Download self-contained JSON+assets tarballs from the latest GitHub release.</span>
           </a>
         </div>
         <p>
