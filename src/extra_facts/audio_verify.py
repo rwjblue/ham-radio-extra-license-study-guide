@@ -167,9 +167,7 @@ def _resolve_audio_path(chapter: dict[str, Any], manifest_path: Path, chapter_nu
     value = chapter.get("audio_path")
     if not isinstance(value, str) or not value:
         raise AudioVerificationError(f"Chapter {chapter_number} missing audio_path")
-    path = Path(value)
-    if not path.is_absolute():
-        path = (manifest_path.parent / path).resolve()
+    path = _resolve_manifest_path(value, manifest_path=manifest_path)
     if not path.exists():
         raise AudioVerificationError(f"Chapter {chapter_number} audio file is missing: {path}")
     return path
@@ -183,7 +181,13 @@ def _resolve_merged_audio_path(payload: dict[str, Any], manifest_path: Path) -> 
     value = audio_render_dict.get("merged_audio_path")
     if not isinstance(value, str) or not value:
         return None
+    return _resolve_manifest_path(value, manifest_path=manifest_path)
+
+
+def _resolve_manifest_path(value: str, manifest_path: Path) -> Path:
     path = Path(value)
     if path.is_absolute():
         return path
+    if path.exists():
+        return path.resolve()
     return (manifest_path.parent / path).resolve()

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 
 import pytest
@@ -98,3 +99,46 @@ def test_verify_audio_from_manifest_allows_missing_merged_when_requested(tmp_pat
         chapter_count_probe=lambda _path: 0,
     )
     assert summary.merged_audio_path is None
+
+
+def test_verify_audio_from_manifest_accepts_repo_relative_audio_paths(tmp_path: Path) -> None:
+    dist_audio_dir = tmp_path / "dist" / "audio"
+    chapters_dir = dist_audio_dir / "chapters"
+    chapters_dir.mkdir(parents=True)
+    (chapters_dir / "chapter-01.mp3").write_bytes(b"a")
+    (dist_audio_dir / "extra_facts_audio.mp3").write_bytes(b"merged")
+
+    manifest = {
+        "schema_version": 1,
+        "chapter_count": 1,
+        "chapters": [
+            {
+                "number": 1,
+                "code": "E1",
+                "title": "One",
+                "audio_path": "dist/audio/chapters/chapter-01.mp3",
+                "duration_seconds": 10.0,
+                "start_seconds": 0.0,
+            }
+        ],
+        "audio_render": {
+            "merged_audio_path": "dist/audio/extra_facts_audio.mp3",
+            "total_duration_seconds": 10.0,
+        },
+    }
+    manifest_path = dist_audio_dir / "audio_chapters_manifest.json"
+    manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+
+    cwd = Path.cwd()
+    try:
+        # Match full-build execution where these manifest paths are evaluated from repo root.
+        os.chdir(tmp_path)
+        summary = verify_audio_from_manifest(
+            manifest_path=manifest_path,
+            duration_probe=lambda _path: 10.0,
+            chapter_count_probe=lambda _path: 1,
+        )
+    finally:
+        os.chdir(cwd)
+
+    assert summary.chapter_count == 1
