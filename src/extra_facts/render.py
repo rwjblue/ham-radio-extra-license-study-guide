@@ -385,10 +385,8 @@ def _write_pdf(
         story.append(Spacer(1, 0.02 * inch))
         for question in questions:
             text = fact_sentence(question, mode=mode, omit_id=omit_id)
-            story.append(_fact_item(text, body, palette["line"]))
             image_flowables = _question_image_flowables(question, image_root_dir)
-            if image_flowables:
-                story.extend(image_flowables)
+            story.extend(_question_block(text, image_flowables, body, palette["line"]))
         story.append(Spacer(1, 0.07 * inch))
 
     doc = SimpleDocTemplate(
@@ -506,11 +504,19 @@ def _group_heading(
     return KeepTogether([label])
 
 
-def _fact_item(text: str, style: ParagraphStyle, line: colors.Color) -> KeepTogether:
+def _question_block(
+    text: str,
+    image_flowables: list[Flowable],
+    style: ParagraphStyle,
+    line: colors.Color,
+) -> list[Flowable]:
     formatted = _format_pdf_fact(text)
     fact = Paragraph(formatted, style)
-    rule = HRFlowable(width="100%", color=line, thickness=0.5, spaceBefore=1, spaceAfter=4)
-    return KeepTogether([fact, rule])
+    bottom_rule = HRFlowable(width="100%", color=line, thickness=0.5, spaceBefore=1, spaceAfter=4)
+    if not image_flowables:
+        return [KeepTogether([fact, bottom_rule])]
+    top_rule = HRFlowable(width="100%", color=line, thickness=0.5, spaceBefore=1, spaceAfter=4)
+    return [KeepTogether([top_rule, *image_flowables, fact, bottom_rule])]
 
 
 def _format_pdf_fact(text: str) -> str:
