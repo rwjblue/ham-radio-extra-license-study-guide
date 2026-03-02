@@ -65,6 +65,10 @@ jobs:
       - name: Build release artifacts
         run: mise run full-build
 
+      - name: Render release audio artifacts
+        if: ${{ env.OPENAI_API_KEY != '' }}
+        run: mise run audio-render
+
       - name: Package dist outputs
         run: |
           tar -czf "ham-radio-extra-study-guide-${RELEASE_TAG}.tar.gz" dist
@@ -84,7 +88,9 @@ jobs:
             dist/prose/prose-extra_facts.txt
             dist/prose/prose-extra_facts.pdf
             dist/audio/extra_facts_audio.txt
+            dist/audio/extra_facts_audio.mp3
             dist/audio/audio_chapters_manifest.json
             dist/audio/chapters/chapter-*.txt
+            dist/audio/chapters/chapter-*.mp3
             dist/extra_pool.json
             dist/extra_pool_prose.json

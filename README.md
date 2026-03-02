@@ -96,6 +96,7 @@ extra-facts audio-render --manifest dist/audio/audio_chapters_manifest.json --ou
 - OpenAI prose calls use on-disk HTTP caching by default at `.cache/openai-http` (override via `OPENAI_HTTP_CACHE_DIR`, disable with `OPENAI_HTTP_CACHE=0`).
 - OpenAI audio-render calls use the same HTTP cache controls as prose.
 - `audio-render` uses `ffprobe` (duration extraction) and `ffmpeg` (MP3 merge + chapter markers).
+- `audio-render` reuses existing chapter MP3 files when chapter text and render settings are unchanged.
 
 ## Contributing
 

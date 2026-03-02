@@ -83,6 +83,8 @@ def audio_render_command(args: argparse.Namespace) -> int:
     print(f"Chapter audio dir: {summary.chapters_audio_dir}")
     print(f"Merged audio: {summary.merged_audio_path}")
     print(f"Chapter markers embedded: {summary.chapter_markers_embedded}")
+    print(f"Chapters rendered: {summary.chapters_rendered}")
+    print(f"Chapters reused: {summary.chapters_reused}")
     print(f"Total duration (seconds): {summary.total_duration_seconds}")
     return 0
 

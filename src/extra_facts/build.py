@@ -143,6 +143,7 @@ def render_audio_from_chapter_manifest(
     embed_chapters: bool,
     out_manifest_path: Path | None = None,
 ) -> AudioRenderSummary:
+    render_fingerprint = f"openai:{model}:{voice}:{speed}:{output_format}"
     client = OpenAITtsClient(
         model=model,
         voice=voice,
@@ -157,6 +158,7 @@ def render_audio_from_chapter_manifest(
         merge_output=merge_output,
         embed_chapters=embed_chapters,
         out_manifest_path=out_manifest_path,
+        render_fingerprint=render_fingerprint,
     )
     return AudioRenderSummary(
         chapter_count=result.chapter_count,
@@ -166,4 +168,6 @@ def render_audio_from_chapter_manifest(
         merged_audio_path=result.merged_audio_path,
         total_duration_seconds=result.total_duration_seconds,
         chapter_markers_embedded=result.chapter_markers_embedded,
+        chapters_rendered=result.chapters_rendered,
+        chapters_reused=result.chapters_reused,
     )

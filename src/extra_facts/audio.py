@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import subprocess
@@ -117,6 +118,8 @@ class AudioRenderResult:
     merged_audio_path: Path | None
     total_duration_seconds: float
     chapter_markers_embedded: bool
+    chapters_rendered: int
+    chapters_reused: int
 
 
 def render_audio_from_manifest(
@@ -130,6 +133,7 @@ def render_audio_from_manifest(
     merge_audio: AudioMerger | None = None,
     embed_chapters: bool = True,
     embed_chapter_markers: ChapterMarkerEmbedder | None = None,
+    render_fingerprint: str = "",
 ) -> AudioRenderResult:
     payload = cast(dict[str, Any], json.loads(manifest_path.read_text(encoding="utf-8")))
     chapters_payload = payload.get("chapters")
@@ -147,6 +151,8 @@ def render_audio_from_manifest(
 
     start_seconds = 0.0
     rendered_paths: list[Path] = []
+    chapters_rendered = 0
+    chapters_reused = 0
     for chapter in chapters:
         chapter_number = int(chapter["number"])
         text_path_value = chapter.get("text_path")
@@ -159,23 +165,36 @@ def render_audio_from_manifest(
 
         audio_file_name = f"chapter-{chapter_number:02d}.{output_format}"
         audio_path = chapters_audio_dir / audio_file_name
-        segment_paths = _render_tts_segments(
-            text=text,
-            chapter_number=chapter_number,
-            output_format=output_format,
-            chapters_audio_dir=chapters_audio_dir,
-            client=client,
+        text_sha256 = _text_sha256(text)
+        can_reuse = _can_reuse_chapter_audio(
+            chapter=chapter,
+            audio_path=audio_path,
+            text_sha256=text_sha256,
+            render_fingerprint=render_fingerprint,
         )
-        if len(segment_paths) == 1:
-            audio_path.write_bytes(segment_paths[0].read_bytes())
+        if can_reuse:
+            chapters_reused += 1
         else:
-            merge_fn(segment_paths, audio_path)
-        _cleanup_temp_segments(segment_paths)
+            segment_paths = _render_tts_segments(
+                text=text,
+                chapter_number=chapter_number,
+                output_format=output_format,
+                chapters_audio_dir=chapters_audio_dir,
+                client=client,
+            )
+            if len(segment_paths) == 1:
+                audio_path.write_bytes(segment_paths[0].read_bytes())
+            else:
+                merge_fn(segment_paths, audio_path)
+            _cleanup_temp_segments(segment_paths)
+            chapters_rendered += 1
 
-        duration_seconds = probe_fn(audio_path)
+        duration_seconds = _duration_for_chapter(chapter, audio_path, probe_fn)
         chapter["audio_path"] = str(audio_path.as_posix())
         chapter["duration_seconds"] = round(duration_seconds, 3)
         chapter["start_seconds"] = round(start_seconds, 3)
+        chapter["text_sha256"] = text_sha256
+        chapter["render_fingerprint"] = render_fingerprint
         start_seconds += duration_seconds
         rendered_paths.append(audio_path)
 
@@ -196,6 +215,9 @@ def render_audio_from_manifest(
         ),
         "total_duration_seconds": round(start_seconds, 3),
         "chapter_markers_embedded": chapter_markers_embedded,
+        "chapters_rendered": chapters_rendered,
+        "chapters_reused": chapters_reused,
+        "render_fingerprint": render_fingerprint,
         "rendered_at": datetime.now(UTC).isoformat(),
     }
 
@@ -212,6 +234,8 @@ def render_audio_from_manifest(
         merged_audio_path=merged_audio_path,
         total_duration_seconds=round(start_seconds, 3),
         chapter_markers_embedded=chapter_markers_embedded,
+        chapters_rendered=chapters_rendered,
+        chapters_reused=chapters_reused,
     )
 
 
@@ -306,6 +330,38 @@ def _resolve_path(value: str, manifest_path: Path) -> Path:
     if path.exists():
         return path
     return (manifest_path.parent / path).resolve()
+
+
+def _text_sha256(text: str) -> str:
+    return hashlib.sha256(text.encode("utf-8")).hexdigest()
+
+
+def _can_reuse_chapter_audio(
+    chapter: dict[str, Any],
+    audio_path: Path,
+    text_sha256: str,
+    render_fingerprint: str,
+) -> bool:
+    existing_hash = chapter.get("text_sha256")
+    existing_fingerprint = chapter.get("render_fingerprint")
+    if not isinstance(existing_hash, str):
+        return False
+    if existing_hash != text_sha256:
+        return False
+    if existing_fingerprint != render_fingerprint:
+        return False
+    return audio_path.exists()
+
+
+def _duration_for_chapter(
+    chapter: dict[str, Any],
+    audio_path: Path,
+    probe_fn: DurationProbe,
+) -> float:
+    existing = chapter.get("duration_seconds")
+    if isinstance(existing, int | float) and existing > 0:
+        return float(existing)
+    return probe_fn(audio_path)
 
 
 def _escape_ffmetadata_value(value: str) -> str:
