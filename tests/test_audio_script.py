@@ -66,6 +66,26 @@ def test_write_audio_script_can_include_ids(tmp_path: Path) -> None:
     assert "E1A01: The maximum symbol rate is 1200 baud." in content
 
 
+def test_write_audio_script_expands_khz_and_mhz_for_audio(tmp_path: Path) -> None:
+    questions = [
+        _question("E1A01", "What is the bandwidth?", "3 kHz"),
+        _question("E1A02", "What is the carrier frequency?", "14.2 MHz"),
+    ]
+
+    path, _chapters_dir, _manifest_path = write_audio_script(
+        questions,
+        out_dir=tmp_path,
+        mode="prose",
+        omit_id=True,
+    )
+
+    content = path.read_text(encoding="utf-8")
+    assert "3 kilohertz" in content
+    assert "14.2 megahertz" in content
+    assert "kHz" not in content
+    assert "MHz" not in content
+
+
 def test_write_audio_script_does_not_force_newline_within_fact_paragraph(tmp_path: Path) -> None:
     questions = [
         _question(
@@ -94,7 +114,7 @@ def test_write_audio_script_does_not_force_newline_within_fact_paragraph(tmp_pat
     assert (
         "\n\nWhen using a transceiver that displays the carrier frequency of phone signals, "
         "what is the lowest frequency at which a properly adjusted LSB emission will be "
-        "totally within the band: 3 kHz above the lower band edge.\n\n"
+        "totally within the band: 3 kilohertz above the lower band edge.\n\n"
     ) in content
 
 
