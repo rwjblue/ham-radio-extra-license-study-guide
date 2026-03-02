@@ -1,0 +1,151 @@
+#!/usr/bin/env bash
+#MISE description="Build GitHub Pages site payload from existing dist artifacts"
+#MISE depends=["deps-dev"]
+#MISE sources=["dist/extra_pool_prose.json", "dist/audio/extra_facts_audio.txt", "dist/audio/extra_facts_audio.mp3", "dist/prose/prose-extra_facts.pdf"]
+#MISE outputs=["docs/index.html", "docs/amateur-extra-license-prep-pool-prose.json", "docs/amateur-extra-license-prep-script.txt", "docs/amateur-extra-license-prep.mp3", "docs/amateur-extra-license-prep-study-workbook.pdf"]
+set -euo pipefail
+
+repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+dist_dir="${DIST_DIR:-${repo_root}/dist}"
+out_dir="${PAGES_DIR:-${repo_root}/docs}"
+
+required_files=(
+  "${dist_dir}/extra_pool_prose.json"
+  "${dist_dir}/audio/extra_facts_audio.txt"
+  "${dist_dir}/audio/extra_facts_audio.mp3"
+  "${dist_dir}/prose/prose-extra_facts.pdf"
+)
+
+for file in "${required_files[@]}"; do
+  if [ ! -f "${file}" ]; then
+    echo "Missing required file: ${file}" >&2
+    exit 1
+  fi
+done
+
+rm -rf "${out_dir}"
+mkdir -p "${out_dir}"
+
+cp "${dist_dir}/extra_pool_prose.json" "${out_dir}/amateur-extra-license-prep-pool-prose.json"
+cp "${dist_dir}/audio/extra_facts_audio.txt" "${out_dir}/amateur-extra-license-prep-script.txt"
+cp "${dist_dir}/audio/extra_facts_audio.mp3" "${out_dir}/amateur-extra-license-prep.mp3"
+cp "${dist_dir}/prose/prose-extra_facts.pdf" "${out_dir}/amateur-extra-license-prep-study-workbook.pdf"
+
+cat > "${out_dir}/index.html" <<'HTML'
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Ham Radio Extra Study Guide Assets</title>
+    <style>
+      :root {
+        --bg: #f6f9ff;
+        --fg: #10243a;
+        --muted: #4a5c71;
+        --card: #ffffff;
+        --border: #d7e1ef;
+        --link: #0057b8;
+      }
+      body {
+        margin: 0;
+        font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Palatino, serif;
+        background: radial-gradient(circle at top right, #e7f0ff 0%, var(--bg) 55%);
+        color: var(--fg);
+      }
+      main {
+        max-width: 720px;
+        margin: 40px auto;
+        padding: 0 20px;
+      }
+      .card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 20px;
+      }
+      h1 {
+        margin: 0 0 12px 0;
+        font-size: clamp(1.6rem, 3vw, 2rem);
+      }
+      p {
+        margin: 0 0 18px 0;
+        color: var(--muted);
+      }
+      p:last-of-type {
+        margin-top: 16px;
+        margin-bottom: 0;
+      }
+      .pipeline {
+        margin-top: 18px;
+      }
+      .assets {
+        display: grid;
+        gap: 10px;
+        margin: 16px 0 0 0;
+      }
+      .asset {
+        display: block;
+        text-decoration: none;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        background: #fdfefe;
+        padding: 12px 14px;
+      }
+      .asset strong {
+        display: block;
+        font-size: 1rem;
+        line-height: 1.3;
+      }
+      .asset span {
+        display: block;
+        margin-top: 4px;
+        color: var(--muted);
+        font-size: 0.94rem;
+      }
+      .asset:hover {
+        background: #f4f8ff;
+        border-color: #c2d6f3;
+      }
+      a {
+        color: var(--link);
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <section class="card">
+        <h1>Ham Radio Extra Study Guide Assets</h1>
+        <p class="pipeline">
+          New here? Start with the
+          <a href="https://ncvec.org/">official NCVEC question pool</a>. This project turns that source into structured JSON, adds clear LLM-assisted summaries with rule-based validation checks, and uses the validated results to produce both the audio script and the PDF study workbook.
+        </p>
+        <div class="assets">
+          <a class="asset" href="./amateur-extra-license-prep-study-workbook.pdf">
+            <strong>Study Workbook PDF</strong>
+            <span>Printable workbook derived from the same validated source data.</span>
+          </a>
+          <a class="asset" href="./amateur-extra-license-prep.mp3">
+            <strong>Audio Book</strong>
+            <span>Rendered listening version for on-the-go study.</span>
+          </a>
+          <a class="asset" href="./amateur-extra-license-prep-script.txt">
+            <strong>Audio Script (Automation)</strong>
+            <span>Full narration text, primarily useful for downstream automation.</span>
+          </a>
+          <a class="asset" href="./amateur-extra-license-prep-pool-prose.json">
+            <strong>Prose Question Pool JSON (Automation)</strong>
+            <span>Structured validated data for programmatic processing and integrations.</span>
+          </a>
+        </div>
+        <p>
+          Created by N1RWJ. Source repository:
+          <a href="https://github.com/rwjblue/ham-radio-extra-license-study-guide">github.com/rwjblue/ham-radio-extra-license-study-guide</a>.
+        </p>
+      </section>
+    </main>
+  </body>
+</html>
+HTML
+
+echo "GitHub Pages site generated at ${out_dir}"

@@ -89,6 +89,23 @@ mise run compare
   `dist/extra_pool.json`
   `dist/extra_pool_prose.json`
 
+## GitHub Pages Site
+
+To publish a Pages payload from the current `dist/` artifacts, run:
+
+```bash
+mise run gh-pages-site
+```
+
+This creates `docs/` with:
+- `docs/amateur-extra-license-prep-pool-prose.json`
+- `docs/amateur-extra-license-prep-script.txt`
+- `docs/amateur-extra-license-prep.mp3`
+- `docs/amateur-extra-license-prep-study-workbook.pdf`
+- `docs/index.html`
+
+The repository workflow `.github/workflows/pages.yml` deploys `docs/` to GitHub Pages on pushes to `main` (when `docs/**` changes) or manual dispatch.
+
 ## CLI
 
 ```bash
