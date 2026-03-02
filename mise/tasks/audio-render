@@ -3,17 +3,26 @@
 #MISE depends=["deps-dev", "audio-script-auto"]
 set -euo pipefail
 
+provider="${TTS_PROVIDER:-}"
+
 cmd=(
   uv run extra-facts audio-render
   --manifest "${MANIFEST:-dist/audio/audio_chapters_manifest.json}"
   --out-dir "${OUT_DIR:-dist/audio}"
-  --provider "${TTS_PROVIDER:-elevenlabs}"
-  --model "${TTS_MODEL:-eleven_multilingual_v2}"
-  --voice "${TTS_VOICE:-JBFqnCBsd6RMkjVDRZzb}"
   --elevenlabs-output-format "${ELEVENLABS_OUTPUT_FORMAT:-mp3_44100_128}"
   --elevenlabs-language-code "${ELEVENLABS_LANGUAGE_CODE:-en}"
   --speed "${SPEED:-1.0}"
 )
+
+if [[ -n "${provider}" ]]; then
+  cmd+=(--provider "${provider}")
+fi
+if [[ -n "${TTS_MODEL:-}" ]]; then
+  cmd+=(--model "${TTS_MODEL}")
+fi
+if [[ -n "${TTS_VOICE:-}" ]]; then
+  cmd+=(--voice "${TTS_VOICE}")
+fi
 
 if [[ -n "${INSTRUCTIONS:-}" ]]; then
   cmd+=(--instructions "${INSTRUCTIONS}")
