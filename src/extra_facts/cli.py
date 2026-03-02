@@ -6,6 +6,7 @@ import sys
 import time
 from pathlib import Path
 
+from .audio import DEFAULT_TTS_INSTRUCTIONS
 from .build import (
     build_audio_script_from_pool_json,
     build_from_pool_json,
@@ -199,6 +200,7 @@ def create_parser() -> argparse.ArgumentParser:
     )
     render_audio.add_argument(
         "--instructions",
+        default=DEFAULT_TTS_INSTRUCTIONS,
         help="Optional style directions for TTS delivery (tone, pacing, emphasis)",
     )
     render_audio.add_argument(

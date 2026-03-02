@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections.abc import Callable
 from pathlib import Path
 
-from .audio import OpenAITtsClient, render_audio_from_manifest
+from .audio import DEFAULT_TTS_INSTRUCTIONS, OpenAITtsClient, render_audio_from_manifest
 from .audio_verify import verify_audio_from_manifest
 from .downloader import download_source
 from .extract import extract_text
@@ -151,15 +151,16 @@ def render_audio_from_chapter_manifest(
     embed_chapters: bool,
     out_manifest_path: Path | None = None,
 ) -> AudioRenderSummary:
+    resolved_instructions = instructions.strip() if instructions else DEFAULT_TTS_INSTRUCTIONS
     render_fingerprint = (
-        f"openai:{model}:{voice}:{speed}:{output_format}:{instructions or ''}"
+        f"openai:{model}:{voice}:{speed}:{output_format}:{resolved_instructions}"
     )
     client = OpenAITtsClient(
         model=model,
         voice=voice,
         response_format=output_format,
         speed=speed,
-        instructions=instructions,
+        instructions=resolved_instructions,
     )
     result = render_audio_from_manifest(
         manifest_path=manifest_path,

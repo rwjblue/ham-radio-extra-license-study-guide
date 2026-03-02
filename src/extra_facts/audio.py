@@ -28,6 +28,10 @@ ChapterMarkerEmbedder = Callable[[list[dict[str, Any]], Path], None]
 TTS_MAX_CHARS = 3500
 DEFAULT_OPENAI_HTTP_CACHE_DIR = Path(".cache/openai-http")
 DEFAULT_OPENAI_HTTP_CACHE_NAME = "audio-speech-v2"
+DEFAULT_TTS_INSTRUCTIONS = (
+    "High-energy study coach. Upbeat and motivating. Dynamic intonation with "
+    "emphasis on key facts and numbers. Keep it natural, not theatrical."
+)
 
 
 class OpenAITtsClient:
@@ -37,7 +41,7 @@ class OpenAITtsClient:
         voice: str,
         response_format: str = "mp3",
         speed: float = 1.0,
-        instructions: str | None = None,
+        instructions: str | None = DEFAULT_TTS_INSTRUCTIONS,
         api_key_env: str = "OPENAI_API_KEY",
         cache_dir: Path | None = None,
         cache_enabled: bool | None = None,

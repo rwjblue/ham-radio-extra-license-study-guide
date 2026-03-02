@@ -92,7 +92,7 @@ extra-facts extract --docx <local.docx> --out-json dist/extra_pool.json
 extra-facts prose --pool-json dist/extra_pool.json --out-json dist/extra_pool_prose.json [--model gpt-5-mini] [--prompt-version v1] [--workers 6] [--max-attempts 3] [--max-questions N] [--resume]
 extra-facts build --pool-json dist/extra_pool.json --out-dir dist --mode literal|tts|prose [--omit-id]
 extra-facts audio-script --pool-json dist/extra_pool_prose.json --out-dir dist/audio --mode prose [--include-id]
-extra-facts audio-render --manifest dist/audio/audio_chapters_manifest.json --out-dir dist/audio [--model gpt-4o-mini-tts] [--voice alloy] [--speed 1.0] [--instructions "Warm, engaging delivery with varied intonation"] [--no-merge] [--no-chapter-markers]
+extra-facts audio-render --manifest dist/audio/audio_chapters_manifest.json --out-dir dist/audio [--model gpt-4o-mini-tts] [--voice alloy] [--speed 1.0] [--instructions "Custom style override"] [--no-merge] [--no-chapter-markers]
 extra-facts audio-verify --manifest dist/audio/audio_chapters_manifest.json [--allow-missing-merged] [--skip-chapter-marker-check]
 ```
 
@@ -103,7 +103,7 @@ extra-facts audio-verify --manifest dist/audio/audio_chapters_manifest.json [--a
 - Group order is preserved as published.
 - OpenAI prose calls use on-disk HTTP caching by default at `.cache/openai-http` (override via `OPENAI_HTTP_CACHE_DIR`, disable with `OPENAI_HTTP_CACHE=0`).
 - OpenAI audio-render calls use the same HTTP cache controls as prose.
-- Set `INSTRUCTIONS` (for `mise run audio-render`) or `--instructions` (CLI) to tune voice style and intonation.
+- Audio render defaults to an energetic study-coach style; set `INSTRUCTIONS` (for `mise run audio-render`) or `--instructions` (CLI) to override it.
 - `audio-render` uses `ffprobe` (duration extraction) and `ffmpeg` (MP3 merge + chapter markers).
 - `audio-render` reuses existing chapter MP3 files when chapter text and render settings are unchanged.
 

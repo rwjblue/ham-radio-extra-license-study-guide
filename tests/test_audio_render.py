@@ -9,6 +9,7 @@ import requests
 from _pytest.monkeypatch import MonkeyPatch
 
 from extra_facts.audio import (
+    DEFAULT_TTS_INSTRUCTIONS,
     OpenAITtsClient,
     render_audio_from_manifest,
 )
@@ -324,7 +325,7 @@ def test_openai_tts_synthesize_uses_audio_speech_endpoint(monkeypatch: MonkeyPat
     assert request_payload["model"] == "gpt-4o-mini-tts"
     assert request_payload["voice"] == "alloy"
     assert request_payload["speed"] == 1.0
-    assert "instructions" not in request_payload
+    assert request_payload["instructions"] == DEFAULT_TTS_INSTRUCTIONS
 
 
 def test_openai_tts_synthesize_raises_without_responses_fallback(monkeypatch: MonkeyPatch) -> None:
