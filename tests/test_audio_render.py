@@ -5,7 +5,11 @@ from pathlib import Path
 
 from _pytest.monkeypatch import MonkeyPatch
 
-from extra_facts.audio import OpenAITtsClient, render_audio_from_manifest
+from extra_facts.audio import (
+    OpenAITtsClient,
+    extract_audio_bytes_from_responses_payload,
+    render_audio_from_manifest,
+)
 
 
 class _FakeTtsClient:
@@ -258,3 +262,20 @@ def test_openai_tts_http_cache_dir_env(monkeypatch: MonkeyPatch) -> None:
     monkeypatch.setenv("OPENAI_HTTP_CACHE_DIR", "/tmp/openai-http-cache-audio")
     client = OpenAITtsClient(model="gpt-4o-mini-tts", voice="alloy")
     assert client.cache_dir == Path("/tmp/openai-http-cache-audio")
+
+
+def test_extract_audio_bytes_from_responses_payload() -> None:
+    payload = {
+        "output": [
+            {
+                "content": [
+                    {
+                        "audio": {
+                            "data": "aGVsbG8=",
+                        }
+                    }
+                ]
+            }
+        ]
+    }
+    assert extract_audio_bytes_from_responses_payload(payload) == b"hello"

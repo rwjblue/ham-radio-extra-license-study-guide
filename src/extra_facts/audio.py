@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import base64
 import hashlib
 import json
 import os
@@ -56,7 +57,7 @@ class OpenAITtsClient:
         self._session.mount("https://", adapter)
 
     def synthesize(self, text: str) -> bytes:
-        response = self._session.post(
+        speech_response = self._session.post(
             "https://api.openai.com/v1/audio/speech",
             headers={
                 "Authorization": f"Bearer {self.api_key}",
@@ -71,10 +72,37 @@ class OpenAITtsClient:
             },
             timeout=180,
         )
-        if response.status_code >= 400:
-            body = response.text.strip()
-            raise RuntimeError(f"OpenAI TTS request failed ({response.status_code}): {body}")
-        return response.content
+        if speech_response.status_code < 400:
+            return speech_response.content
+
+        responses_response = self._session.post(
+            "https://api.openai.com/v1/responses",
+            headers={
+                "Authorization": f"Bearer {self.api_key}",
+                "Content-Type": "application/json",
+            },
+            json={
+                "model": self.model,
+                "input": text,
+                "modalities": ["audio"],
+                "audio": {
+                    "voice": self.voice,
+                    "format": self.response_format,
+                },
+            },
+            timeout=180,
+        )
+        if responses_response.status_code < 400:
+            payload = cast(dict[str, Any], responses_response.json())
+            return extract_audio_bytes_from_responses_payload(payload)
+
+        speech_body = speech_response.text.strip()
+        responses_body = responses_response.text.strip()
+        raise RuntimeError(
+            "OpenAI TTS request failed for both endpoints: "
+            f"/v1/audio/speech ({speech_response.status_code}): {speech_body}; "
+            f"/v1/responses ({responses_response.status_code}): {responses_body}"
+        )
 
 
 def _resolve_openai_http_cache_enabled(config: bool | None) -> bool:
@@ -429,3 +457,34 @@ def _split_text_for_tts(text: str, max_chars: int) -> list[str]:
 def _cleanup_temp_segments(segment_paths: list[Path]) -> None:
     for segment_path in segment_paths:
         segment_path.unlink(missing_ok=True)
+
+
+def extract_audio_bytes_from_responses_payload(payload: dict[str, Any]) -> bytes:
+    output_obj = payload.get("output")
+    if not isinstance(output_obj, list):
+        raise RuntimeError("No audio output returned by model")
+
+    output = cast(list[Any], output_obj)
+    for item in output:
+        if not isinstance(item, dict):
+            continue
+        item_dict = cast(dict[str, Any], item)
+        content_obj = item_dict.get("content")
+        if not isinstance(content_obj, list):
+            continue
+        content = cast(list[Any], content_obj)
+        for entry in content:
+            if not isinstance(entry, dict):
+                continue
+            entry_dict = cast(dict[str, Any], entry)
+            audio_obj = entry_dict.get("audio")
+            if isinstance(audio_obj, dict):
+                audio = cast(dict[str, Any], audio_obj)
+                data = audio.get("data")
+                if isinstance(data, str) and data:
+                    return base64.b64decode(data)
+            data = entry_dict.get("data")
+            if isinstance(data, str) and data:
+                return base64.b64decode(data)
+
+    raise RuntimeError("No audio data found in /v1/responses payload")
