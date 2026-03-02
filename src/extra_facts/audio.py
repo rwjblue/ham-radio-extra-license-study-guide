@@ -572,32 +572,46 @@ def _split_text_for_tts(text: str, max_chars: int) -> list[str]:
         return []
 
     chunks: list[str] = []
-    current: list[str] = []
+    current_paragraphs: list[str] = []
     current_len = 0
     for paragraph in paragraphs:
-        wrapped_segments = textwrap.wrap(
-            paragraph,
-            width=max_chars,
-            break_long_words=False,
-            break_on_hyphens=False,
-        )
-        parts = wrapped_segments if wrapped_segments else [paragraph]
-        for part in parts:
-            part_len = len(part)
-            sep = 1 if current else 0
-            if current and current_len + sep + part_len > max_chars:
-                chunks.append("\n".join(current))
-                current = [part]
-                current_len = part_len
-                continue
-            if current:
-                current_len += sep + part_len
-            else:
-                current_len = part_len
-            current.append(part)
+        paragraph_len = len(paragraph)
+        if paragraph_len > max_chars:
+            if current_paragraphs:
+                chunks.append("\n".join(current_paragraphs))
+                current_paragraphs = []
+                current_len = 0
+            parts = textwrap.wrap(
+                paragraph,
+                width=max_chars,
+                break_long_words=False,
+                break_on_hyphens=False,
+            )
+            if not parts:
+                parts = [paragraph]
+            for part in parts:
+                if len(part) > max_chars:
+                    raise RuntimeError(
+                        "Paragraph contains token longer than TTS max chars; "
+                        "cannot safely split without breaking words"
+                    )
+                chunks.append(part)
+            continue
 
-    if current:
-        chunks.append("\n".join(current))
+        sep = 1 if current_paragraphs else 0
+        if current_paragraphs and current_len + sep + paragraph_len > max_chars:
+            chunks.append("\n".join(current_paragraphs))
+            current_paragraphs = [paragraph]
+            current_len = paragraph_len
+            continue
+        if current_paragraphs:
+            current_len += sep + paragraph_len
+        else:
+            current_len = paragraph_len
+        current_paragraphs.append(paragraph)
+
+    if current_paragraphs:
+        chunks.append("\n".join(current_paragraphs))
     return chunks
 
 

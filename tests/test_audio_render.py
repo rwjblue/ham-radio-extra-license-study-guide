@@ -8,6 +8,7 @@ import pytest
 import requests
 from _pytest.monkeypatch import MonkeyPatch
 
+import extra_facts.audio as audio_module
 from extra_facts.audio import (
     DEFAULT_ELEVENLABS_OUTPUT_FORMAT,
     DEFAULT_TTS_INSTRUCTIONS,
@@ -24,6 +25,15 @@ class _FakeTtsClient:
     def synthesize(self, text: str) -> bytes:
         self.calls += 1
         return f"audio:{text[:16]}".encode()
+
+
+class _CapturingTtsClient:
+    def __init__(self) -> None:
+        self.inputs: list[str] = []
+
+    def synthesize(self, text: str) -> bytes:
+        self.inputs.append(text)
+        return b"audio-bytes"
 
 
 def test_render_audio_from_manifest_enriches_manifest_and_merges(tmp_path: Path) -> None:
@@ -246,6 +256,117 @@ def test_render_audio_from_manifest_reuses_unchanged_chapters(tmp_path: Path) ->
     assert second_client.calls == 0
     assert second.chapters_rendered == 0
     assert second.chapters_reused == 2
+
+
+def test_render_audio_from_manifest_chunks_at_paragraph_boundaries(tmp_path: Path) -> None:
+    chapter_path = tmp_path / "audio" / "chapters" / "chapter-01.txt"
+    chapter_path.parent.mkdir(parents=True)
+    chapter_path.write_text(
+        "Paragraph one.\n\nParagraph two is here.\n\nParagraph three.",
+        encoding="utf-8",
+    )
+    manifest_path = tmp_path / "audio" / "audio_chapters_manifest.json"
+    manifest_path.write_text(
+        json.dumps(
+            {
+                "schema_version": 1,
+                "chapter_count": 1,
+                "chapters": [
+                    {
+                        "number": 1,
+                        "code": "E1",
+                        "title": "One",
+                        "groups": ["E1A"],
+                        "text_path": str(chapter_path),
+                    }
+                ],
+            },
+            indent=2,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    client = _CapturingTtsClient()
+    def _merge(_inputs: list[Path], output: Path) -> None:
+        output.write_bytes(b"merged-audio")
+    original_max = audio_module.TTS_MAX_CHARS
+    audio_module.TTS_MAX_CHARS = 30
+    try:
+        _ = render_audio_from_manifest(
+            manifest_path=manifest_path,
+            out_dir=tmp_path / "audio",
+            client=client,
+            merge_output=False,
+            merge_audio=_merge,
+            probe_duration=lambda _path: 1.0,
+            render_fingerprint="test-fingerprint",
+        )
+    finally:
+        audio_module.TTS_MAX_CHARS = original_max
+
+    assert client.inputs == [
+        "Paragraph one.",
+        "Paragraph two is here.",
+        "Paragraph three.",
+    ]
+
+
+def test_render_audio_from_manifest_splits_oversize_paragraph_without_breaking_words(
+    tmp_path: Path,
+) -> None:
+    chapter_path = tmp_path / "audio" / "chapters" / "chapter-01.txt"
+    chapter_path.parent.mkdir(parents=True)
+    chapter_path.write_text(
+        "alpha beta gamma delta epsilon zeta eta theta iota kappa",
+        encoding="utf-8",
+    )
+    manifest_path = tmp_path / "audio" / "audio_chapters_manifest.json"
+    manifest_path.write_text(
+        json.dumps(
+            {
+                "schema_version": 1,
+                "chapter_count": 1,
+                "chapters": [
+                    {
+                        "number": 1,
+                        "code": "E1",
+                        "title": "One",
+                        "groups": ["E1A"],
+                        "text_path": str(chapter_path),
+                    }
+                ],
+            },
+            indent=2,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    client = _CapturingTtsClient()
+    def _merge(_inputs: list[Path], output: Path) -> None:
+        output.write_bytes(b"merged-audio")
+    original_max = audio_module.TTS_MAX_CHARS
+    audio_module.TTS_MAX_CHARS = 18
+    try:
+        _ = render_audio_from_manifest(
+            manifest_path=manifest_path,
+            out_dir=tmp_path / "audio",
+            client=client,
+            merge_output=False,
+            merge_audio=_merge,
+            probe_duration=lambda _path: 1.0,
+            render_fingerprint="test-fingerprint",
+        )
+    finally:
+        audio_module.TTS_MAX_CHARS = original_max
+
+    assert client.inputs == [
+        "alpha beta gamma",
+        "delta epsilon zeta",
+        "eta theta iota",
+        "kappa",
+    ]
 
 
 def test_openai_tts_http_cache_enabled_defaults_true(monkeypatch: MonkeyPatch) -> None:
