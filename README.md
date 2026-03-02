@@ -107,6 +107,7 @@ This creates `docs/` with:
 - `docs/amateur-extra-license-prep-script.txt`
 - `docs/amateur-extra-license-prep.mp3`
 - `docs/amateur-extra-license-prep-study-workbook.pdf`
+- `docs/amateur-extra-license-prep-study-workbook-dark.pdf`
 - `docs/index.html`
 
 For downloadable JSON+assets bundles, use GitHub Releases.
