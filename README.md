@@ -3,8 +3,8 @@
 Generate a clean study guide from the public NCVEC Element 4 (Amateur Extra) pool.
 
 This project produces:
-- static facts (`dist/static/static-extra_facts.txt` and `dist/static/static-extra_facts.pdf`)
-- optional LLM prose facts (`dist/prose/prose-extra_facts.txt` and `dist/prose/prose-extra_facts.pdf`)
+- static facts (`dist/static/static-extra_facts.txt`, `dist/static/static-extra_facts.pdf`, and `dist/static/static-extra_facts-dark.pdf`)
+- optional LLM prose facts (`dist/prose/prose-extra_facts.txt`, `dist/prose/prose-extra_facts.pdf`, and `dist/prose/prose-extra_facts-dark.pdf`)
 - optional listenable script (`dist/audio/extra_facts_audio.txt`)
 - per-chapter audio script files (`dist/audio/chapters/chapter-01.txt`, ...)
 - audio chapter manifest (`dist/audio/audio_chapters_manifest.json`)
@@ -76,9 +76,11 @@ mise run compare
 - Static outputs:
   `dist/static/static-extra_facts.txt`
   `dist/static/static-extra_facts.pdf`
+  `dist/static/static-extra_facts-dark.pdf`
 - Prose outputs (only when `OPENAI_API_KEY` is set):
   `dist/prose/prose-extra_facts.txt`
   `dist/prose/prose-extra_facts.pdf`
+  `dist/prose/prose-extra_facts-dark.pdf`
 - Audio script output:
   `dist/audio/extra_facts_audio.txt`
   `dist/audio/chapters/chapter-01.txt` ... `chapter-10.txt`

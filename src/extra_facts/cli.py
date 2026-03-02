@@ -37,6 +37,8 @@ def build_command(args: argparse.Namespace) -> int:
     print(f"Intermediate JSON: {summary.intermediate_path}")
     print(f"Text output: {summary.text_path}")
     print(f"PDF output: {summary.pdf_path}")
+    if summary.dark_pdf_path is not None:
+        print(f"Dark PDF output: {summary.dark_pdf_path}")
     return 0
 
 

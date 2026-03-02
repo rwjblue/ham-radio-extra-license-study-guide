@@ -52,6 +52,7 @@ class BuildSummary:
     intermediate_path: Path
     text_path: Path
     pdf_path: Path
+    dark_pdf_path: Path | None = None
 
 
 @dataclass(frozen=True)

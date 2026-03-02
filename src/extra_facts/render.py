@@ -36,7 +36,8 @@ def write_outputs(
     metadata: PoolMetadata | None = None,
     txt_name: str = "extra_facts.txt",
     pdf_name: str = "extra_facts.pdf",
-) -> tuple[Path, Path]:
+    dark_pdf_name: str | None = None,
+) -> tuple[Path, Path, Path | None]:
     out_dir.mkdir(parents=True, exist_ok=True)
     groups = group_pool_questions(questions)
 
@@ -44,9 +45,14 @@ def write_outputs(
     _write_text(groups, txt_path, mode, omit_id, metadata)
 
     pdf_path = out_dir / pdf_name
-    _write_pdf(groups, pdf_path, mode, omit_id, metadata)
+    _write_pdf(groups, pdf_path, mode, omit_id, metadata, theme="light")
 
-    return txt_path, pdf_path
+    dark_pdf_path: Path | None = None
+    if dark_pdf_name:
+        dark_pdf_path = out_dir / dark_pdf_name
+        _write_pdf(groups, dark_pdf_path, mode, omit_id, metadata, theme="dark")
+
+    return txt_path, pdf_path, dark_pdf_path
 
 
 def _write_text(
@@ -254,15 +260,9 @@ def _write_pdf(
     mode: str,
     omit_id: bool,
     metadata: PoolMetadata | None,
+    theme: str = "light",
 ) -> None:
-    palette = {
-        "ink": colors.HexColor("#1F2937"),
-        "muted": colors.HexColor("#4B5563"),
-        "accent": colors.HexColor("#0F766E"),
-        "accent_soft": colors.HexColor("#ECFEFF"),
-        "group_bg": colors.HexColor("#F8FAFC"),
-        "line": colors.HexColor("#CBD5E1"),
-    }
+    palette = _pdf_palette(theme)
 
     styles = getSampleStyleSheet()
     title_style = ParagraphStyle(
@@ -301,7 +301,7 @@ def _write_pdf(
         fontName="Helvetica-Bold",
         fontSize=12,
         leading=15,
-        textColor=palette["accent"],
+        textColor=palette["group_heading"],
         spaceBefore=0,
         spaceAfter=0,
     )
@@ -327,7 +327,7 @@ def _write_pdf(
     )
 
     story: list[Flowable] = []
-    story.extend(_cover_header(title_style, subtitle_style, mode))
+    story.extend(_cover_header(title_style, subtitle_style, mode, palette["line"]))
     story.append(
         Paragraph(
             "Workbook format: review each statement, speak it aloud, and mark weak items.",
@@ -375,10 +375,42 @@ def _write_pdf(
     )
     doc.build(
         story,
-        onFirstPage=lambda canvas, doc: _draw_footer(canvas, doc, palette["muted"]),
-        onLaterPages=lambda canvas, doc: _draw_footer(canvas, doc, palette["muted"]),
+        onFirstPage=lambda canvas, doc: _draw_footer(
+            canvas,
+            doc,
+            palette["muted"],
+            palette["page_bg"],
+        ),
+        onLaterPages=lambda canvas, doc: _draw_footer(
+            canvas,
+            doc,
+            palette["muted"],
+            palette["page_bg"],
+        ),
     )
 
+
+def _pdf_palette(theme: str) -> dict[str, colors.Color]:
+    normalized = theme.strip().lower()
+    if normalized == "dark":
+        return {
+            "ink": colors.HexColor("#E5E7EB"),
+            "muted": colors.HexColor("#9CA3AF"),
+            "accent": colors.HexColor("#14B8A6"),
+            "group_heading": colors.HexColor("#5EEAD4"),
+            "group_bg": colors.HexColor("#111827"),
+            "line": colors.HexColor("#374151"),
+            "page_bg": colors.HexColor("#030712"),
+        }
+    return {
+        "ink": colors.HexColor("#1F2937"),
+        "muted": colors.HexColor("#4B5563"),
+        "accent": colors.HexColor("#0F766E"),
+        "group_heading": colors.HexColor("#0F766E"),
+        "group_bg": colors.HexColor("#F8FAFC"),
+        "line": colors.HexColor("#CBD5E1"),
+        "page_bg": colors.white,
+    }
 
 def _mode_label(mode: str) -> str:
     if mode == "prose":
@@ -392,6 +424,7 @@ def _cover_header(
     title_style: ParagraphStyle,
     subtitle_style: ParagraphStyle,
     mode: str,
+    line_color: colors.Color,
 ) -> list[Flowable]:
     return [
         Paragraph("FCC Amateur Extra (Element 4) Statements of Fact", title_style),
@@ -399,7 +432,7 @@ def _cover_header(
             f"{_mode_label(mode)} · Grouped by subelement and question group",
             subtitle_style,
         ),
-        HRFlowable(width="100%", color=colors.HexColor("#CBD5E1"), thickness=1.2),
+        HRFlowable(width="100%", color=line_color, thickness=1.2),
         Spacer(1, 0.08 * inch),
     ]
 
@@ -493,9 +526,16 @@ def _group_title_for_display(group: str, metadata: PoolMetadata | None) -> str:
     return metadata.group_titles.get(group, "").strip()
 
 
-def _draw_footer(canvas: Canvas, doc: BaseDocTemplate, color: colors.Color) -> None:
+def _draw_footer(
+    canvas: Canvas,
+    doc: BaseDocTemplate,
+    color: colors.Color,
+    page_background: colors.Color,
+) -> None:
     page_canvas = canvas
     page_canvas.saveState()
+    page_canvas.setFillColor(page_background)
+    page_canvas.rect(0, 0, LETTER[0], LETTER[1], stroke=0, fill=1)
     page_canvas.setFont("Helvetica", 8.5)
     page_canvas.setFillColor(color)
     page_canvas.drawString(doc.leftMargin, 0.4 * inch, "FCC Amateur Extra Study Facts")
