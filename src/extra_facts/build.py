@@ -78,7 +78,7 @@ def build_from_pool_json(
     loaded_pool = read_question_pool(pool_json_path)
     out_dir.mkdir(parents=True, exist_ok=True)
     output_prefix = "prose" if mode == "prose" else "static"
-    text_path, pdf_path, dark_pdf_path = write_outputs(
+    text_path, pdf_path, dark_pdf_path, epub_path = write_outputs(
         loaded_pool.questions,
         out_dir=out_dir,
         mode=mode,
@@ -88,6 +88,7 @@ def build_from_pool_json(
         txt_name=f"{output_prefix}-extra_facts.txt",
         pdf_name=f"{output_prefix}-extra_facts.pdf",
         dark_pdf_name=f"{output_prefix}-extra_facts-dark.pdf",
+        epub_name=f"{output_prefix}-extra_facts.epub",
     )
     return BuildSummary(
         question_count=len(loaded_pool.questions),
@@ -97,6 +98,7 @@ def build_from_pool_json(
         text_path=text_path,
         pdf_path=pdf_path,
         dark_pdf_path=dark_pdf_path,
+        epub_path=epub_path,
     )
 
 

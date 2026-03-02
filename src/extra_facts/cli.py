@@ -39,6 +39,8 @@ def build_command(args: argparse.Namespace) -> int:
     print(f"PDF output: {summary.pdf_path}")
     if summary.dark_pdf_path is not None:
         print(f"Dark PDF output: {summary.dark_pdf_path}")
+    if summary.epub_path is not None:
+        print(f"EPUB output: {summary.epub_path}")
     return 0
 
 

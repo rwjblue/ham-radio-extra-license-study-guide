@@ -72,6 +72,7 @@ class BuildSummary:
     text_path: Path
     pdf_path: Path
     dark_pdf_path: Path | None = None
+    epub_path: Path | None = None
 
 
 @dataclass(frozen=True)

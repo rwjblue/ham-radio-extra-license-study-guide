@@ -245,10 +245,24 @@ wheels = [
 ]
 
 [[package]]
+name = "ebooklib"
+version = "0.20"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "lxml" },
+    { name = "six" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/77/85/322e8882a582d4b707220d1929cfb74c125f2ba513991edbce40dbc462de/ebooklib-0.20.tar.gz", hash = "sha256:35e2f9d7d39907be8d39ae2deb261b19848945903ae3dbb6577b187ead69e985", size = 127066, upload-time = "2025-10-26T20:56:20.968Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/bf/ee/aa015c5de8b0dc42a8e507eae8c2de5d1c0e068c896858fec6d502402ed6/ebooklib-0.20-py3-none-any.whl", hash = "sha256:fff5322517a37e31c972d27be7d982cc3928c16b3dcc5fd7e8f7c0f5d7bcf42b", size = 40995, upload-time = "2025-10-26T20:56:19.104Z" },
+]
+
+[[package]]
 name = "extra-facts"
 version = "0.1.9"
 source = { editable = "." }
 dependencies = [
+    { name = "ebooklib" },
     { name = "pdfplumber" },
     { name = "pymupdf" },
     { name = "python-docx" },
@@ -266,6 +280,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
+    { name = "ebooklib", specifier = ">=0.20" },
     { name = "pdfplumber", specifier = ">=0.11.0" },
     { name = "pymupdf", specifier = ">=1.24.0" },
     { name = "pyright", marker = "extra == 'dev'", specifier = ">=1.1.395" },
@@ -720,6 +735,15 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/1b/fa/2ef715a1cd329ef47c1a050e10dee91a9054b7ce2fcfdd6a06d139afb7ec/ruff-0.15.4-py3-none-win32.whl", hash = "sha256:65594a2d557d4ee9f02834fcdf0a28daa8b3b9f6cb2cb93846025a36db47ef22", size = 10506664, upload-time = "2026-02-26T20:03:50.56Z" },
     { url = "https://files.pythonhosted.org/packages/d0/a8/c688ef7e29983976820d18710f955751d9f4d4eb69df658af3d006e2ba3e/ruff-0.15.4-py3-none-win_amd64.whl", hash = "sha256:04196ad44f0df220c2ece5b0e959c2f37c777375ec744397d21d15b50a75264f", size = 11651048, upload-time = "2026-02-26T20:04:17.191Z" },
     { url = "https://files.pythonhosted.org/packages/3e/0a/9e1be9035b37448ce2e68c978f0591da94389ade5a5abafa4cf99985d1b2/ruff-0.15.4-py3-none-win_arm64.whl", hash = "sha256:60d5177e8cfc70e51b9c5fad936c634872a74209f934c1e79107d11787ad5453", size = 10966776, upload-time = "2026-02-26T20:03:56.908Z" },
+]
+
+[[package]]
+name = "six"
+version = "1.17.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/94/e7/b2c673351809dca68a0e064b6af791aa332cf192da575fd474ed7d6f16a2/six-1.17.0.tar.gz", hash = "sha256:ff70335d468e7eb6ec65b95b99d3a2836546063f63acc5171de367e834932a81", size = 34031, upload-time = "2024-12-04T17:35:28.174Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/b7/ce/149a00dd41f10bc29e5921b496af8b574d8413afcd5e30dfa0ed46c2cc5e/six-1.17.0-py2.py3-none-any.whl", hash = "sha256:4721f391ed90541fddacab5acf947aa0d3dc7d27b2e1e8eda2be8970586c3274", size = 11050, upload-time = "2024-12-04T17:35:26.475Z" },
 ]
 
 [[package]]

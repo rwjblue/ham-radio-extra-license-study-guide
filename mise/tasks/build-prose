@@ -2,7 +2,7 @@
 #MISE description="Build prose facts outputs"
 #MISE depends=["prose"]
 #MISE sources=["dist/pool/extra_pool_prose.json", "src/**/*.py", "pyproject.toml"]
-#MISE outputs=["dist/prose/prose-extra_facts.txt", "dist/prose/prose-extra_facts.pdf"]
+#MISE outputs=["dist/prose/prose-extra_facts.txt", "dist/prose/prose-extra_facts.pdf", "dist/prose/prose-extra_facts.epub"]
 set -euo pipefail
 
 uv run extra-facts build \

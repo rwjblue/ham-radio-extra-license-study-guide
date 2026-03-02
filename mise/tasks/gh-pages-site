@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #MISE description="Build GitHub Pages site payload from existing dist artifacts"
 #MISE depends=["deps-dev"]
-#MISE sources=["dist/pool/extra_pool_prose.json", "dist/audio/extra_facts_audio.txt", "dist/audio/extra_facts_audio.mp3", "dist/prose/prose-extra_facts.pdf", "dist/prose/prose-extra_facts-dark.pdf", "dist/pool/assets/**"]
+#MISE sources=["dist/pool/extra_pool_prose.json", "dist/audio/extra_facts_audio.txt", "dist/audio/extra_facts_audio.mp3", "dist/prose/prose-extra_facts.pdf", "dist/prose/prose-extra_facts-dark.pdf", "dist/prose/prose-extra_facts.epub", "dist/pool/assets/**"]
 #MISE outputs={auto=true}
 set -euo pipefail
 
@@ -15,6 +15,7 @@ required_files=(
   "${dist_dir}/audio/extra_facts_audio.mp3"
   "${dist_dir}/prose/prose-extra_facts.pdf"
   "${dist_dir}/prose/prose-extra_facts-dark.pdf"
+  "${dist_dir}/prose/prose-extra_facts.epub"
 )
 
 for file in "${required_files[@]}"; do
@@ -39,6 +40,7 @@ cp "${dist_dir}/audio/extra_facts_audio.txt" "${out_dir}/amateur-extra-license-p
 cp "${dist_dir}/audio/extra_facts_audio.mp3" "${out_dir}/amateur-extra-license-prep.mp3"
 cp "${dist_dir}/prose/prose-extra_facts.pdf" "${out_dir}/amateur-extra-license-prep-study-workbook.pdf"
 cp "${dist_dir}/prose/prose-extra_facts-dark.pdf" "${out_dir}/amateur-extra-license-prep-study-workbook-dark.pdf"
+cp "${dist_dir}/prose/prose-extra_facts.epub" "${out_dir}/amateur-extra-license-prep-study-workbook.epub"
 cp -R "${assets_dir}" "${out_dir}/assets"
 
 cat > "${out_dir}/index.html" <<'HTML'
@@ -138,6 +140,10 @@ cat > "${out_dir}/index.html" <<'HTML'
           <a class="asset" href="./amateur-extra-license-prep-study-workbook-dark.pdf">
             <strong>Study Workbook PDF (Dark)</strong>
             <span>Dark-theme version of the workbook for easier on-screen reading.</span>
+          </a>
+          <a class="asset" href="./amateur-extra-license-prep-study-workbook.epub">
+            <strong>Study Workbook EPUB</strong>
+            <span>E-reader version of the workbook for Kindle, Kobo, Apple Books, etc.</span>
           </a>
           <a class="asset" href="./amateur-extra-license-prep.mp3">
             <strong>Audio Book</strong>

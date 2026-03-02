@@ -42,7 +42,8 @@ def write_outputs(
     txt_name: str = "extra_facts.txt",
     pdf_name: str = "extra_facts.pdf",
     dark_pdf_name: str | None = None,
-) -> tuple[Path, Path, Path | None]:
+    epub_name: str | None = None,
+) -> tuple[Path, Path, Path | None, Path | None]:
     out_dir.mkdir(parents=True, exist_ok=True)
     groups = group_pool_questions(questions)
 
@@ -75,7 +76,20 @@ def write_outputs(
             theme="dark",
         )
 
-    return txt_path, pdf_path, dark_pdf_path
+    epub_path: Path | None = None
+    if epub_name:
+        from .epub import write_epub
+
+        epub_path = write_epub(
+            questions,
+            out_dir / epub_name,
+            mode,
+            omit_id,
+            metadata,
+            resolved_image_root,
+        )
+
+    return txt_path, pdf_path, dark_pdf_path, epub_path
 
 
 def _write_text(
