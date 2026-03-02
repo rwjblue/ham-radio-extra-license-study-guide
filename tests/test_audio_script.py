@@ -86,6 +86,29 @@ def test_write_audio_script_expands_khz_and_mhz_for_audio(tmp_path: Path) -> Non
     assert "MHz" not in content
 
 
+def test_write_audio_script_expands_usb_lsb_ssb_for_audio(tmp_path: Path) -> None:
+    questions = [
+        _question("E1A01", "What modulation is used?", "USB"),
+        _question("E1A02", "What alternative is common?", "LSB"),
+        _question("E1A03", "What family includes both?", "SSB"),
+    ]
+
+    path, _chapters_dir, _manifest_path = write_audio_script(
+        questions,
+        out_dir=tmp_path,
+        mode="prose",
+        omit_id=True,
+    )
+
+    content = path.read_text(encoding="utf-8")
+    assert "upper side band" in content
+    assert "lower side band" in content
+    assert "single side band" in content
+    assert " USB" not in content
+    assert " LSB" not in content
+    assert " SSB" not in content
+
+
 def test_write_audio_script_does_not_force_newline_within_fact_paragraph(tmp_path: Path) -> None:
     questions = [
         _question(
@@ -113,7 +136,7 @@ def test_write_audio_script_does_not_force_newline_within_fact_paragraph(tmp_pat
     ) not in content
     assert (
         "\n\nWhen using a transceiver that displays the carrier frequency of phone signals, "
-        "what is the lowest frequency at which a properly adjusted LSB emission will be "
+        "what is the lowest frequency at which a properly adjusted lower side band emission will be "
         "totally within the band: 3 kilohertz above the lower band edge.\n\n"
     ) in content
 

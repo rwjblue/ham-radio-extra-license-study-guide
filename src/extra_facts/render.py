@@ -140,7 +140,7 @@ def _build_audio_chapters(
         for question in questions:
             fact = fact_sentence(question, mode=mode, omit_id=omit_id)
             fact = _rewrite_first_abbreviation_use(fact, seen_abbreviations)
-            fact = _expand_frequency_units_for_tts(fact)
+            fact = _expand_terms_for_tts(fact)
             chapter_lines.append(_normalize_audio_paragraph(fact))
             chapter_lines.append("")
 
@@ -228,9 +228,12 @@ def _rewrite_first_abbreviation_use(text: str, seen_abbreviations: set[str]) -> 
     return re.sub(r"\b([A-Z]{2,})\s*\(([^)]+)\)", _replace, text)
 
 
-def _expand_frequency_units_for_tts(text: str) -> str:
+def _expand_terms_for_tts(text: str) -> str:
     out = re.sub(r"\bkHz\b", "kilohertz", text)
     out = re.sub(r"\bMHz\b", "megahertz", out)
+    out = re.sub(r"\bUSB\b", "upper side band", out)
+    out = re.sub(r"\bLSB\b", "lower side band", out)
+    out = re.sub(r"\bSSB\b", "single side band", out)
     return out
 
 
