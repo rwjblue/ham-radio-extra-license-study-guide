@@ -12,6 +12,8 @@ from pathlib import Path
 from typing import Any, Protocol, cast
 
 import requests
+from requests.adapters import HTTPAdapter
+from requests_cache import CachedSession
 
 
 class TtsClient(Protocol):
@@ -22,6 +24,8 @@ class TtsClient(Protocol):
 DurationProbe = Callable[[Path], float]
 AudioMerger = Callable[[list[Path], Path], None]
 TTS_MAX_CHARS = 3500
+DEFAULT_OPENAI_HTTP_CACHE_DIR = Path(".cache/openai-http")
+DEFAULT_OPENAI_HTTP_CACHE_NAME = "responses"
 
 
 class OpenAITtsClient:
@@ -32,6 +36,8 @@ class OpenAITtsClient:
         response_format: str = "mp3",
         speed: float = 1.0,
         api_key_env: str = "OPENAI_API_KEY",
+        cache_dir: Path | None = None,
+        cache_enabled: bool | None = None,
     ) -> None:
         api_key = os.getenv(api_key_env, "").strip()
         if not api_key:
@@ -41,9 +47,14 @@ class OpenAITtsClient:
         self.voice = voice
         self.response_format = response_format
         self.speed = speed
+        self.cache_enabled = _resolve_openai_http_cache_enabled(cache_enabled)
+        self.cache_dir = _resolve_openai_http_cache_dir(cache_dir)
+        self._session = _build_openai_session(self.cache_dir, self.cache_enabled)
+        adapter = HTTPAdapter(pool_connections=10, pool_maxsize=20)
+        self._session.mount("https://", adapter)
 
     def synthesize(self, text: str) -> bytes:
-        response = requests.post(
+        response = self._session.post(
             "https://api.openai.com/v1/audio/speech",
             headers={
                 "Authorization": f"Bearer {self.api_key}",
@@ -62,6 +73,38 @@ class OpenAITtsClient:
             body = response.text.strip()
             raise RuntimeError(f"OpenAI TTS request failed ({response.status_code}): {body}")
         return response.content
+
+
+def _resolve_openai_http_cache_enabled(config: bool | None) -> bool:
+    if config is not None:
+        return config
+    value = os.getenv("OPENAI_HTTP_CACHE", "1")
+    return value.strip().lower() not in {"0", "false", "no", "off"}
+
+
+def _resolve_openai_http_cache_dir(config: Path | None) -> Path:
+    if config is not None:
+        return config
+    value = os.getenv("OPENAI_HTTP_CACHE_DIR", "").strip()
+    if value:
+        return Path(value)
+    return DEFAULT_OPENAI_HTTP_CACHE_DIR
+
+
+def _build_openai_session(cache_dir: Path, cache_enabled: bool) -> requests.Session:
+    if not cache_enabled:
+        return requests.Session()
+    cache_dir.mkdir(parents=True, exist_ok=True)
+    cache_name = cache_dir / DEFAULT_OPENAI_HTTP_CACHE_NAME
+    return cast(
+        requests.Session,
+        CachedSession(
+            cache_name=str(cache_name),
+            backend="sqlite",
+            expire_after=-1,
+            allowable_methods=("GET", "POST"),
+        ),
+    )
 
 
 @dataclass(frozen=True)

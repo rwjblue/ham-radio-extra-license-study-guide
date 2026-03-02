@@ -3,7 +3,9 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from extra_facts.audio import render_audio_from_manifest
+from _pytest.monkeypatch import MonkeyPatch
+
+from extra_facts.audio import OpenAITtsClient, render_audio_from_manifest
 
 
 class _FakeTtsClient:
@@ -114,3 +116,24 @@ def test_render_audio_from_manifest_supports_no_merge(tmp_path: Path) -> None:
         probe_duration=_probe_fixed,
     )
     assert result.merged_audio_path is None
+
+
+def test_openai_tts_http_cache_enabled_defaults_true(monkeypatch: MonkeyPatch) -> None:
+    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
+    monkeypatch.delenv("OPENAI_HTTP_CACHE", raising=False)
+    client = OpenAITtsClient(model="gpt-4o-mini-tts", voice="alloy")
+    assert client.cache_enabled is True
+
+
+def test_openai_tts_http_cache_enabled_env_false(monkeypatch: MonkeyPatch) -> None:
+    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
+    monkeypatch.setenv("OPENAI_HTTP_CACHE", "false")
+    client = OpenAITtsClient(model="gpt-4o-mini-tts", voice="alloy")
+    assert client.cache_enabled is False
+
+
+def test_openai_tts_http_cache_dir_env(monkeypatch: MonkeyPatch) -> None:
+    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
+    monkeypatch.setenv("OPENAI_HTTP_CACHE_DIR", "/tmp/openai-http-cache-audio")
+    client = OpenAITtsClient(model="gpt-4o-mini-tts", voice="alloy")
+    assert client.cache_dir == Path("/tmp/openai-http-cache-audio")
