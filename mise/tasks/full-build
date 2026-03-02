@@ -4,11 +4,21 @@
 #MISE outputs={auto=true}
 set -euo pipefail
 
-if [ -n "${OPENAI_API_KEY:-}" ]; then
+provider="${TTS_PROVIDER:-elevenlabs}"
+
+if [ "${provider}" = "openai" ]; then
+  key_var_name="OPENAI_API_KEY"
+  key_value="${OPENAI_API_KEY:-}"
+else
+  key_var_name="ELEVENLABS_API_KEY"
+  key_value="${ELEVENLABS_API_KEY:-}"
+fi
+
+if [ -n "${key_value}" ]; then
   mise run audio-render
   mise run audio-verify
 else
-  echo "OPENAI_API_KEY not set; skipping audio-render and audio-verify"
+  echo "${key_var_name} not set for TTS_PROVIDER=${provider}; skipping audio-render and audio-verify"
 fi
 
 echo "full-build complete"

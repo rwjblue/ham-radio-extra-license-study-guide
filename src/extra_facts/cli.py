@@ -6,7 +6,7 @@ import sys
 import time
 from pathlib import Path
 
-from .audio import DEFAULT_TTS_INSTRUCTIONS
+from .audio import DEFAULT_ELEVENLABS_OUTPUT_FORMAT, DEFAULT_TTS_INSTRUCTIONS
 from .build import (
     build_audio_script_from_pool_json,
     build_from_pool_json,
@@ -66,12 +66,24 @@ def audio_script_command(args: argparse.Namespace) -> int:
 
 
 def audio_render_command(args: argparse.Namespace) -> int:
+    provider = args.provider.strip().lower()
+    if provider == "elevenlabs":
+        model = args.model or "eleven_multilingual_v2"
+        voice = args.voice or "JBFqnCBsd6RMkjVDRZzb"
+    elif provider == "openai":
+        model = args.model or "gpt-4o-mini-tts"
+        voice = args.voice or "alloy"
+    else:
+        raise SystemExit(f"Unsupported audio provider: {args.provider}")
+
     summary = render_audio_from_chapter_manifest(
         manifest_path=Path(args.manifest),
         out_dir=Path(args.out_dir),
-        model=args.model,
-        voice=args.voice,
+        provider=provider,
+        model=model,
+        voice=voice,
         output_format=args.output_format,
+        elevenlabs_output_format=args.elevenlabs_output_format,
         speed=args.speed,
         instructions=args.instructions,
         merge_output=args.merge,
@@ -184,8 +196,14 @@ def create_parser() -> argparse.ArgumentParser:
         help="Path to chapter manifest JSON from audio-script stage",
     )
     render_audio.add_argument("--out-dir", default="dist/audio", help="Output directory")
-    render_audio.add_argument("--model", default="gpt-4o-mini-tts", help="TTS model name")
-    render_audio.add_argument("--voice", default="alloy", help="TTS voice")
+    render_audio.add_argument(
+        "--provider",
+        choices=["elevenlabs", "openai"],
+        default="elevenlabs",
+        help="TTS provider",
+    )
+    render_audio.add_argument("--model", help="TTS model name (provider-specific)")
+    render_audio.add_argument("--voice", help="TTS voice (OpenAI voice or ElevenLabs voice_id)")
     render_audio.add_argument(
         "--output-format",
         default="mp3",
@@ -201,7 +219,12 @@ def create_parser() -> argparse.ArgumentParser:
     render_audio.add_argument(
         "--instructions",
         default=DEFAULT_TTS_INSTRUCTIONS,
-        help="Optional style directions for TTS delivery (tone, pacing, emphasis)",
+        help="Optional style directions for OpenAI TTS delivery",
+    )
+    render_audio.add_argument(
+        "--elevenlabs-output-format",
+        default=DEFAULT_ELEVENLABS_OUTPUT_FORMAT,
+        help="ElevenLabs output format value (for example mp3_44100_128)",
     )
     render_audio.add_argument(
         "--no-merge",

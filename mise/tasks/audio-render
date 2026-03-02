@@ -7,8 +7,10 @@ cmd=(
   uv run extra-facts audio-render
   --manifest "${MANIFEST:-dist/audio/audio_chapters_manifest.json}"
   --out-dir "${OUT_DIR:-dist/audio}"
-  --model "${MODEL:-gpt-4o-mini-tts}"
-  --voice "${VOICE:-alloy}"
+  --provider "${TTS_PROVIDER:-elevenlabs}"
+  --model "${TTS_MODEL:-eleven_multilingual_v2}"
+  --voice "${TTS_VOICE:-JBFqnCBsd6RMkjVDRZzb}"
+  --elevenlabs-output-format "${ELEVENLABS_OUTPUT_FORMAT:-mp3_44100_128}"
   --speed "${SPEED:-1.0}"
 )
 

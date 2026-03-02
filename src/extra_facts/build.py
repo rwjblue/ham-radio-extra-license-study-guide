@@ -3,7 +3,13 @@ from __future__ import annotations
 from collections.abc import Callable
 from pathlib import Path
 
-from .audio import DEFAULT_TTS_INSTRUCTIONS, OpenAITtsClient, render_audio_from_manifest
+from .audio import (
+    DEFAULT_ELEVENLABS_OUTPUT_FORMAT,
+    DEFAULT_TTS_INSTRUCTIONS,
+    ElevenLabsTtsClient,
+    OpenAITtsClient,
+    render_audio_from_manifest,
+)
 from .audio_verify import verify_audio_from_manifest
 from .downloader import download_source
 from .extract import extract_text
@@ -142,26 +148,46 @@ def build_audio_script_from_pool_json(
 def render_audio_from_chapter_manifest(
     manifest_path: Path,
     out_dir: Path,
+    provider: str,
     model: str,
     voice: str,
     output_format: str,
+    elevenlabs_output_format: str,
     speed: float,
     instructions: str | None,
     merge_output: bool,
     embed_chapters: bool,
     out_manifest_path: Path | None = None,
 ) -> AudioRenderSummary:
-    resolved_instructions = instructions.strip() if instructions else DEFAULT_TTS_INSTRUCTIONS
-    render_fingerprint = (
-        f"openai:{model}:{voice}:{speed}:{output_format}:{resolved_instructions}"
-    )
-    client = OpenAITtsClient(
-        model=model,
-        voice=voice,
-        response_format=output_format,
-        speed=speed,
-        instructions=resolved_instructions,
-    )
+    normalized_provider = provider.strip().lower()
+    if normalized_provider == "openai":
+        resolved_instructions = instructions.strip() if instructions else DEFAULT_TTS_INSTRUCTIONS
+        render_fingerprint = (
+            f"openai:{model}:{voice}:{speed}:{output_format}:{resolved_instructions}"
+        )
+        client = OpenAITtsClient(
+            model=model,
+            voice=voice,
+            response_format=output_format,
+            speed=speed,
+            instructions=resolved_instructions,
+        )
+    elif normalized_provider == "elevenlabs":
+        resolved_output_format = (
+            elevenlabs_output_format.strip()
+            if elevenlabs_output_format
+            else DEFAULT_ELEVENLABS_OUTPUT_FORMAT
+        )
+        render_fingerprint = f"elevenlabs:{model}:{voice}:{speed}:{resolved_output_format}"
+        client = ElevenLabsTtsClient(
+            model=model,
+            voice_id=voice,
+            response_format=resolved_output_format,
+            speed=speed,
+        )
+    else:
+        raise RuntimeError(f"Unsupported audio provider: {provider}")
+
     result = render_audio_from_manifest(
         manifest_path=manifest_path,
         out_dir=out_dir,
@@ -171,6 +197,7 @@ def render_audio_from_chapter_manifest(
         embed_chapters=embed_chapters,
         out_manifest_path=out_manifest_path,
         render_fingerprint=render_fingerprint,
+        provider=normalized_provider,
     )
     return AudioRenderSummary(
         chapter_count=result.chapter_count,

@@ -28,6 +28,9 @@ ChapterMarkerEmbedder = Callable[[list[dict[str, Any]], Path], None]
 TTS_MAX_CHARS = 3500
 DEFAULT_OPENAI_HTTP_CACHE_DIR = Path(".cache/openai-http")
 DEFAULT_OPENAI_HTTP_CACHE_NAME = "audio-speech-v2"
+DEFAULT_ELEVENLABS_HTTP_CACHE_DIR = Path(".cache/elevenlabs-http")
+DEFAULT_ELEVENLABS_HTTP_CACHE_NAME = "text-to-speech-v1"
+DEFAULT_ELEVENLABS_OUTPUT_FORMAT = "mp3_44100_128"
 DEFAULT_TTS_INSTRUCTIONS = (
     "High-energy study coach. Upbeat and motivating. Dynamic intonation with "
     "emphasis on key facts and numbers. Keep it natural, not theatrical."
@@ -72,15 +75,25 @@ class OpenAITtsClient:
         if self.instructions:
             payload["instructions"] = self.instructions
 
-        speech_response = self._session.post(
-            "https://api.openai.com/v1/audio/speech",
-            headers={
-                "Authorization": f"Bearer {self.api_key}",
-                "Content-Type": "application/json",
-            },
-            json=payload,
-            timeout=180,
-        )
+        speech_response = self._post_audio_speech(self._session, payload)
+        first_from_cache = bool(getattr(speech_response, "from_cache", False))
+        if speech_response.status_code >= 400:
+            # Retry once without cache so stale/poisoned cache entries cannot block renders.
+            with requests.Session() as uncached_session:
+                uncached_session.trust_env = False
+                retry_response = self._post_audio_speech(uncached_session, payload)
+            if retry_response.status_code < 400:
+                speech_response = retry_response
+            else:
+                first_body = speech_response.text.strip()
+                retry_body = retry_response.text.strip()
+                raise RuntimeError(
+                    "OpenAI TTS request failed for /v1/audio/speech; "
+                    "first attempt "
+                    f"({speech_response.status_code}, from_cache={first_from_cache}): "
+                    f"{first_body}; retry ({retry_response.status_code}): {retry_body}"
+                )
+
         if speech_response.status_code < 400:
             content_type = speech_response.headers.get("Content-Type", "").lower()
             if "application/json" in content_type:
@@ -95,6 +108,109 @@ class OpenAITtsClient:
         raise RuntimeError(
             "OpenAI TTS request failed for /v1/audio/speech "
             f"({speech_response.status_code}): {speech_body}"
+        )
+
+    def _post_audio_speech(
+        self,
+        session: requests.Session,
+        payload: dict[str, Any],
+    ) -> requests.Response:
+        return session.post(
+            "https://api.openai.com/v1/audio/speech",
+            headers={
+                "Authorization": f"Bearer {self.api_key}",
+                "Content-Type": "application/json",
+            },
+            json=payload,
+            timeout=180,
+        )
+
+
+class ElevenLabsTtsClient:
+    def __init__(
+        self,
+        model: str,
+        voice_id: str,
+        response_format: str = DEFAULT_ELEVENLABS_OUTPUT_FORMAT,
+        speed: float = 1.0,
+        api_key_env: str = "ELEVENLABS_API_KEY",
+        cache_dir: Path | None = None,
+        cache_enabled: bool | None = None,
+    ) -> None:
+        api_key = os.getenv(api_key_env, "").strip()
+        if not api_key:
+            raise RuntimeError(f"Missing API key env var: {api_key_env}")
+        if speed != 1.0:
+            raise RuntimeError(
+                "ElevenLabs client currently supports speed=1.0 only for deterministic output"
+            )
+        self.api_key = api_key
+        self.model = model
+        self.voice_id = voice_id
+        self.response_format = response_format
+        self.speed = speed
+        self.cache_enabled = _resolve_elevenlabs_http_cache_enabled(cache_enabled)
+        self.cache_dir = _resolve_elevenlabs_http_cache_dir(cache_dir)
+        self._session = _build_elevenlabs_session(self.cache_dir, self.cache_enabled)
+        adapter = HTTPAdapter(pool_connections=10, pool_maxsize=20)
+        self._session.mount("https://", adapter)
+
+    def synthesize(self, text: str) -> bytes:
+        payload: dict[str, Any] = {
+            "text": text,
+            "model_id": self.model,
+        }
+
+        speech_response = self._post_audio_speech(self._session, payload)
+        first_from_cache = bool(getattr(speech_response, "from_cache", False))
+        if speech_response.status_code >= 400:
+            # Retry once without cache so stale/poisoned cache entries cannot block renders.
+            with requests.Session() as uncached_session:
+                uncached_session.trust_env = False
+                retry_response = self._post_audio_speech(uncached_session, payload)
+            if retry_response.status_code < 400:
+                speech_response = retry_response
+            else:
+                first_body = speech_response.text.strip()
+                retry_body = retry_response.text.strip()
+                raise RuntimeError(
+                    "ElevenLabs TTS request failed for /v1/text-to-speech/{voice_id}; "
+                    "first attempt "
+                    f"({speech_response.status_code}, from_cache={first_from_cache}): "
+                    f"{first_body}; retry ({retry_response.status_code}): {retry_body}"
+                )
+
+        if speech_response.status_code < 400:
+            content_type = speech_response.headers.get("Content-Type", "").lower()
+            if "application/json" in content_type:
+                body = speech_response.text.strip()
+                raise RuntimeError(
+                    "ElevenLabs TTS request returned JSON for /v1/text-to-speech/{voice_id}; "
+                    f"expected audio bytes. Body: {body}"
+                )
+            return speech_response.content
+
+        speech_body = speech_response.text.strip()
+        raise RuntimeError(
+            "ElevenLabs TTS request failed for /v1/text-to-speech/{voice_id} "
+            f"({speech_response.status_code}): {speech_body}"
+        )
+
+    def _post_audio_speech(
+        self,
+        session: requests.Session,
+        payload: dict[str, Any],
+    ) -> requests.Response:
+        return session.post(
+            f"https://api.elevenlabs.io/v1/text-to-speech/{self.voice_id}",
+            headers={
+                "xi-api-key": self.api_key,
+                "Content-Type": "application/json",
+                "Accept": "audio/mpeg",
+            },
+            params={"output_format": self.response_format},
+            json=payload,
+            timeout=180,
         )
 
 
@@ -119,6 +235,39 @@ def _build_openai_session(cache_dir: Path, cache_enabled: bool) -> requests.Sess
         return requests.Session()
     cache_dir.mkdir(parents=True, exist_ok=True)
     cache_name = cache_dir / DEFAULT_OPENAI_HTTP_CACHE_NAME
+    return cast(
+        requests.Session,
+        CachedSession(
+            cache_name=str(cache_name),
+            backend="sqlite",
+            expire_after=-1,
+            allowable_methods=("GET", "POST"),
+            allowable_codes=(200,),
+        ),
+    )
+
+
+def _resolve_elevenlabs_http_cache_enabled(config: bool | None) -> bool:
+    if config is not None:
+        return config
+    value = os.getenv("ELEVENLABS_HTTP_CACHE", "1")
+    return value.strip().lower() not in {"0", "false", "no", "off"}
+
+
+def _resolve_elevenlabs_http_cache_dir(config: Path | None) -> Path:
+    if config is not None:
+        return config
+    value = os.getenv("ELEVENLABS_HTTP_CACHE_DIR", "").strip()
+    if value:
+        return Path(value)
+    return DEFAULT_ELEVENLABS_HTTP_CACHE_DIR
+
+
+def _build_elevenlabs_session(cache_dir: Path, cache_enabled: bool) -> requests.Session:
+    if not cache_enabled:
+        return requests.Session()
+    cache_dir.mkdir(parents=True, exist_ok=True)
+    cache_name = cache_dir / DEFAULT_ELEVENLABS_HTTP_CACHE_NAME
     return cast(
         requests.Session,
         CachedSession(
@@ -156,6 +305,7 @@ def render_audio_from_manifest(
     embed_chapters: bool = True,
     embed_chapter_markers: ChapterMarkerEmbedder | None = None,
     render_fingerprint: str = "",
+    provider: str = "openai",
 ) -> AudioRenderResult:
     payload = cast(dict[str, Any], json.loads(manifest_path.read_text(encoding="utf-8")))
     chapters_payload = payload.get("chapters")
@@ -230,7 +380,7 @@ def render_audio_from_manifest(
             chapter_markers_embedded = True
 
     payload["audio_render"] = {
-        "provider": "openai",
+        "provider": provider,
         "output_format": output_format,
         "merged_audio_path": (
             str(merged_audio_path.as_posix()) if merged_audio_path is not None else None

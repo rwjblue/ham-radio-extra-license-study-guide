@@ -31,6 +31,9 @@ cp .env.example .env
 # optional: tweak HTTP cache behavior for OpenAI calls
 # OPENAI_HTTP_CACHE=1
 # OPENAI_HTTP_CACHE_DIR=.cache/openai-http
+# set TTS provider credentials for audio render
+# TTS_PROVIDER=elevenlabs
+# ELEVENLABS_API_KEY=...
 ```
 
 3. Build:
@@ -40,7 +43,9 @@ mise run full-build
 ```
 
 `mise run full-build` now also generates the listenable audio script, and
-when `OPENAI_API_KEY` is set it renders and verifies chapter/merged MP3 outputs.
+when the configured TTS provider key is set (`ELEVENLABS_API_KEY` by default,
+or `OPENAI_API_KEY` when `TTS_PROVIDER=openai`) it renders and verifies
+chapter/merged MP3 outputs.
 
 If you want to regenerate only the audio script from the static pool:
 
@@ -92,7 +97,7 @@ extra-facts extract --docx <local.docx> --out-json dist/extra_pool.json
 extra-facts prose --pool-json dist/extra_pool.json --out-json dist/extra_pool_prose.json [--model gpt-5-mini] [--prompt-version v1] [--workers 6] [--max-attempts 3] [--max-questions N] [--resume]
 extra-facts build --pool-json dist/extra_pool.json --out-dir dist --mode literal|tts|prose [--omit-id]
 extra-facts audio-script --pool-json dist/extra_pool_prose.json --out-dir dist/audio --mode prose [--include-id]
-extra-facts audio-render --manifest dist/audio/audio_chapters_manifest.json --out-dir dist/audio [--model gpt-4o-mini-tts] [--voice alloy] [--speed 1.0] [--instructions "Custom style override"] [--no-merge] [--no-chapter-markers]
+extra-facts audio-render --manifest dist/audio/audio_chapters_manifest.json --out-dir dist/audio [--provider elevenlabs|openai] [--model <provider-model>] [--voice <provider-voice>] [--elevenlabs-output-format mp3_44100_128] [--speed 1.0] [--instructions "Custom style override"] [--no-merge] [--no-chapter-markers]
 extra-facts audio-verify --manifest dist/audio/audio_chapters_manifest.json [--allow-missing-merged] [--skip-chapter-marker-check]
 ```
 
@@ -102,8 +107,10 @@ extra-facts audio-verify --manifest dist/audio/audio_chapters_manifest.json [--a
 - Parsing is deterministic and excludes withdrawn/removed/deleted questions.
 - Group order is preserved as published.
 - OpenAI prose calls use on-disk HTTP caching by default at `.cache/openai-http` (override via `OPENAI_HTTP_CACHE_DIR`, disable with `OPENAI_HTTP_CACHE=0`).
+- Audio render defaults to ElevenLabs (`TTS_PROVIDER=elevenlabs`) with `TTS_MODEL=eleven_multilingual_v2` and `TTS_VOICE=JBFqnCBsd6RMkjVDRZzb`; switch to OpenAI by setting `TTS_PROVIDER=openai`.
+- ElevenLabs audio-render calls use on-disk HTTP caching at `.cache/elevenlabs-http` (override via `ELEVENLABS_HTTP_CACHE_DIR`, disable with `ELEVENLABS_HTTP_CACHE=0`).
 - OpenAI audio-render calls use the same HTTP cache controls as prose.
-- Audio render defaults to an energetic study-coach style; set `INSTRUCTIONS` (for `mise run audio-render`) or `--instructions` (CLI) to override it.
+- Audio render instructions are currently applied to OpenAI only; set `INSTRUCTIONS` (for `mise run audio-render`) or `--instructions` (CLI) to override OpenAI delivery style.
 - `audio-render` uses `ffprobe` (duration extraction) and `ffmpeg` (MP3 merge + chapter markers).
 - `audio-render` reuses existing chapter MP3 files when chapter text and render settings are unchanged.
 

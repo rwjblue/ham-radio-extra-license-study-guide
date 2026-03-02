@@ -9,7 +9,9 @@ import requests
 from _pytest.monkeypatch import MonkeyPatch
 
 from extra_facts.audio import (
+    DEFAULT_ELEVENLABS_OUTPUT_FORMAT,
     DEFAULT_TTS_INSTRUCTIONS,
+    ElevenLabsTtsClient,
     OpenAITtsClient,
     render_audio_from_manifest,
 )
@@ -274,11 +276,13 @@ class _RecordingResponse:
         content: bytes,
         text: str = "",
         headers: dict[str, str] | None = None,
+        from_cache: bool = False,
     ) -> None:
         self.status_code = status_code
         self.content = content
         self.text = text
         self.headers = headers or {}
+        self.from_cache = from_cache
 
 
 class _RecordingSession:
@@ -292,6 +296,7 @@ class _RecordingSession:
         headers: dict[str, str],
         json: dict[str, object],
         timeout: int,
+        params: dict[str, object] | None = None,
     ) -> _RecordingResponse:
         self.calls.append(
             {
@@ -299,9 +304,41 @@ class _RecordingSession:
                 "headers": headers,
                 "json": json,
                 "timeout": timeout,
+                "params": params,
             }
         )
         return self.response
+
+
+class _SequenceSession:
+    def __init__(self, responses: list[_RecordingResponse]) -> None:
+        self.responses = responses
+        self.calls: list[dict[str, object]] = []
+
+    def post(
+        self,
+        url: str,
+        headers: dict[str, str],
+        json: dict[str, object],
+        timeout: int,
+        params: dict[str, object] | None = None,
+    ) -> _RecordingResponse:
+        self.calls.append(
+            {
+                "url": url,
+                "headers": headers,
+                "json": json,
+                "timeout": timeout,
+                "params": params,
+            }
+        )
+        return self.responses.pop(0)
+
+    def __enter__(self) -> _SequenceSession:
+        return self
+
+    def __exit__(self, *_args: object) -> bool:
+        return False
 
 
 def test_openai_tts_synthesize_uses_audio_speech_endpoint(monkeypatch: MonkeyPatch) -> None:
@@ -331,20 +368,38 @@ def test_openai_tts_synthesize_uses_audio_speech_endpoint(monkeypatch: MonkeyPat
 def test_openai_tts_synthesize_raises_without_responses_fallback(monkeypatch: MonkeyPatch) -> None:
     monkeypatch.setenv("OPENAI_API_KEY", "test-key")
     client = OpenAITtsClient(model="gpt-4o-mini-tts", voice="alloy")
-    session = _RecordingSession(
-        _RecordingResponse(
-            status_code=400,
-            content=b"",
-            text='{"error":"bad request"}',
-            headers={"Content-Type": "application/json"},
-        )
+    cached_or_primary_session = _SequenceSession(
+        [
+            _RecordingResponse(
+                status_code=400,
+                content=b"",
+                text='{"error":"bad request"}',
+                headers={"Content-Type": "application/json"},
+            )
+        ]
     )
-    client._session = cast(requests.Session, session)  # pyright: ignore[reportPrivateUsage]
+    uncached_retry_session = _SequenceSession(
+        [
+            _RecordingResponse(
+                status_code=401,
+                content=b"",
+                text='{"error":"retry unauthorized"}',
+                headers={"Content-Type": "application/json"},
+            )
+        ]
+    )
+    client._session = cast(requests.Session, cached_or_primary_session)  # pyright: ignore[reportPrivateUsage]
+    monkeypatch.setattr(
+        requests,
+        "Session",
+        lambda: cast(requests.Session, uncached_retry_session),
+    )
 
-    with pytest.raises(RuntimeError, match=r"/v1/audio/speech \(400\)"):
+    with pytest.raises(RuntimeError, match=r"first attempt \(400, from_cache=False\)"):
         client.synthesize("hello")
 
-    assert len(session.calls) == 1
+    assert len(cached_or_primary_session.calls) == 1
+    assert len(uncached_retry_session.calls) == 1
 
 
 def test_openai_tts_synthesize_includes_instructions(monkeypatch: MonkeyPatch) -> None:
@@ -367,3 +422,124 @@ def test_openai_tts_synthesize_includes_instructions(monkeypatch: MonkeyPatch) -
 
     request_payload = cast(dict[str, object], session.calls[0]["json"])
     assert request_payload["instructions"] == "Warm, engaging delivery with varied intonation."
+
+
+def test_openai_tts_retries_uncached_when_cached_error_returned(monkeypatch: MonkeyPatch) -> None:
+    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
+    client = OpenAITtsClient(model="gpt-4o-mini-tts", voice="alloy")
+    cached_error_session = _SequenceSession(
+        [
+            _RecordingResponse(
+                status_code=404,
+                content=b"",
+                text='{"error":"stale cached error"}',
+                headers={"Content-Type": "application/json"},
+                from_cache=True,
+            )
+        ]
+    )
+    uncached_success_session = _SequenceSession(
+        [
+            _RecordingResponse(
+                status_code=200,
+                content=b"audio-bytes",
+                headers={"Content-Type": "audio/mpeg"},
+            )
+        ]
+    )
+    client._session = cast(requests.Session, cached_error_session)  # pyright: ignore[reportPrivateUsage]
+    monkeypatch.setattr(
+        requests,
+        "Session",
+        lambda: cast(requests.Session, uncached_success_session),
+    )
+
+    rendered = client.synthesize("hello")
+
+    assert rendered == b"audio-bytes"
+    assert len(cached_error_session.calls) == 1
+    assert len(uncached_success_session.calls) == 1
+
+
+def test_elevenlabs_tts_http_cache_enabled_defaults_true(monkeypatch: MonkeyPatch) -> None:
+    monkeypatch.setenv("ELEVENLABS_API_KEY", "test-key")
+    monkeypatch.delenv("ELEVENLABS_HTTP_CACHE", raising=False)
+    client = ElevenLabsTtsClient(model="eleven_multilingual_v2", voice_id="voice-id")
+    assert client.cache_enabled is True
+
+
+def test_elevenlabs_tts_http_cache_enabled_env_false(monkeypatch: MonkeyPatch) -> None:
+    monkeypatch.setenv("ELEVENLABS_API_KEY", "test-key")
+    monkeypatch.setenv("ELEVENLABS_HTTP_CACHE", "false")
+    client = ElevenLabsTtsClient(model="eleven_multilingual_v2", voice_id="voice-id")
+    assert client.cache_enabled is False
+
+
+def test_elevenlabs_tts_http_cache_dir_env(monkeypatch: MonkeyPatch) -> None:
+    monkeypatch.setenv("ELEVENLABS_API_KEY", "test-key")
+    monkeypatch.setenv("ELEVENLABS_HTTP_CACHE_DIR", "/tmp/elevenlabs-http-cache-audio")
+    client = ElevenLabsTtsClient(model="eleven_multilingual_v2", voice_id="voice-id")
+    assert client.cache_dir == Path("/tmp/elevenlabs-http-cache-audio")
+
+
+def test_elevenlabs_tts_synthesize_uses_tts_endpoint(monkeypatch: MonkeyPatch) -> None:
+    monkeypatch.setenv("ELEVENLABS_API_KEY", "test-key")
+    client = ElevenLabsTtsClient(model="eleven_multilingual_v2", voice_id="voice-id")
+    session = _RecordingSession(
+        _RecordingResponse(
+            status_code=200,
+            content=b"audio-bytes",
+            headers={"Content-Type": "audio/mpeg"},
+        )
+    )
+    client._session = cast(requests.Session, session)  # pyright: ignore[reportPrivateUsage]
+
+    rendered = client.synthesize("hello")
+
+    assert rendered == b"audio-bytes"
+    assert len(session.calls) == 1
+    assert session.calls[0]["url"] == "https://api.elevenlabs.io/v1/text-to-speech/voice-id"
+    request_payload = cast(dict[str, object], session.calls[0]["json"])
+    assert request_payload["model_id"] == "eleven_multilingual_v2"
+    assert request_payload["text"] == "hello"
+    request_params = cast(dict[str, object], session.calls[0]["params"])
+    assert request_params["output_format"] == DEFAULT_ELEVENLABS_OUTPUT_FORMAT
+
+
+def test_elevenlabs_tts_retries_uncached_when_cached_error_returned(
+    monkeypatch: MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("ELEVENLABS_API_KEY", "test-key")
+    client = ElevenLabsTtsClient(model="eleven_multilingual_v2", voice_id="voice-id")
+    cached_error_session = _SequenceSession(
+        [
+            _RecordingResponse(
+                status_code=404,
+                content=b"",
+                text='{"error":"stale cached error"}',
+                headers={"Content-Type": "application/json"},
+                from_cache=True,
+            )
+        ]
+    )
+    uncached_success_session = _SequenceSession(
+        [
+            _RecordingResponse(
+                status_code=200,
+                content=b"audio-bytes",
+                headers={"Content-Type": "audio/mpeg"},
+            )
+        ]
+    )
+    client._session = cast(requests.Session, cached_error_session)  # pyright: ignore[reportPrivateUsage]
+    monkeypatch.setattr(
+        requests,
+        "Session",
+        lambda: cast(requests.Session, uncached_success_session),
+    )
+
+    rendered = client.synthesize("hello")
+
+    assert rendered == b"audio-bytes"
+    assert len(cached_error_session.calls) == 1
+    assert len(uncached_success_session.calls) == 1
