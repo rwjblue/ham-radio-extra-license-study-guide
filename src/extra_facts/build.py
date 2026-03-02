@@ -12,7 +12,7 @@ from .audio import (
 )
 from .audio_verify import verify_audio_from_manifest
 from .downloader import download_source
-from .extract import export_docx_media, extract_docx_with_images, extract_text
+from .extract import export_docx_media_for_questions, extract_docx_with_images, extract_text
 from .intermediate import read_question_pool, to_question_pool, write_question_pool
 from .models import (
     AudioRenderSummary,
@@ -37,11 +37,11 @@ def extract_pool_from_source(source_path: Path, pool_json_path: Path) -> Extract
     if source_path.suffix.lower() == ".docx":
         text, docx_image_paths = extract_docx_with_images(source_path)
         assets_dir = pool_json_path.parent / "assets"
-        media_map = export_docx_media(source_path, assets_dir)
-        question_images = {
-            question_id: [media_map[path] for path in paths if path in media_map]
-            for question_id, paths in docx_image_paths.items()
-        }
+        question_images = export_docx_media_for_questions(
+            source_path,
+            assets_dir,
+            docx_image_paths,
+        )
     else:
         text = extract_text(source_path)
 
