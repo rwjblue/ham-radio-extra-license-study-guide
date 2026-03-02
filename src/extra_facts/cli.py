@@ -66,7 +66,7 @@ def audio_script_command(args: argparse.Namespace) -> int:
 
 
 def audio_render_command(args: argparse.Namespace) -> int:
-    provider = args.provider.strip().lower()
+    provider = resolve_tts_provider(args.provider)
     if provider == "elevenlabs":
         model = args.model or "eleven_multilingual_v2"
         voice = args.voice or "JBFqnCBsd6RMkjVDRZzb"
@@ -103,6 +103,21 @@ def audio_render_command(args: argparse.Namespace) -> int:
     print(f"Chapters reused: {summary.chapters_reused}")
     print(f"Total duration (seconds): {summary.total_duration_seconds}")
     return 0
+
+
+def resolve_tts_provider(provider: str | None) -> str:
+    if provider:
+        return provider.strip().lower()
+
+    has_elevenlabs_key = bool(os.getenv("ELEVENLABS_API_KEY", "").strip())
+    if has_elevenlabs_key:
+        return "elevenlabs"
+
+    has_openai_key = bool(os.getenv("OPENAI_API_KEY", "").strip())
+    if has_openai_key:
+        return "openai"
+
+    return "elevenlabs"
 
 
 def audio_verify_command(args: argparse.Namespace) -> int:
@@ -200,8 +215,10 @@ def create_parser() -> argparse.ArgumentParser:
     render_audio.add_argument(
         "--provider",
         choices=["elevenlabs", "openai"],
-        default="elevenlabs",
-        help="TTS provider",
+        help=(
+            "TTS provider (auto-detected by key availability if omitted: "
+            "ELEVENLABS_API_KEY first, then OPENAI_API_KEY)"
+        ),
     )
     render_audio.add_argument("--model", help="TTS model name (provider-specific)")
     render_audio.add_argument("--voice", help="TTS voice (OpenAI voice or ElevenLabs voice_id)")
