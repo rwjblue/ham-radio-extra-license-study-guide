@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+#MISE description="Verify rendered chapter audio files and merged MP3 markers"
+#MISE depends=["deps-dev", "audio-render"]
+set -euo pipefail
+
+uv run extra-facts audio-verify \
+  --manifest "${MANIFEST:-dist/audio/audio_chapters_manifest.json}" \
+  ${ALLOW_MISSING_MERGED:+--allow-missing-merged} \
+  ${SKIP_CHAPTER_MARKERS:+--skip-chapter-marker-check}

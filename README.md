@@ -53,6 +53,12 @@ Render MP3 audio from chapter text files:
 mise run audio-render
 ```
 
+Verify rendered MP3s, timing metadata, and chapter markers:
+
+```bash
+mise run audio-verify
+```
+
 4. Compare static vs prose text:
 
 ```bash
@@ -86,6 +92,7 @@ extra-facts prose --pool-json dist/extra_pool.json --out-json dist/extra_pool_pr
 extra-facts build --pool-json dist/extra_pool.json --out-dir dist --mode literal|tts|prose [--omit-id]
 extra-facts audio-script --pool-json dist/extra_pool_prose.json --out-dir dist/audio --mode prose [--include-id]
 extra-facts audio-render --manifest dist/audio/audio_chapters_manifest.json --out-dir dist/audio [--model gpt-4o-mini-tts] [--voice alloy] [--speed 1.0] [--no-merge] [--no-chapter-markers]
+extra-facts audio-verify --manifest dist/audio/audio_chapters_manifest.json [--allow-missing-merged] [--skip-chapter-marker-check]
 ```
 
 ## Notes

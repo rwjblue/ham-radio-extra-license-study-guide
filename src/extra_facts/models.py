@@ -80,6 +80,15 @@ class AudioRenderSummary:
 
 
 @dataclass(frozen=True)
+class AudioVerifySummary:
+    manifest_path: Path
+    chapter_count: int
+    chapter_markers_verified: bool
+    merged_audio_path: Path | None
+    total_duration_seconds: float
+
+
+@dataclass(frozen=True)
 class ExtractSummary:
     question_count: int
     group_count: int

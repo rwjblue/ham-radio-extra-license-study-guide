@@ -4,10 +4,17 @@ from collections.abc import Callable
 from pathlib import Path
 
 from .audio import OpenAITtsClient, render_audio_from_manifest
+from .audio_verify import verify_audio_from_manifest
 from .downloader import download_source
 from .extract import extract_text
 from .intermediate import read_question_pool, to_question_pool, write_question_pool
-from .models import AudioRenderSummary, AudioScriptSummary, BuildSummary, ExtractSummary
+from .models import (
+    AudioRenderSummary,
+    AudioScriptSummary,
+    AudioVerifySummary,
+    BuildSummary,
+    ExtractSummary,
+)
 from .parser import extract_pool_metadata, parse_questions
 from .prose import (
     OpenAIProseClient,
@@ -170,4 +177,16 @@ def render_audio_from_chapter_manifest(
         chapter_markers_embedded=result.chapter_markers_embedded,
         chapters_rendered=result.chapters_rendered,
         chapters_reused=result.chapters_reused,
+    )
+
+
+def verify_audio_outputs(
+    manifest_path: Path,
+    require_merged_audio: bool,
+    require_chapter_markers: bool,
+) -> AudioVerifySummary:
+    return verify_audio_from_manifest(
+        manifest_path=manifest_path,
+        require_merged_audio=require_merged_audio,
+        require_chapter_markers=require_chapter_markers,
     )
