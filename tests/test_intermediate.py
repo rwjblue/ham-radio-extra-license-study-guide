@@ -15,6 +15,7 @@ def test_question_pool_round_trip(tmp_path: Path) -> None:
             choices={"A": "wrong", "B": "right", "C": "no", "D": "never"},
             group="E1A",
             subelement="E1",
+            image_paths=["assets/image1.png"],
         )
     ]
 
@@ -23,6 +24,7 @@ def test_question_pool_round_trip(tmp_path: Path) -> None:
     assert pool.excluded_count == 2
     assert pool.questions[0].correct_choice_index == 1
     assert pool.questions[0].correct_answer == "right"
+    assert pool.questions[0].image_paths == ["assets/image1.png"]
 
     target = tmp_path / "pool.json"
     write_question_pool(pool, target)

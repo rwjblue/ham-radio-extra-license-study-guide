@@ -9,6 +9,10 @@ def _empty_str_map() -> dict[str, str]:
     return {}
 
 
+def _empty_str_list() -> list[str]:
+    return []
+
+
 @dataclass(frozen=True)
 class ParsedQuestion:
     question_id: str
@@ -17,6 +21,7 @@ class ParsedQuestion:
     choices: dict[str, str]
     group: str
     subelement: str
+    image_paths: list[str] = field(default_factory=_empty_str_list)
 
 
 @dataclass(frozen=True)
@@ -27,6 +32,7 @@ class PoolQuestion:
     correct_choice_index: int
     group: str
     subelement: str
+    image_paths: list[str] = field(default_factory=_empty_str_list)
     llm: LlmProse | None = None
 
     @property

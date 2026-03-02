@@ -18,10 +18,14 @@ class ParseError(RuntimeError):
     pass
 
 
-def parse_questions(raw_text: str) -> tuple[list[ParsedQuestion], int]:
+def parse_questions(
+    raw_text: str,
+    question_images: dict[str, list[str]] | None = None,
+) -> tuple[list[ParsedQuestion], int]:
     lines = _normalize_lines(raw_text)
     questions: list[ParsedQuestion] = []
     excluded = 0
+    question_images = question_images or {}
 
     i = 0
     while i < len(lines):
@@ -79,6 +83,7 @@ def parse_questions(raw_text: str) -> tuple[list[ParsedQuestion], int]:
                 choices=choices,
                 group=group,
                 subelement=subelement,
+                image_paths=question_images.get(question_id, []),
             )
         )
 

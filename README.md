@@ -125,6 +125,7 @@ extra-facts audio-verify --manifest dist/audio/audio_chapters_manifest.json [--a
 - Source is the NCVEC public pool DOCX release.
 - Parsing is deterministic and excludes withdrawn/removed/deleted questions.
 - Group order is preserved as published.
+- DOCX figures are exported to `assets/` next to the extracted pool JSON and linked per question via `image_paths` in the JSON.
 - OpenAI prose calls use on-disk HTTP caching by default at `.cache/openai-http` (override via `OPENAI_HTTP_CACHE_DIR`, disable with `OPENAI_HTTP_CACHE=0`).
 - Audio render defaults to ElevenLabs (`TTS_PROVIDER=elevenlabs`) with `TTS_MODEL=eleven_multilingual_v2` and `TTS_VOICE=JBFqnCBsd6RMkjVDRZzb`; switch to OpenAI by setting `TTS_PROVIDER=openai`.
 - ElevenLabs requests include `language_code` (default `en`; override with `ELEVENLABS_LANGUAGE_CODE` or `--elevenlabs-language-code`).
