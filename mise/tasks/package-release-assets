@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+#MISE description="Package pool JSON files with required image assets for release"
+#MISE depends=["deps-dev"]
+#MISE sources=["dist/extra_pool.json", "dist/extra_pool_prose.json", "dist/assets/**"]
+#MISE outputs={auto=true}
+set -euo pipefail
+
+release_dir="${RELEASE_DIR:-dist/release}"
+mkdir -p "${release_dir}"
+
+bundle_pool_json() {
+  local json_name="$1"
+  local bundle_name="$2"
+
+  if [ ! -f "dist/${json_name}" ]; then
+    echo "dist/${json_name} not found; skipping ${bundle_name}"
+    return 0
+  fi
+
+  if [ ! -d "dist/assets" ]; then
+    echo "dist/assets not found; skipping ${bundle_name}"
+    return 0
+  fi
+
+  tar -C dist -czf "${release_dir}/${bundle_name}" "${json_name}" assets
+  sha256sum "${release_dir}/${bundle_name}" > "${release_dir}/${bundle_name}.sha256"
+  echo "Created ${release_dir}/${bundle_name}"
+}
+
+bundle_pool_json "extra_pool.json" "extra_pool_with_assets.tar.gz"
+bundle_pool_json "extra_pool_prose.json" "extra_pool_prose_with_assets.tar.gz"

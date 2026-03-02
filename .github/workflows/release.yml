@@ -70,6 +70,7 @@ jobs:
         run: |
           tar -czf "ham-radio-extra-study-guide-${RELEASE_TAG}.tar.gz" dist
           sha256sum "ham-radio-extra-study-guide-${RELEASE_TAG}.tar.gz" > "ham-radio-extra-study-guide-${RELEASE_TAG}.sha256"
+          mise run package-release-assets
 
       - name: Publish GitHub release
         uses: softprops/action-gh-release@v2
@@ -80,6 +81,10 @@ jobs:
           files: |
             ham-radio-extra-study-guide-${{ env.RELEASE_TAG }}.tar.gz
             ham-radio-extra-study-guide-${{ env.RELEASE_TAG }}.sha256
+            dist/release/extra_pool_with_assets.tar.gz
+            dist/release/extra_pool_with_assets.tar.gz.sha256
+            dist/release/extra_pool_prose_with_assets.tar.gz
+            dist/release/extra_pool_prose_with_assets.tar.gz.sha256
             dist/static/static-extra_facts.txt
             dist/static/static-extra_facts.pdf
             dist/prose/prose-extra_facts.txt

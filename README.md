@@ -90,6 +90,8 @@ mise run compare
 - Intermediate pool JSON:
   `dist/extra_pool.json`
   `dist/extra_pool_prose.json`
+  `dist/release/extra_pool_with_assets.tar.gz`
+  `dist/release/extra_pool_prose_with_assets.tar.gz`
 
 ## GitHub Pages Site
 
@@ -126,6 +128,7 @@ extra-facts audio-verify --manifest dist/audio/audio_chapters_manifest.json [--a
 - Parsing is deterministic and excludes withdrawn/removed/deleted questions.
 - Group order is preserved as published.
 - DOCX figures are exported to `assets/` next to the extracted pool JSON with question-linked names (for example `e1a04-01.png`) and linked per question via `image_paths` in the JSON.
+- Release workflow publishes pool bundles (`extra_pool*_with_assets.tar.gz`) so JSON consumers can resolve `image_paths` without additional downloads.
 - OpenAI prose calls use on-disk HTTP caching by default at `.cache/openai-http` (override via `OPENAI_HTTP_CACHE_DIR`, disable with `OPENAI_HTTP_CACHE=0`).
 - Audio render defaults to ElevenLabs (`TTS_PROVIDER=elevenlabs`) with `TTS_MODEL=eleven_multilingual_v2` and `TTS_VOICE=JBFqnCBsd6RMkjVDRZzb`; switch to OpenAI by setting `TTS_PROVIDER=openai`.
 - ElevenLabs requests include `language_code` (default `en`; override with `ELEVENLABS_LANGUAGE_CODE` or `--elevenlabs-language-code`).
