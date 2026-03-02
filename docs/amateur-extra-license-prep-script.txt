@@ -562,7 +562,7 @@ In a series RLC circuit where XC is 25 ohms, R is 100 ohms, and XL is 75 ohms, t
 
 Admittance is the inverse of impedance.
 
-Section E5C.
+Section E5C. 3 questions that require figures were removed from this section.
 
 Pure capacitive reactance of 100 ohms in rectangular notation is represented as 0 - j100.
 
@@ -581,12 +581,6 @@ The impedance of a pure resistance is plotted on the horizontal axis on rectangu
 The phase angle of a circuit containing resistance, inductive reactance, and/or capacitive reactance is often displayed using polar coordinates.
 
 When using rectangular coordinates to graph the impedance of a circuit, the X axis represents the resistive component and the Y axis represents the reactive component.
-
-On Figure E5-1, point 4 represents the impedance of a series circuit consisting of a 400-ohm resistor and a 38-picofarad capacitor at 14 megahertz.
-
-On the impedance plane of Figure E5-1, a series circuit consisting of a 300-ohm resistor and an 18-microhenry inductor at 3.505 megahertz is represented by point 3.
-
-On Figure E5-1, point 1 best represents the impedance of a series circuit consisting of a 300-ohm resistor and a 19-picofarad capacitor at 21.200 megahertz.
 
 Section E5D.
 
@@ -618,7 +612,7 @@ That wraps up chapter E5.
 
 Chapter E6: Electronic and RF Components.
 
-Section E6A.
+Section E6A. 2 questions that require figures were removed from this section.
 
 Gallium arsenide is used as a semiconductor material in microwave circuits.
 
@@ -638,13 +632,9 @@ The term for the frequency at which the grounded-base current gain of a bipolar 
 
 A depletion-mode field-effect transistor (FET) is an FET that exhibits a current flow between source and drain when no gate voltage is applied.
 
-In Figure E6-1, schematic symbol 4 represents an N-channel dual-gate MOSFET.
-
-In Figure E6-1, the schematic symbol for a P-channel junction FET is symbol number 1.
-
 Connecting Zener diodes between a MOSFET gate and its source or drain protects the gate from static damage.
 
-Section E6B.
+Section E6B. One question that requires a figure was removed from this section.
 
 A Zener diode provides a constant voltage drop under conditions of varying current.
 
@@ -664,11 +654,9 @@ A Schottky barrier diode is a metal-semiconductor junction.
 
 Point-contact diodes are commonly used as RF detectors.
 
-In Figure E6-2, the schematic symbol for a Schottky diode is labeled 6.
-
 The attenuation of RF signals by a PIN diode is controlled by the forward DC bias current.
 
-Section E6C.
+Section E6C. 3 questions that require figures were removed from this section.
 
 The function of hysteresis in a comparator is to prevent input noise from causing unstable output signals.
 
@@ -684,13 +672,7 @@ CMOS digital integrated circuits have high immunity to noise on the input signal
 
 A pull-up or pull-down resistor is a resistor connected to the positive or negative supply that is used to establish a voltage when an input or output is an open circuit.
 
-In Figure E6-3, schematic symbol 2 represents a NAND gate.
-
 A hardware description language (HDL) is used to design the configuration of a field-programmable gate array (FPGA).
-
-In Figure E6-3, symbol 4 is the schematic symbol for a NOR gate.
-
-In Figure E6-3, symbol 5 is the schematic symbol for the NOT operation (inversion).
 
 Section E6D.
 
@@ -792,7 +774,7 @@ A truth table is a list of inputs and corresponding outputs for a digital device
 
 In positive logic, a high voltage represents a 1 and a low voltage represents a 0.
 
-Section E7B.
+Section E7B. 3 questions that require figures were removed from this section.
 
 In a push-pull, Class AB amplifier, each active element conducts for more than 180 degrees but less than 360 degrees of the signal cycle.
 
@@ -811,12 +793,6 @@ Using a Class C amplifier to amplify a single-sideband phone signal results in s
 Switching amplifiers are more efficient than linear amplifiers because the switching device is at saturation or cutoff most of the time.
 
 An emitter follower, or common collector, amplifier has input and output signals that are in-phase.
-
-In Figure E7-1, R1 and R2 provide voltage divider bias.
-
-In Figure E7-1, the purpose of R3 is to provide self bias.
-
-The amplifier circuit shown in Figure E7-1 is a common emitter amplifier.
 
 Section E7C.
 
@@ -842,7 +818,7 @@ A cavity filter is used in a 2-meter band repeater duplexer.
 
 A filter’s ability to reject signals in adjacent channels is measured by its shape factor.
 
-Section E7D.
+Section E7D. 3 questions that require figures were removed from this section.
 
 A linear electronic voltage regulator works by varying the conduction of a control element to maintain a constant output voltage.
 
@@ -853,12 +829,6 @@ A Zener diode is used as a stable voltage reference.
 A three-terminal voltage regulator is a series regulator.
 
 A shunt regulator is the type of linear voltage regulator that operates by loading the unregulated voltage source.
-
-Q1 in the circuit shown in Figure E7-2 controls the current to keep the output voltage constant.
-
-In the circuit shown in Figure E7-2, C2 bypasses rectifier output ripple around D1.
-
-The circuit shown in Figure E7-2 is a linear voltage regulator.
 
 Battery operating time is calculated by dividing its capacity in amp-hours by the average current.
 
@@ -926,7 +896,7 @@ In a digital signal processing filter, taps provide incremental signal delays fo
 
 Using more taps in a digital signal processing filter allows it to create a sharper filter response.
 
-Section E7G.
+Section E7G. 3 questions that require figures were removed from this section.
 
 The typical output impedance of an op-amp is very low.
 
@@ -943,12 +913,6 @@ The gain-bandwidth of an operational amplifier is the frequency at which the ope
 The voltage gain from the circuit in Figure E7-3 is 47 when R1 is 10 ohms and RF is 470 ohms.
 
 The gain of an ideal operational amplifier does not vary with frequency.
-
-The output voltage of the circuit shown in Figure E7-3 will be -2.3 volts if R1 is 1,000 ohms, RF is 10,000 ohms, and 0.23 volts DC is applied to the input.
-
-The absolute voltage gain expected from the circuit in Figure E7-3 when R1 is 1,800 ohms and RF is 68 kilohms is 38.
-
-The absolute voltage gain expected from the circuit in Figure E7-3 when R1 is 3,300 ohms and RF is 47 kilohms is 14.
 
 An operational amplifier is a high-gain, direct-coupled differential amplifier with very high input impedance and very low output impedance.
 
@@ -1108,7 +1072,7 @@ A repeater station with 200 watts transmitter power output, 4 dB feed line loss,
 
 The effective isotropic radiated power (EIRP) of a repeater station with 200 watts transmitter power output, 2 dB feed line loss, 2.8 dB duplexer loss, 1.2 dB circulator loss, and 7 dBi antenna gain is 252 watts.
 
-Among common communication bands, the 5.8 GHz frequency band has the smallest first Fresnel zone.
+Among common communication bands, the 5.8 gigahertz frequency band has the smallest first Fresnel zone.
 
 Antenna efficiency is the ratio of radiation resistance divided by total resistance.
 
@@ -1118,19 +1082,9 @@ Ground losses for a ground-mounted vertical antenna operating on HF are determin
 
 An antenna that has 6 dB gain over an isotropic radiator has 3.85 dB gain compared to a half-wavelength dipole.
 
-Section E9B.
-
-The 3 dB beamwidth of the antenna radiation pattern shown in Figure E9-1 is 50 degrees.
-
-The front-to-back ratio of the antenna radiation pattern shown in Figure E9-1 is 18 dB.
-
-The front-to-side ratio of the antenna radiation pattern shown in Figure E9-1 is 14 dB.
+Section E9B. 5 questions that require figures were removed from this section.
 
 The front-to-back ratio of the radiation pattern shown in Figure E9-2 is 28 dB.
-
-Figure E9-2 shows an elevation antenna pattern.
-
-The elevation angle of peak response in the antenna radiation pattern shown in Figure E9-2 is 7.5 degrees.
 
 A lossless antenna with gain and an isotropic radiator driven by the same power radiate the same total power.
 
@@ -1244,7 +1198,7 @@ A 1/8-wavelength transmission line that is open at the far end presents a capaci
 
 A 1/4-wavelength transmission line that is open at the far end presents a very low impedance to an RF generator.
 
-Section E9G.
+Section E9G. 2 questions that require figures were removed from this section.
 
 A Smith chart can be used to calculate impedance along transmission lines.
 
@@ -1255,10 +1209,6 @@ A Smith chart is often used to determine impedance and SWR values in transmissio
 A Smith chart is composed of a family of resistance circles and a family of reactance arcs.
 
 A common use for a Smith chart is to determine the length and position of an impedance matching stub.
-
-On the Smith chart shown in Figure E9-3, the large outer circle on which the reactance arcs terminate is called the reactance axis.
-
-On the Smith chart shown in Figure E9-3, the only straight line shown is the resistance axis.
 
 A Smith chart is normalized by reassigning the prime center’s impedance value.
 
