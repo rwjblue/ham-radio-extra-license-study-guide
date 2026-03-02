@@ -2,6 +2,7 @@
 #MISE description="Build GitHub Pages site payload from existing dist artifacts"
 #MISE depends=["deps-dev"]
 #MISE sources=["dist/pool/extra_pool_prose.json", "dist/audio/extra_facts_audio.txt", "dist/audio/extra_facts_audio.mp3", "dist/prose/prose-extra_facts.pdf", "dist/prose/prose-extra_facts-dark.pdf", "dist/prose/prose-extra_facts.epub", "dist/pool/assets/**"]
+# Audio files (mp3 + txt script) are optional; the script skips them if missing.
 #MISE outputs={auto=true}
 set -euo pipefail
 
@@ -11,12 +12,16 @@ out_dir="${PAGES_DIR:-${repo_root}/docs}"
 
 required_files=(
   "${dist_dir}/pool/extra_pool_prose.json"
-  "${dist_dir}/audio/extra_facts_audio.txt"
-  "${dist_dir}/audio/extra_facts_audio.mp3"
   "${dist_dir}/prose/prose-extra_facts.pdf"
   "${dist_dir}/prose/prose-extra_facts-dark.pdf"
   "${dist_dir}/prose/prose-extra_facts.epub"
 )
+
+# Audio files are optional
+has_audio=false
+if [ -f "${dist_dir}/audio/extra_facts_audio.mp3" ] && [ -f "${dist_dir}/audio/extra_facts_audio.txt" ]; then
+  has_audio=true
+fi
 
 for file in "${required_files[@]}"; do
   if [ ! -f "${file}" ]; then
@@ -32,12 +37,33 @@ if [ ! -d "${assets_dir}" ]; then
   exit 1
 fi
 
+# Preserve existing audio files if we won't be replacing them
+audio_backup_dir=""
+if [ "${has_audio}" = false ] && [ -d "${out_dir}" ]; then
+  audio_backup_dir="$(mktemp -d)"
+  for f in amateur-extra-license-prep.mp3 amateur-extra-license-prep-script.txt; do
+    if [ -f "${out_dir}/${f}" ]; then
+      cp "${out_dir}/${f}" "${audio_backup_dir}/${f}"
+    fi
+  done
+fi
+
 rm -rf "${out_dir}"
 mkdir -p "${out_dir}"
 
 cp "${pool_json}" "${out_dir}/amateur-extra-license-prep-pool.json"
-cp "${dist_dir}/audio/extra_facts_audio.txt" "${out_dir}/amateur-extra-license-prep-script.txt"
-cp "${dist_dir}/audio/extra_facts_audio.mp3" "${out_dir}/amateur-extra-license-prep.mp3"
+if [ "${has_audio}" = true ]; then
+  cp "${dist_dir}/audio/extra_facts_audio.txt" "${out_dir}/amateur-extra-license-prep-script.txt"
+  cp "${dist_dir}/audio/extra_facts_audio.mp3" "${out_dir}/amateur-extra-license-prep.mp3"
+elif [ -n "${audio_backup_dir}" ]; then
+  # Restore previously existing audio files
+  for f in amateur-extra-license-prep.mp3 amateur-extra-license-prep-script.txt; do
+    if [ -f "${audio_backup_dir}/${f}" ]; then
+      cp "${audio_backup_dir}/${f}" "${out_dir}/${f}"
+    fi
+  done
+  rm -rf "${audio_backup_dir}"
+fi
 cp "${dist_dir}/prose/prose-extra_facts.pdf" "${out_dir}/amateur-extra-license-prep-study-workbook.pdf"
 cp "${dist_dir}/prose/prose-extra_facts-dark.pdf" "${out_dir}/amateur-extra-license-prep-study-workbook-dark.pdf"
 cp "${dist_dir}/prose/prose-extra_facts.epub" "${out_dir}/amateur-extra-license-prep-study-workbook.epub"
