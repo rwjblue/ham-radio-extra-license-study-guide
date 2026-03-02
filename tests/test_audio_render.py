@@ -27,6 +27,17 @@ class _FakeTtsClient:
         return f"audio:{text[:16]}".encode()
 
 
+class _FailAfterOneTtsClient:
+    def __init__(self) -> None:
+        self.calls = 0
+
+    def synthesize(self, text: str) -> bytes:
+        self.calls += 1
+        if self.calls > 1:
+            raise RuntimeError("simulated credits exhausted")
+        return f"audio:{text[:16]}".encode()
+
+
 class _CapturingTtsClient:
     def __init__(self) -> None:
         self.inputs: list[str] = []
@@ -256,6 +267,68 @@ def test_render_audio_from_manifest_reuses_unchanged_chapters(tmp_path: Path) ->
     assert second_client.calls == 0
     assert second.chapters_rendered == 0
     assert second.chapters_reused == 2
+
+
+def test_render_audio_from_manifest_checkpoints_progress_for_resume(tmp_path: Path) -> None:
+    chapters_dir = tmp_path / "audio" / "chapters"
+    chapters_dir.mkdir(parents=True)
+    chapter_1 = chapters_dir / "chapter-01.txt"
+    chapter_2 = chapters_dir / "chapter-02.txt"
+    chapter_1.write_text("Chapter one text", encoding="utf-8")
+    chapter_2.write_text("Chapter two text", encoding="utf-8")
+
+    manifest_path = tmp_path / "audio" / "audio_chapters_manifest.json"
+    manifest = {
+        "schema_version": 1,
+        "chapter_count": 2,
+        "chapters": [
+            {
+                "number": 1,
+                "code": "E1",
+                "title": "One",
+                "groups": ["E1A"],
+                "text_path": str(chapter_1),
+            },
+            {
+                "number": 2,
+                "code": "E2",
+                "title": "Two",
+                "groups": ["E2A"],
+                "text_path": str(chapter_2),
+            },
+        ],
+    }
+    manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+
+    with pytest.raises(RuntimeError, match="credits exhausted"):
+        _ = render_audio_from_manifest(
+            manifest_path=manifest_path,
+            out_dir=tmp_path / "audio",
+            client=_FailAfterOneTtsClient(),
+            merge_output=False,
+            probe_duration=lambda _path: 5.0,
+            render_fingerprint="resume-fingerprint",
+        )
+
+    checkpointed = json.loads(manifest_path.read_text(encoding="utf-8"))
+    chapter_entries = checkpointed["chapters"]
+    assert chapter_entries[0]["audio_path"].endswith("chapter-01.mp3")
+    assert chapter_entries[0]["render_fingerprint"] == "resume-fingerprint"
+    assert isinstance(chapter_entries[0]["text_sha256"], str)
+    assert "audio_path" not in chapter_entries[1]
+
+    resume_client = _FakeTtsClient()
+    resumed = render_audio_from_manifest(
+        manifest_path=manifest_path,
+        out_dir=tmp_path / "audio",
+        client=resume_client,
+        merge_output=False,
+        probe_duration=lambda _path: 5.0,
+        render_fingerprint="resume-fingerprint",
+    )
+    assert resume_client.calls == 1
+    assert resumed.chapters_reused == 1
+    assert resumed.chapters_rendered == 1
 
 
 def test_render_audio_from_manifest_chunks_at_paragraph_boundaries(tmp_path: Path) -> None:

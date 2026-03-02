@@ -319,6 +319,7 @@ def render_audio_from_manifest(
     out_dir.mkdir(parents=True, exist_ok=True)
     chapters_audio_dir = out_dir / "chapters"
     chapters_audio_dir.mkdir(parents=True, exist_ok=True)
+    target_manifest = out_manifest_path or manifest_path
 
     probe_fn = probe_duration or probe_mp3_duration
     merge_fn = merge_audio or merge_mp3_files
@@ -372,6 +373,7 @@ def render_audio_from_manifest(
         chapter["render_fingerprint"] = render_fingerprint
         start_seconds += duration_seconds
         rendered_paths.append(audio_path)
+        _write_manifest_payload(payload, target_manifest)
 
     merged_audio_path: Path | None = None
     chapter_markers_embedded = False
@@ -396,11 +398,7 @@ def render_audio_from_manifest(
         "rendered_at": datetime.now(UTC).isoformat(),
     }
 
-    target_manifest = out_manifest_path or manifest_path
-    target_manifest.write_text(
-        json.dumps(payload, ensure_ascii=False, indent=2) + "\n",
-        encoding="utf-8",
-    )
+    _write_manifest_payload(payload, target_manifest)
     return AudioRenderResult(
         chapter_count=len(chapters),
         manifest_in_path=manifest_path,
@@ -618,3 +616,10 @@ def _split_text_for_tts(text: str, max_chars: int) -> list[str]:
 def _cleanup_temp_segments(segment_paths: list[Path]) -> None:
     for segment_path in segment_paths:
         segment_path.unlink(missing_ok=True)
+
+
+def _write_manifest_payload(payload: dict[str, Any], target_manifest: Path) -> None:
+    target_manifest.write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
