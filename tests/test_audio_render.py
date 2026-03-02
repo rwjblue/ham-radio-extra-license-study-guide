@@ -45,6 +45,7 @@ def test_render_audio_from_manifest_enriches_manifest_and_merges(tmp_path: Path)
     manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
 
     merge_calls: list[list[Path]] = []
+    embed_calls: list[tuple[list[dict[str, object]], Path]] = []
 
     def _probe(path: Path) -> float:
         if path.name == "chapter-01.mp3":
@@ -55,6 +56,9 @@ def test_render_audio_from_manifest_enriches_manifest_and_merges(tmp_path: Path)
         merge_calls.append(inputs)
         output.write_bytes(b"merged-audio")
 
+    def _embed(chapters: list[dict[str, object]], merged_audio_path: Path) -> None:
+        embed_calls.append((chapters, merged_audio_path))
+
     result = render_audio_from_manifest(
         manifest_path=manifest_path,
         out_dir=tmp_path / "audio",
@@ -63,6 +67,7 @@ def test_render_audio_from_manifest_enriches_manifest_and_merges(tmp_path: Path)
         merge_output=True,
         probe_duration=_probe,
         merge_audio=_merge,
+        embed_chapter_markers=_embed,
     )
 
     assert result.chapter_count == 2
@@ -73,6 +78,9 @@ def test_render_audio_from_manifest_enriches_manifest_and_merges(tmp_path: Path)
     assert result.merged_audio_path.exists()
     assert len(merge_calls) == 1
     assert [path.name for path in merge_calls[0]] == ["chapter-01.mp3", "chapter-02.mp3"]
+    assert len(embed_calls) == 1
+    assert embed_calls[0][1] == result.merged_audio_path
+    assert result.chapter_markers_embedded is True
 
     enriched = json.loads(manifest_path.read_text(encoding="utf-8"))
     chapters = enriched["chapters"]
@@ -82,6 +90,7 @@ def test_render_audio_from_manifest_enriches_manifest_and_merges(tmp_path: Path)
     assert chapters[1]["duration_seconds"] == 12.5
     assert chapters[1]["start_seconds"] == 10.0
     assert enriched["audio_render"]["total_duration_seconds"] == 22.5
+    assert enriched["audio_render"]["chapter_markers_embedded"] is True
 
 
 def test_render_audio_from_manifest_supports_no_merge(tmp_path: Path) -> None:
@@ -116,6 +125,47 @@ def test_render_audio_from_manifest_supports_no_merge(tmp_path: Path) -> None:
         probe_duration=_probe_fixed,
     )
     assert result.merged_audio_path is None
+    assert result.chapter_markers_embedded is False
+
+
+def test_render_audio_from_manifest_supports_no_chapter_markers(tmp_path: Path) -> None:
+    chapter_path = tmp_path / "audio" / "chapters" / "chapter-01.txt"
+    chapter_path.parent.mkdir(parents=True)
+    chapter_path.write_text("Only chapter", encoding="utf-8")
+
+    manifest_path = tmp_path / "audio" / "audio_chapters_manifest.json"
+    manifest = {
+        "schema_version": 1,
+        "chapter_count": 1,
+        "chapters": [
+            {
+                "number": 1,
+                "code": "E1",
+                "title": "One",
+                "groups": ["E1A"],
+                "text_path": str(chapter_path),
+            }
+        ],
+    }
+    manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+
+    def _probe_fixed(_path: Path) -> float:
+        return 5.0
+
+    def _merge(inputs: list[Path], output: Path) -> None:
+        _ = inputs
+        output.write_bytes(b"merged-audio")
+
+    result = render_audio_from_manifest(
+        manifest_path=manifest_path,
+        out_dir=tmp_path / "audio",
+        client=_FakeTtsClient(),
+        merge_output=True,
+        probe_duration=_probe_fixed,
+        merge_audio=_merge,
+        embed_chapters=False,
+    )
+    assert result.chapter_markers_embedded is False
 
 
 def test_openai_tts_http_cache_enabled_defaults_true(monkeypatch: MonkeyPatch) -> None:

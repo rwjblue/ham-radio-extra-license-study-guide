@@ -140,6 +140,7 @@ def render_audio_from_chapter_manifest(
     output_format: str,
     speed: float,
     merge_output: bool,
+    embed_chapters: bool,
     out_manifest_path: Path | None = None,
 ) -> AudioRenderSummary:
     client = OpenAITtsClient(
@@ -154,6 +155,7 @@ def render_audio_from_chapter_manifest(
         client=client,
         output_format=output_format,
         merge_output=merge_output,
+        embed_chapters=embed_chapters,
         out_manifest_path=out_manifest_path,
     )
     return AudioRenderSummary(
@@ -163,4 +165,5 @@ def render_audio_from_chapter_manifest(
         chapters_audio_dir=result.chapters_audio_dir,
         merged_audio_path=result.merged_audio_path,
         total_duration_seconds=result.total_duration_seconds,
+        chapter_markers_embedded=result.chapter_markers_embedded,
     )

@@ -74,6 +74,7 @@ class AudioRenderSummary:
     chapters_audio_dir: Path
     merged_audio_path: Path | None
     total_duration_seconds: float
+    chapter_markers_embedded: bool
 
 
 @dataclass(frozen=True)

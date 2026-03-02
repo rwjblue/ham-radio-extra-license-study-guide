@@ -9,4 +9,5 @@ uv run extra-facts audio-render \
   --model "${MODEL:-gpt-4o-mini-tts}" \
   --voice "${VOICE:-alloy}" \
   --speed "${SPEED:-1.0}" \
-  ${NO_MERGE:+--no-merge}
+  ${NO_MERGE:+--no-merge} \
+  ${NO_CHAPTER_MARKERS:+--no-chapter-markers}

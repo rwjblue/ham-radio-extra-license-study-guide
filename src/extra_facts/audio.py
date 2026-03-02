@@ -23,6 +23,7 @@ class TtsClient(Protocol):
 
 DurationProbe = Callable[[Path], float]
 AudioMerger = Callable[[list[Path], Path], None]
+ChapterMarkerEmbedder = Callable[[list[dict[str, Any]], Path], None]
 TTS_MAX_CHARS = 3500
 DEFAULT_OPENAI_HTTP_CACHE_DIR = Path(".cache/openai-http")
 DEFAULT_OPENAI_HTTP_CACHE_NAME = "responses"
@@ -115,6 +116,7 @@ class AudioRenderResult:
     chapters_audio_dir: Path
     merged_audio_path: Path | None
     total_duration_seconds: float
+    chapter_markers_embedded: bool
 
 
 def render_audio_from_manifest(
@@ -126,6 +128,8 @@ def render_audio_from_manifest(
     out_manifest_path: Path | None = None,
     probe_duration: DurationProbe | None = None,
     merge_audio: AudioMerger | None = None,
+    embed_chapters: bool = True,
+    embed_chapter_markers: ChapterMarkerEmbedder | None = None,
 ) -> AudioRenderResult:
     payload = cast(dict[str, Any], json.loads(manifest_path.read_text(encoding="utf-8")))
     chapters_payload = payload.get("chapters")
@@ -139,6 +143,7 @@ def render_audio_from_manifest(
 
     probe_fn = probe_duration or probe_mp3_duration
     merge_fn = merge_audio or merge_mp3_files
+    embed_fn = embed_chapter_markers or embed_mp3_chapters
 
     start_seconds = 0.0
     rendered_paths: list[Path] = []
@@ -175,9 +180,13 @@ def render_audio_from_manifest(
         rendered_paths.append(audio_path)
 
     merged_audio_path: Path | None = None
+    chapter_markers_embedded = False
     if merge_output and rendered_paths:
         merged_audio_path = out_dir / f"extra_facts_audio.{output_format}"
         merge_fn(rendered_paths, merged_audio_path)
+        if embed_chapters and output_format == "mp3":
+            embed_fn(chapters, merged_audio_path)
+            chapter_markers_embedded = True
 
     payload["audio_render"] = {
         "provider": "openai",
@@ -186,6 +195,7 @@ def render_audio_from_manifest(
             str(merged_audio_path.as_posix()) if merged_audio_path is not None else None
         ),
         "total_duration_seconds": round(start_seconds, 3),
+        "chapter_markers_embedded": chapter_markers_embedded,
         "rendered_at": datetime.now(UTC).isoformat(),
     }
 
@@ -201,6 +211,7 @@ def render_audio_from_manifest(
         chapters_audio_dir=chapters_audio_dir,
         merged_audio_path=merged_audio_path,
         total_duration_seconds=round(start_seconds, 3),
+        chapter_markers_embedded=chapter_markers_embedded,
     )
 
 
@@ -249,6 +260,45 @@ def merge_mp3_files(inputs: list[Path], output_path: Path) -> None:
         list_path.unlink(missing_ok=True)
 
 
+def embed_mp3_chapters(chapters: list[dict[str, Any]], merged_audio_path: Path) -> None:
+    with tempfile.NamedTemporaryFile("w", delete=False, suffix=".ffmetadata") as metadata_file:
+        metadata_path = Path(metadata_file.name)
+        metadata_file.write(";FFMETADATA1\n")
+        for chapter in chapters:
+            start_seconds = float(chapter.get("start_seconds", 0.0))
+            duration_seconds = float(chapter.get("duration_seconds", 0.0))
+            start_ms = max(0, round(start_seconds * 1000))
+            end_ms = max(start_ms + 1, round((start_seconds + duration_seconds) * 1000))
+            raw_title = chapter.get("title") or chapter.get("code") or "Chapter"
+            title = _escape_ffmetadata_value(str(raw_title))
+            metadata_file.write("[CHAPTER]\n")
+            metadata_file.write("TIMEBASE=1/1000\n")
+            metadata_file.write(f"START={start_ms}\n")
+            metadata_file.write(f"END={end_ms}\n")
+            metadata_file.write(f"title={title}\n")
+
+    output_with_chapters = merged_audio_path.with_suffix(".chapters.mp3")
+    try:
+        command = [
+            "ffmpeg",
+            "-y",
+            "-i",
+            str(merged_audio_path),
+            "-i",
+            str(metadata_path),
+            "-map_metadata",
+            "1",
+            "-codec",
+            "copy",
+            str(output_with_chapters),
+        ]
+        subprocess.run(command, check=True, capture_output=True, text=True)
+        output_with_chapters.replace(merged_audio_path)
+    finally:
+        metadata_path.unlink(missing_ok=True)
+        output_with_chapters.unlink(missing_ok=True)
+
+
 def _resolve_path(value: str, manifest_path: Path) -> Path:
     path = Path(value)
     if path.is_absolute():
@@ -256,6 +306,14 @@ def _resolve_path(value: str, manifest_path: Path) -> Path:
     if path.exists():
         return path
     return (manifest_path.parent / path).resolve()
+
+
+def _escape_ffmetadata_value(value: str) -> str:
+    escaped = value.replace("\\", "\\\\")
+    escaped = escaped.replace("=", "\\=")
+    escaped = escaped.replace(";", "\\;")
+    escaped = escaped.replace("#", "\\#")
+    return escaped
 
 
 def _render_tts_segments(
