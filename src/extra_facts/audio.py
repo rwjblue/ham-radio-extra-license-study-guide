@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import base64
 import hashlib
 import json
 import os
@@ -28,7 +27,7 @@ AudioMerger = Callable[[list[Path], Path], None]
 ChapterMarkerEmbedder = Callable[[list[dict[str, Any]], Path], None]
 TTS_MAX_CHARS = 3500
 DEFAULT_OPENAI_HTTP_CACHE_DIR = Path(".cache/openai-http")
-DEFAULT_OPENAI_HTTP_CACHE_NAME = "responses"
+DEFAULT_OPENAI_HTTP_CACHE_NAME = "audio-speech-v2"
 
 
 class OpenAITtsClient:
@@ -38,6 +37,7 @@ class OpenAITtsClient:
         voice: str,
         response_format: str = "mp3",
         speed: float = 1.0,
+        instructions: str | None = None,
         api_key_env: str = "OPENAI_API_KEY",
         cache_dir: Path | None = None,
         cache_enabled: bool | None = None,
@@ -50,6 +50,7 @@ class OpenAITtsClient:
         self.voice = voice
         self.response_format = response_format
         self.speed = speed
+        self.instructions = instructions.strip() if instructions else None
         self.cache_enabled = _resolve_openai_http_cache_enabled(cache_enabled)
         self.cache_dir = _resolve_openai_http_cache_dir(cache_dir)
         self._session = _build_openai_session(self.cache_dir, self.cache_enabled)
@@ -57,51 +58,39 @@ class OpenAITtsClient:
         self._session.mount("https://", adapter)
 
     def synthesize(self, text: str) -> bytes:
+        payload: dict[str, Any] = {
+            "model": self.model,
+            "voice": self.voice,
+            "input": text,
+            "response_format": self.response_format,
+            "speed": self.speed,
+        }
+        if self.instructions:
+            payload["instructions"] = self.instructions
+
         speech_response = self._session.post(
             "https://api.openai.com/v1/audio/speech",
             headers={
                 "Authorization": f"Bearer {self.api_key}",
                 "Content-Type": "application/json",
             },
-            json={
-                "model": self.model,
-                "voice": self.voice,
-                "input": text,
-                "response_format": self.response_format,
-                "speed": self.speed,
-            },
+            json=payload,
             timeout=180,
         )
         if speech_response.status_code < 400:
+            content_type = speech_response.headers.get("Content-Type", "").lower()
+            if "application/json" in content_type:
+                body = speech_response.text.strip()
+                raise RuntimeError(
+                    "OpenAI TTS request returned JSON for /v1/audio/speech; "
+                    f"expected audio bytes. Body: {body}"
+                )
             return speech_response.content
 
-        responses_response = self._session.post(
-            "https://api.openai.com/v1/responses",
-            headers={
-                "Authorization": f"Bearer {self.api_key}",
-                "Content-Type": "application/json",
-            },
-            json={
-                "model": self.model,
-                "input": text,
-                "modalities": ["audio"],
-                "audio": {
-                    "voice": self.voice,
-                    "format": self.response_format,
-                },
-            },
-            timeout=180,
-        )
-        if responses_response.status_code < 400:
-            payload = cast(dict[str, Any], responses_response.json())
-            return extract_audio_bytes_from_responses_payload(payload)
-
         speech_body = speech_response.text.strip()
-        responses_body = responses_response.text.strip()
         raise RuntimeError(
-            "OpenAI TTS request failed for both endpoints: "
-            f"/v1/audio/speech ({speech_response.status_code}): {speech_body}; "
-            f"/v1/responses ({responses_response.status_code}): {responses_body}"
+            "OpenAI TTS request failed for /v1/audio/speech "
+            f"({speech_response.status_code}): {speech_body}"
         )
 
 
@@ -133,6 +122,7 @@ def _build_openai_session(cache_dir: Path, cache_enabled: bool) -> requests.Sess
             backend="sqlite",
             expire_after=-1,
             allowable_methods=("GET", "POST"),
+            allowable_codes=(200,),
         ),
     )
 
@@ -457,34 +447,3 @@ def _split_text_for_tts(text: str, max_chars: int) -> list[str]:
 def _cleanup_temp_segments(segment_paths: list[Path]) -> None:
     for segment_path in segment_paths:
         segment_path.unlink(missing_ok=True)
-
-
-def extract_audio_bytes_from_responses_payload(payload: dict[str, Any]) -> bytes:
-    output_obj = payload.get("output")
-    if not isinstance(output_obj, list):
-        raise RuntimeError("No audio output returned by model")
-
-    output = cast(list[Any], output_obj)
-    for item in output:
-        if not isinstance(item, dict):
-            continue
-        item_dict = cast(dict[str, Any], item)
-        content_obj = item_dict.get("content")
-        if not isinstance(content_obj, list):
-            continue
-        content = cast(list[Any], content_obj)
-        for entry in content:
-            if not isinstance(entry, dict):
-                continue
-            entry_dict = cast(dict[str, Any], entry)
-            audio_obj = entry_dict.get("audio")
-            if isinstance(audio_obj, dict):
-                audio = cast(dict[str, Any], audio_obj)
-                data = audio.get("data")
-                if isinstance(data, str) and data:
-                    return base64.b64decode(data)
-            data = entry_dict.get("data")
-            if isinstance(data, str) and data:
-                return base64.b64decode(data)
-
-    raise RuntimeError("No audio data found in /v1/responses payload")

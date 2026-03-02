@@ -146,16 +146,20 @@ def render_audio_from_chapter_manifest(
     voice: str,
     output_format: str,
     speed: float,
+    instructions: str | None,
     merge_output: bool,
     embed_chapters: bool,
     out_manifest_path: Path | None = None,
 ) -> AudioRenderSummary:
-    render_fingerprint = f"openai:{model}:{voice}:{speed}:{output_format}"
+    render_fingerprint = (
+        f"openai:{model}:{voice}:{speed}:{output_format}:{instructions or ''}"
+    )
     client = OpenAITtsClient(
         model=model,
         voice=voice,
         response_format=output_format,
         speed=speed,
+        instructions=instructions,
     )
     result = render_audio_from_manifest(
         manifest_path=manifest_path,

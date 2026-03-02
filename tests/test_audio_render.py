@@ -2,12 +2,14 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from typing import cast
 
+import pytest
+import requests
 from _pytest.monkeypatch import MonkeyPatch
 
 from extra_facts.audio import (
     OpenAITtsClient,
-    extract_audio_bytes_from_responses_payload,
     render_audio_from_manifest,
 )
 
@@ -264,18 +266,103 @@ def test_openai_tts_http_cache_dir_env(monkeypatch: MonkeyPatch) -> None:
     assert client.cache_dir == Path("/tmp/openai-http-cache-audio")
 
 
-def test_extract_audio_bytes_from_responses_payload() -> None:
-    payload = {
-        "output": [
+class _RecordingResponse:
+    def __init__(
+        self,
+        status_code: int,
+        content: bytes,
+        text: str = "",
+        headers: dict[str, str] | None = None,
+    ) -> None:
+        self.status_code = status_code
+        self.content = content
+        self.text = text
+        self.headers = headers or {}
+
+
+class _RecordingSession:
+    def __init__(self, response: _RecordingResponse) -> None:
+        self.response = response
+        self.calls: list[dict[str, object]] = []
+
+    def post(
+        self,
+        url: str,
+        headers: dict[str, str],
+        json: dict[str, object],
+        timeout: int,
+    ) -> _RecordingResponse:
+        self.calls.append(
             {
-                "content": [
-                    {
-                        "audio": {
-                            "data": "aGVsbG8=",
-                        }
-                    }
-                ]
+                "url": url,
+                "headers": headers,
+                "json": json,
+                "timeout": timeout,
             }
-        ]
-    }
-    assert extract_audio_bytes_from_responses_payload(payload) == b"hello"
+        )
+        return self.response
+
+
+def test_openai_tts_synthesize_uses_audio_speech_endpoint(monkeypatch: MonkeyPatch) -> None:
+    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
+    client = OpenAITtsClient(model="gpt-4o-mini-tts", voice="alloy")
+    session = _RecordingSession(
+        _RecordingResponse(
+            status_code=200,
+            content=b"audio-bytes",
+            headers={"Content-Type": "audio/mpeg"},
+        )
+    )
+    client._session = cast(requests.Session, session)  # pyright: ignore[reportPrivateUsage]
+
+    rendered = client.synthesize("hello")
+
+    assert rendered == b"audio-bytes"
+    assert len(session.calls) == 1
+    assert session.calls[0]["url"] == "https://api.openai.com/v1/audio/speech"
+    request_payload = cast(dict[str, object], session.calls[0]["json"])
+    assert request_payload["model"] == "gpt-4o-mini-tts"
+    assert request_payload["voice"] == "alloy"
+    assert request_payload["speed"] == 1.0
+    assert "instructions" not in request_payload
+
+
+def test_openai_tts_synthesize_raises_without_responses_fallback(monkeypatch: MonkeyPatch) -> None:
+    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
+    client = OpenAITtsClient(model="gpt-4o-mini-tts", voice="alloy")
+    session = _RecordingSession(
+        _RecordingResponse(
+            status_code=400,
+            content=b"",
+            text='{"error":"bad request"}',
+            headers={"Content-Type": "application/json"},
+        )
+    )
+    client._session = cast(requests.Session, session)  # pyright: ignore[reportPrivateUsage]
+
+    with pytest.raises(RuntimeError, match=r"/v1/audio/speech \(400\)"):
+        client.synthesize("hello")
+
+    assert len(session.calls) == 1
+
+
+def test_openai_tts_synthesize_includes_instructions(monkeypatch: MonkeyPatch) -> None:
+    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
+    client = OpenAITtsClient(
+        model="gpt-4o-mini-tts",
+        voice="alloy",
+        instructions="Warm, engaging delivery with varied intonation.",
+    )
+    session = _RecordingSession(
+        _RecordingResponse(
+            status_code=200,
+            content=b"audio-bytes",
+            headers={"Content-Type": "audio/mpeg"},
+        )
+    )
+    client._session = cast(requests.Session, session)  # pyright: ignore[reportPrivateUsage]
+
+    _ = client.synthesize("hello")
+
+    request_payload = cast(dict[str, object], session.calls[0]["json"])
+    assert request_payload["instructions"] == "Warm, engaging delivery with varied intonation."

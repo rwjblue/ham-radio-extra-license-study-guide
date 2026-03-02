@@ -72,6 +72,7 @@ def audio_render_command(args: argparse.Namespace) -> int:
         voice=args.voice,
         output_format=args.output_format,
         speed=args.speed,
+        instructions=args.instructions,
         merge_output=args.merge,
         embed_chapters=args.embed_chapters,
         out_manifest_path=Path(args.out_manifest) if args.out_manifest else None,
@@ -195,6 +196,10 @@ def create_parser() -> argparse.ArgumentParser:
         type=float,
         default=1.0,
         help="Speech speed multiplier",
+    )
+    render_audio.add_argument(
+        "--instructions",
+        help="Optional style directions for TTS delivery (tone, pacing, emphasis)",
     )
     render_audio.add_argument(
         "--no-merge",
