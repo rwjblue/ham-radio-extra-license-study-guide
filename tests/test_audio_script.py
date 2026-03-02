@@ -136,7 +136,8 @@ def test_write_audio_script_does_not_force_newline_within_fact_paragraph(tmp_pat
     ) not in content
     assert (
         "\n\nWhen using a transceiver that displays the carrier frequency of phone signals, "
-        "what is the lowest frequency at which a properly adjusted lower side band emission will be "
+        "what is the lowest frequency at which a properly adjusted lower side "
+        "band emission will be "
         "totally within the band: 3 kilohertz above the lower band edge.\n\n"
     ) in content
 
