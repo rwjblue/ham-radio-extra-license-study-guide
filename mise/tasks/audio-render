@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+#MISE description="Render chapter text files into per-chapter and merged MP3 audio"
+#MISE depends=["deps-dev", "audio-script-auto"]
+set -euo pipefail
+
+uv run extra-facts audio-render \
+  --manifest "${MANIFEST:-dist/audio/audio_chapters_manifest.json}" \
+  --out-dir "${OUT_DIR:-dist/audio}" \
+  --model "${MODEL:-gpt-4o-mini-tts}" \
+  --voice "${VOICE:-alloy}" \
+  --speed "${SPEED:-1.0}" \
+  ${NO_MERGE:+--no-merge}

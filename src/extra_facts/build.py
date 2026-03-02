@@ -3,10 +3,11 @@ from __future__ import annotations
 from collections.abc import Callable
 from pathlib import Path
 
+from .audio import OpenAITtsClient, render_audio_from_manifest
 from .downloader import download_source
 from .extract import extract_text
 from .intermediate import read_question_pool, to_question_pool, write_question_pool
-from .models import AudioScriptSummary, BuildSummary, ExtractSummary
+from .models import AudioRenderSummary, AudioScriptSummary, BuildSummary, ExtractSummary
 from .parser import extract_pool_metadata, parse_questions
 from .prose import (
     OpenAIProseClient,
@@ -128,4 +129,38 @@ def build_audio_script_from_pool_json(
         chapters_dir=chapters_dir,
         chapters_manifest_path=chapters_manifest_path,
         chapter_count=len({q.subelement for q in loaded_pool.questions}),
+    )
+
+
+def render_audio_from_chapter_manifest(
+    manifest_path: Path,
+    out_dir: Path,
+    model: str,
+    voice: str,
+    output_format: str,
+    speed: float,
+    merge_output: bool,
+    out_manifest_path: Path | None = None,
+) -> AudioRenderSummary:
+    client = OpenAITtsClient(
+        model=model,
+        voice=voice,
+        response_format=output_format,
+        speed=speed,
+    )
+    result = render_audio_from_manifest(
+        manifest_path=manifest_path,
+        out_dir=out_dir,
+        client=client,
+        output_format=output_format,
+        merge_output=merge_output,
+        out_manifest_path=out_manifest_path,
+    )
+    return AudioRenderSummary(
+        chapter_count=result.chapter_count,
+        manifest_in_path=result.manifest_in_path,
+        manifest_out_path=result.manifest_out_path,
+        chapters_audio_dir=result.chapters_audio_dir,
+        merged_audio_path=result.merged_audio_path,
+        total_duration_seconds=result.total_duration_seconds,
     )

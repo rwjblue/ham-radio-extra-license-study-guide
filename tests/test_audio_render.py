@@ -1,0 +1,116 @@
+from __future__ import annotations
+
+import json
+from pathlib import Path
+
+from extra_facts.audio import render_audio_from_manifest
+
+
+class _FakeTtsClient:
+    def synthesize(self, text: str) -> bytes:
+        return f"audio:{text[:16]}".encode()
+
+
+def test_render_audio_from_manifest_enriches_manifest_and_merges(tmp_path: Path) -> None:
+    chapters_dir = tmp_path / "audio" / "chapters"
+    chapters_dir.mkdir(parents=True)
+    chapter_1 = chapters_dir / "chapter-01.txt"
+    chapter_2 = chapters_dir / "chapter-02.txt"
+    chapter_1.write_text("Chapter one text", encoding="utf-8")
+    chapter_2.write_text("Chapter two text", encoding="utf-8")
+
+    manifest_path = tmp_path / "audio" / "audio_chapters_manifest.json"
+    manifest = {
+        "schema_version": 1,
+        "chapter_count": 2,
+        "chapters": [
+            {
+                "number": 1,
+                "code": "E1",
+                "title": "One",
+                "groups": ["E1A"],
+                "text_path": str(chapter_1),
+            },
+            {
+                "number": 2,
+                "code": "E2",
+                "title": "Two",
+                "groups": ["E2A"],
+                "text_path": str(chapter_2),
+            },
+        ],
+    }
+    manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+
+    merge_calls: list[list[Path]] = []
+
+    def _probe(path: Path) -> float:
+        if path.name == "chapter-01.mp3":
+            return 10.0
+        return 12.5
+
+    def _merge(inputs: list[Path], output: Path) -> None:
+        merge_calls.append(inputs)
+        output.write_bytes(b"merged-audio")
+
+    result = render_audio_from_manifest(
+        manifest_path=manifest_path,
+        out_dir=tmp_path / "audio",
+        client=_FakeTtsClient(),
+        output_format="mp3",
+        merge_output=True,
+        probe_duration=_probe,
+        merge_audio=_merge,
+    )
+
+    assert result.chapter_count == 2
+    assert (tmp_path / "audio" / "chapters" / "chapter-01.mp3").exists()
+    assert (tmp_path / "audio" / "chapters" / "chapter-02.mp3").exists()
+    assert result.merged_audio_path == (tmp_path / "audio" / "extra_facts_audio.mp3")
+    assert result.merged_audio_path is not None
+    assert result.merged_audio_path.exists()
+    assert len(merge_calls) == 1
+    assert [path.name for path in merge_calls[0]] == ["chapter-01.mp3", "chapter-02.mp3"]
+
+    enriched = json.loads(manifest_path.read_text(encoding="utf-8"))
+    chapters = enriched["chapters"]
+    assert chapters[0]["audio_path"].endswith("chapter-01.mp3")
+    assert chapters[0]["duration_seconds"] == 10.0
+    assert chapters[0]["start_seconds"] == 0.0
+    assert chapters[1]["duration_seconds"] == 12.5
+    assert chapters[1]["start_seconds"] == 10.0
+    assert enriched["audio_render"]["total_duration_seconds"] == 22.5
+
+
+def test_render_audio_from_manifest_supports_no_merge(tmp_path: Path) -> None:
+    chapter_path = tmp_path / "audio" / "chapters" / "chapter-01.txt"
+    chapter_path.parent.mkdir(parents=True)
+    chapter_path.write_text("Only chapter", encoding="utf-8")
+
+    manifest_path = tmp_path / "audio" / "audio_chapters_manifest.json"
+    manifest = {
+        "schema_version": 1,
+        "chapter_count": 1,
+        "chapters": [
+            {
+                "number": 1,
+                "code": "E1",
+                "title": "One",
+                "groups": ["E1A"],
+                "text_path": str(chapter_path),
+            }
+        ],
+    }
+    manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+
+    def _probe_fixed(_path: Path) -> float:
+        return 5.0
+
+    result = render_audio_from_manifest(
+        manifest_path=manifest_path,
+        out_dir=tmp_path / "audio",
+        client=_FakeTtsClient(),
+        merge_output=False,
+        probe_duration=_probe_fixed,
+    )
+    assert result.merged_audio_path is None

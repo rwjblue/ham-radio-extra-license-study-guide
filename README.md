@@ -8,6 +8,8 @@ This project produces:
 - optional listenable script (`dist/audio/extra_facts_audio.txt`)
 - per-chapter audio script files (`dist/audio/chapters/chapter-01.txt`, ...)
 - audio chapter manifest (`dist/audio/audio_chapters_manifest.json`)
+- optional rendered chapter audio (`dist/audio/chapters/chapter-01.mp3`, ...)
+- optional merged audio (`dist/audio/extra_facts_audio.mp3`)
 - intermediate JSON files (`dist/extra_pool.json`, `dist/extra_pool_prose.json`)
 
 Each fact line includes the question ID and a declarative restatement of the correct answer.
@@ -45,6 +47,12 @@ If you want to regenerate only the audio script from the static pool:
 POOL_JSON=dist/extra_pool.json MODE=tts mise run audio-script
 ```
 
+Render MP3 audio from chapter text files:
+
+```bash
+mise run audio-render
+```
+
 4. Compare static vs prose text:
 
 ```bash
@@ -63,6 +71,8 @@ mise run compare
   `dist/audio/extra_facts_audio.txt`
   `dist/audio/chapters/chapter-01.txt` ... `chapter-10.txt`
   `dist/audio/audio_chapters_manifest.json`
+  `dist/audio/chapters/chapter-01.mp3` ... `chapter-10.mp3`
+  `dist/audio/extra_facts_audio.mp3`
 - Intermediate pool JSON:
   `dist/extra_pool.json`
   `dist/extra_pool_prose.json`
@@ -75,6 +85,7 @@ extra-facts extract --docx <local.docx> --out-json dist/extra_pool.json
 extra-facts prose --pool-json dist/extra_pool.json --out-json dist/extra_pool_prose.json [--model gpt-5-mini] [--prompt-version v1] [--workers 6] [--max-attempts 3] [--max-questions N] [--resume]
 extra-facts build --pool-json dist/extra_pool.json --out-dir dist --mode literal|tts|prose [--omit-id]
 extra-facts audio-script --pool-json dist/extra_pool_prose.json --out-dir dist/audio --mode prose [--include-id]
+extra-facts audio-render --manifest dist/audio/audio_chapters_manifest.json --out-dir dist/audio [--model gpt-4o-mini-tts] [--voice alloy] [--speed 1.0] [--no-merge]
 ```
 
 ## Notes
@@ -83,6 +94,7 @@ extra-facts audio-script --pool-json dist/extra_pool_prose.json --out-dir dist/a
 - Parsing is deterministic and excludes withdrawn/removed/deleted questions.
 - Group order is preserved as published.
 - OpenAI prose calls use on-disk HTTP caching by default at `.cache/openai-http` (override via `OPENAI_HTTP_CACHE_DIR`, disable with `OPENAI_HTTP_CACHE=0`).
+- `audio-render` uses `ffprobe` (duration extraction) and `ffmpeg` (MP3 merge).
 
 ## Contributing
 

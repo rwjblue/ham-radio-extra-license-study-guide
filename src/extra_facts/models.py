@@ -67,6 +67,16 @@ class AudioScriptSummary:
 
 
 @dataclass(frozen=True)
+class AudioRenderSummary:
+    chapter_count: int
+    manifest_in_path: Path
+    manifest_out_path: Path
+    chapters_audio_dir: Path
+    merged_audio_path: Path | None
+    total_duration_seconds: float
+
+
+@dataclass(frozen=True)
 class ExtractSummary:
     question_count: int
     group_count: int

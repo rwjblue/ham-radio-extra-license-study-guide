@@ -12,6 +12,7 @@ from .build import (
     extract_pool_from_source,
     extract_pool_from_url,
     generate_prose_for_pool,
+    render_audio_from_chapter_manifest,
 )
 from .prose import ProseProgressUpdate
 
@@ -60,6 +61,29 @@ def audio_script_command(args: argparse.Namespace) -> int:
     print(f"Chapter texts dir: {summary.chapters_dir}")
     print(f"Chapter manifest: {summary.chapters_manifest_path}")
     return 0
+
+
+def audio_render_command(args: argparse.Namespace) -> int:
+    summary = render_audio_from_chapter_manifest(
+        manifest_path=Path(args.manifest),
+        out_dir=Path(args.out_dir),
+        model=args.model,
+        voice=args.voice,
+        output_format=args.output_format,
+        speed=args.speed,
+        merge_output=args.merge,
+        out_manifest_path=Path(args.out_manifest) if args.out_manifest else None,
+    )
+
+    print("Audio render complete")
+    print(f"Chapters rendered: {summary.chapter_count}")
+    print(f"Input manifest: {summary.manifest_in_path}")
+    print(f"Output manifest: {summary.manifest_out_path}")
+    print(f"Chapter audio dir: {summary.chapters_audio_dir}")
+    print(f"Merged audio: {summary.merged_audio_path}")
+    print(f"Total duration (seconds): {summary.total_duration_seconds}")
+    return 0
+
 
 def extract_command(args: argparse.Namespace) -> int:
     if not args.source_url and not args.docx:
@@ -126,6 +150,42 @@ def create_parser() -> argparse.ArgumentParser:
         help="Include question IDs in output lines",
     )
     audio.set_defaults(func=audio_script_command)
+
+    render_audio = sub.add_parser(
+        "audio-render",
+        help="Render chapter text files into MP3 audio and update manifest timings",
+    )
+    render_audio.add_argument(
+        "--manifest",
+        default="dist/audio/audio_chapters_manifest.json",
+        help="Path to chapter manifest JSON from audio-script stage",
+    )
+    render_audio.add_argument("--out-dir", default="dist/audio", help="Output directory")
+    render_audio.add_argument("--model", default="gpt-4o-mini-tts", help="TTS model name")
+    render_audio.add_argument("--voice", default="alloy", help="TTS voice")
+    render_audio.add_argument(
+        "--output-format",
+        default="mp3",
+        choices=["mp3"],
+        help="Rendered audio format",
+    )
+    render_audio.add_argument(
+        "--speed",
+        type=float,
+        default=1.0,
+        help="Speech speed multiplier",
+    )
+    render_audio.add_argument(
+        "--no-merge",
+        action="store_false",
+        dest="merge",
+        help="Skip merged extra_facts_audio.mp3 generation",
+    )
+    render_audio.add_argument(
+        "--out-manifest",
+        help="Optional path for enriched output manifest (defaults to --manifest)",
+    )
+    render_audio.set_defaults(func=audio_render_command, merge=True)
 
     prose = sub.add_parser("prose", help="Generate LLM prose facts into enriched pool JSON")
     prose.add_argument("--pool-json", required=True, help="Input intermediate question pool JSON")
