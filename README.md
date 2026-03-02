@@ -6,6 +6,8 @@ This project produces:
 - static facts (`dist/static/static-extra_facts.txt` and `dist/static/static-extra_facts.pdf`)
 - optional LLM prose facts (`dist/prose/prose-extra_facts.txt` and `dist/prose/prose-extra_facts.pdf`)
 - optional listenable script (`dist/audio/extra_facts_audio.txt`)
+- per-chapter audio script files (`dist/audio/chapters/chapter-01.txt`, ...)
+- audio chapter manifest (`dist/audio/audio_chapters_manifest.json`)
 - intermediate JSON files (`dist/extra_pool.json`, `dist/extra_pool_prose.json`)
 
 Each fact line includes the question ID and a declarative restatement of the correct answer.
@@ -59,6 +61,8 @@ mise run compare
   `dist/prose/prose-extra_facts.pdf`
 - Audio script output:
   `dist/audio/extra_facts_audio.txt`
+  `dist/audio/chapters/chapter-01.txt` ... `chapter-10.txt`
+  `dist/audio/audio_chapters_manifest.json`
 - Intermediate pool JSON:
   `dist/extra_pool.json`
   `dist/extra_pool_prose.json`

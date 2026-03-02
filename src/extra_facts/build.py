@@ -112,7 +112,7 @@ def build_audio_script_from_pool_json(
 ) -> AudioScriptSummary:
     loaded_pool = read_question_pool(pool_json_path)
     out_dir.mkdir(parents=True, exist_ok=True)
-    script_path = write_audio_script(
+    script_path, chapters_dir, chapters_manifest_path = write_audio_script(
         loaded_pool.questions,
         out_dir=out_dir,
         mode=mode,
@@ -125,4 +125,7 @@ def build_audio_script_from_pool_json(
         excluded_count=loaded_pool.excluded_count,
         intermediate_path=pool_json_path,
         script_path=script_path,
+        chapters_dir=chapters_dir,
+        chapters_manifest_path=chapters_manifest_path,
+        chapter_count=len({q.subelement for q in loaded_pool.questions}),
     )

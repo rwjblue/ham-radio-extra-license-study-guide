@@ -61,6 +61,9 @@ class AudioScriptSummary:
     excluded_count: int
     intermediate_path: Path
     script_path: Path
+    chapters_dir: Path
+    chapters_manifest_path: Path
+    chapter_count: int
 
 
 @dataclass(frozen=True)

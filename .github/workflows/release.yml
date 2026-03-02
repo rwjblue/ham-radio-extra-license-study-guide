@@ -84,5 +84,7 @@ jobs:
             dist/prose/prose-extra_facts.txt
             dist/prose/prose-extra_facts.pdf
             dist/audio/extra_facts_audio.txt
+            dist/audio/audio_chapters_manifest.json
+            dist/audio/chapters/chapter-*.txt
             dist/extra_pool.json
             dist/extra_pool_prose.json

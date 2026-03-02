@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import re
 from pathlib import Path
 
@@ -86,47 +87,121 @@ def write_audio_script(
     omit_id: bool,
     metadata: PoolMetadata | None = None,
     txt_name: str = "extra_facts_audio.txt",
-) -> Path:
+) -> tuple[Path, Path, Path]:
     out_dir.mkdir(parents=True, exist_ok=True)
     groups = group_pool_questions(questions)
+    chapters = _build_audio_chapters(groups, mode=mode, omit_id=omit_id, metadata=metadata)
+
+    chapters_dir = out_dir / "chapters"
+    chapters_dir.mkdir(parents=True, exist_ok=True)
+    _write_chapter_texts(chapters, chapters_dir)
+
+    manifest_path = out_dir / "audio_chapters_manifest.json"
+    _write_chapter_manifest(chapters, chapters_dir, manifest_path)
+
     txt_path = out_dir / txt_name
-    _write_audio_text(groups, txt_path, mode, omit_id, metadata)
-    return txt_path
+    _write_combined_audio_text(chapters_dir, chapter_count=len(chapters), target=txt_path)
+    return txt_path, chapters_dir, manifest_path
 
 
-def _write_audio_text(
+def _build_audio_chapters(
     groups: dict[str, list[PoolQuestion]],
-    target: Path,
     mode: str,
     omit_id: bool,
     metadata: PoolMetadata | None,
-) -> None:
-    lines: list[str] = []
+) -> list[_AudioChapter]:
+    chapters: list[_AudioChapter] = []
+    chapter_lines: list[str] = []
+    chapter_groups: list[str] = []
     current_subelement = ""
     seen_abbreviations: set[str] = set()
+    chapter_title = ""
 
     for group, questions in groups.items():
         subelement = group[:2]
         if subelement != current_subelement:
             if current_subelement:
-                lines.append(f"That wraps up chapter {current_subelement}.")
-                lines.append("")
-            lines.extend(_audio_chapter_intro(subelement, metadata))
+                chapter_lines.append(f"That wraps up chapter {current_subelement}.")
+                chapters.append(
+                    _AudioChapter(
+                        code=current_subelement,
+                        title=chapter_title,
+                        groups=chapter_groups,
+                        lines=chapter_lines,
+                    )
+                )
+            chapter_title = _subelement_title_for_display(subelement, metadata)
+            chapter_lines = _audio_chapter_intro(subelement, metadata)
+            chapter_groups = []
             current_subelement = subelement
 
-        lines.append(_audio_group_intro(group, metadata))
+        chapter_groups.append(group)
+        chapter_lines.append(_audio_group_intro(group, metadata))
         for question in questions:
             fact = fact_sentence(question, mode=mode, omit_id=omit_id)
             fact = _rewrite_first_abbreviation_use(fact, seen_abbreviations)
-            lines.extend(_split_for_audio(fact, max_chars=AUDIO_MAX_LINE_CHARS))
-        lines.append("Section recap: review these rules and examples before moving on.")
-        lines.append("")
+            chapter_lines.extend(_split_for_audio(fact, max_chars=AUDIO_MAX_LINE_CHARS))
+        chapter_lines.append("Section recap: review these rules and examples before moving on.")
+        chapter_lines.append("")
 
     if current_subelement:
-        lines.append(f"That wraps up chapter {current_subelement}.")
-        lines.append("End of audio study guide.")
+        chapter_lines.append(f"That wraps up chapter {current_subelement}.")
+        chapters.append(
+            _AudioChapter(
+                code=current_subelement,
+                title=chapter_title,
+                groups=chapter_groups,
+                lines=chapter_lines,
+            )
+        )
 
+    return chapters
+
+
+def _write_combined_audio_text(chapters_dir: Path, chapter_count: int, target: Path) -> None:
+    lines: list[str] = []
+    for number in range(1, chapter_count + 1):
+        chapter_path = chapters_dir / _chapter_txt_name(number)
+        chapter_lines = chapter_path.read_text(encoding="utf-8").splitlines()
+        lines.extend(chapter_lines)
+        lines.append("")
+    lines.append("End of audio study guide.")
     target.write_text("\n".join(lines).rstrip() + "\n", encoding="utf-8")
+
+
+def _write_chapter_texts(chapters: list[_AudioChapter], chapters_dir: Path) -> None:
+    for index, chapter in enumerate(chapters, start=1):
+        chapter_path = chapters_dir / _chapter_txt_name(index)
+        chapter_path.write_text("\n".join(chapter.lines).rstrip() + "\n", encoding="utf-8")
+
+
+def _write_chapter_manifest(
+    chapters: list[_AudioChapter],
+    chapters_dir: Path,
+    manifest_path: Path,
+) -> None:
+    payload: dict[str, object] = {
+        "schema_version": 1,
+        "chapter_count": len(chapters),
+        "chapters": [
+            {
+                "number": index,
+                "code": chapter.code,
+                "title": chapter.title or chapter.code,
+                "groups": chapter.groups,
+                "text_path": str((chapters_dir / _chapter_txt_name(index)).as_posix()),
+            }
+            for index, chapter in enumerate(chapters, start=1)
+        ],
+    }
+    manifest_path.write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
+
+
+def _chapter_txt_name(number: int) -> str:
+    return f"chapter-{number:02d}.txt"
 
 
 def _audio_chapter_intro(subelement: str, metadata: PoolMetadata | None) -> list[str]:
@@ -230,6 +305,14 @@ def _capitalize_sentence_start(text: str) -> str:
     if not text:
         return text
     return text[0].upper() + text[1:]
+
+
+class _AudioChapter:
+    def __init__(self, code: str, title: str, groups: list[str], lines: list[str]) -> None:
+        self.code = code
+        self.title = title
+        self.groups = list(groups)
+        self.lines = list(lines)
 
 def _write_pdf(
     groups: dict[str, list[PoolQuestion]],

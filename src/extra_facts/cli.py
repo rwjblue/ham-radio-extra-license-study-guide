@@ -56,6 +56,9 @@ def audio_script_command(args: argparse.Namespace) -> int:
     print(f"Excluded items: {summary.excluded_count}")
     print(f"Intermediate JSON: {summary.intermediate_path}")
     print(f"Audio script: {summary.script_path}")
+    print(f"Chapters: {summary.chapter_count}")
+    print(f"Chapter texts dir: {summary.chapters_dir}")
+    print(f"Chapter manifest: {summary.chapters_manifest_path}")
     return 0
 
 def extract_command(args: argparse.Namespace) -> int:

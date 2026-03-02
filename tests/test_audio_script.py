@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 from extra_facts.models import PoolMetadata, PoolQuestion
@@ -30,7 +31,7 @@ def test_write_audio_script_adds_spoken_headers_and_omits_ids(tmp_path: Path) ->
         group_friendly_titles={"E1A": "Band Privileges", "E1B": "Station Limits"},
     )
 
-    path = write_audio_script(
+    path, chapters_dir, manifest_path = write_audio_script(
         questions,
         out_dir=tmp_path,
         mode="tts",
@@ -44,12 +45,16 @@ def test_write_audio_script_adds_spoken_headers_and_omits_ids(tmp_path: Path) ->
     assert "Next section, E1B: Station Limits." in content
     assert "Section recap: review these rules and examples before moving on." in content
     assert "E1A01:" not in content
+    assert (chapters_dir / "chapter-01.txt").exists()
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    assert manifest["chapter_count"] == 1
+    assert manifest["chapters"][0]["code"] == "E1"
 
 
 def test_write_audio_script_can_include_ids(tmp_path: Path) -> None:
     questions = [_question("E1A01", "What is the maximum symbol rate?", "1200 baud")]
 
-    path = write_audio_script(
+    path, _chapters_dir, _manifest_path = write_audio_script(
         questions,
         out_dir=tmp_path,
         mode="literal",
@@ -73,7 +78,7 @@ def test_write_audio_script_splits_overlong_facts(tmp_path: Path) -> None:
         )
     ]
 
-    path = write_audio_script(
+    path, _chapters_dir, _manifest_path = write_audio_script(
         questions,
         out_dir=tmp_path,
         mode="literal",
@@ -83,3 +88,28 @@ def test_write_audio_script_splits_overlong_facts(tmp_path: Path) -> None:
     lines = [line for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
     long_lines = [line for line in lines if len(line) > 160]
     assert long_lines == []
+
+
+def test_write_audio_script_emits_chapter_files_in_order(tmp_path: Path) -> None:
+    questions = [
+        _question("E1A01", "What is true?", "A"),
+        _question("E2A01", "What is also true?", "B"),
+    ]
+    metadata = PoolMetadata(
+        subelement_titles={"E1": "Rules", "E2": "Procedures"},
+        group_titles={"E1A": "First Group", "E2A": "Second Group"},
+    )
+
+    _path, chapters_dir, manifest_path = write_audio_script(
+        questions,
+        out_dir=tmp_path,
+        mode="literal",
+        omit_id=True,
+        metadata=metadata,
+    )
+
+    assert (chapters_dir / "chapter-01.txt").exists()
+    assert (chapters_dir / "chapter-02.txt").exists()
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    assert manifest["chapter_count"] == 2
+    assert [chapter["code"] for chapter in manifest["chapters"]] == ["E1", "E2"]

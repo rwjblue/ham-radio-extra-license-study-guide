@@ -2,7 +2,7 @@
 #MISE description="Generate audio script from prose when available, else static"
 #MISE depends=["build-static", "build-prose-if-enabled"]
 #MISE sources=["dist/extra_pool.json", "dist/extra_pool_prose.json", "src/**/*.py", "pyproject.toml"]
-#MISE outputs=["dist/audio/extra_facts_audio.txt"]
+#MISE outputs=["dist/audio/extra_facts_audio.txt", "dist/audio/audio_chapters_manifest.json", "dist/audio/chapters/chapter-*.txt"]
 set -euo pipefail
 
 if [ -n "${OPENAI_API_KEY:-}" ] && [ -f "${PROSE_JSON:-dist/extra_pool_prose.json}" ]; then
