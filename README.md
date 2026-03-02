@@ -39,7 +39,8 @@ cp .env.example .env
 mise run full-build
 ```
 
-`mise run full-build` now also generates the listenable audio script.
+`mise run full-build` now also generates the listenable audio script, and
+when `OPENAI_API_KEY` is set it renders and verifies chapter/merged MP3 outputs.
 
 If you want to regenerate only the audio script from the static pool:
 

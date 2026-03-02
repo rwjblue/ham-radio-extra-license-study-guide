@@ -1,7 +1,14 @@
 #!/usr/bin/env bash
-#MISE description="Extract, build static/prose outputs, and generate audio script"
+#MISE description="Extract/build all outputs, render audio, and verify artifacts when enabled"
 #MISE depends=["audio-script-auto"]
 #MISE outputs={auto=true}
 set -euo pipefail
+
+if [ -n "${OPENAI_API_KEY:-}" ]; then
+  mise run audio-render
+  mise run audio-verify
+else
+  echo "OPENAI_API_KEY not set; skipping audio-render and audio-verify"
+fi
 
 echo "full-build complete"
