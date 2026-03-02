@@ -11,18 +11,26 @@ mkdir -p "${release_dir}"
 bundle_pool_json() {
   local json_name="$1"
   local bundle_name="$2"
+  local json_path="dist/${json_name}"
+  local json_dir
+  local json_file
+  local assets_dir
 
-  if [ ! -f "dist/${json_name}" ]; then
-    echo "dist/${json_name} not found; skipping ${bundle_name}"
+  if [ ! -f "${json_path}" ]; then
+    echo "${json_path} not found; skipping ${bundle_name}"
     return 0
   fi
 
-  if [ ! -d "dist/assets" ]; then
-    echo "dist/assets not found; skipping ${bundle_name}"
+  json_dir="$(dirname "${json_path}")"
+  json_file="$(basename "${json_path}")"
+  assets_dir="${json_dir}/assets"
+
+  if [ ! -d "${assets_dir}" ]; then
+    echo "${assets_dir} not found; skipping ${bundle_name}"
     return 0
   fi
 
-  tar -C dist -czf "${release_dir}/${bundle_name}" "${json_name}" assets
+  tar -C "${json_dir}" -czf "${release_dir}/${bundle_name}" "${json_file}" assets
   sha256sum "${release_dir}/${bundle_name}" > "${release_dir}/${bundle_name}.sha256"
   echo "Created ${release_dir}/${bundle_name}"
 }

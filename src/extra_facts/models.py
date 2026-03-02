@@ -13,6 +13,18 @@ def _empty_str_list() -> list[str]:
     return []
 
 
+def _empty_question_image_list() -> list[QuestionImage]:
+    return []
+
+
+@dataclass(frozen=True)
+class QuestionImage:
+    path: str | None = None
+    data_base64: str | None = None
+    data_url: str | None = None
+    media_type: str | None = None
+
+
 @dataclass(frozen=True)
 class ParsedQuestion:
     question_id: str
@@ -33,6 +45,7 @@ class PoolQuestion:
     group: str
     subelement: str
     image_paths: list[str] = field(default_factory=_empty_str_list)
+    images: list[QuestionImage] = field(default_factory=_empty_question_image_list)
     llm: LlmProse | None = None
 
     @property

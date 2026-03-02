@@ -7,7 +7,7 @@ import re
 import threading
 from collections.abc import Callable, Iterable
 from concurrent.futures import Future, ThreadPoolExecutor, as_completed
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, Literal, Protocol, cast
@@ -771,15 +771,8 @@ def _validation_feedback_details(
 
 
 def _with_llm(question: PoolQuestion, llm: LlmProse) -> PoolQuestion:
-    return PoolQuestion(
-        question_id=question.question_id,
-        question_text=question.question_text,
-        choices=question.choices,
-        correct_choice_index=question.correct_choice_index,
-        group=question.group,
-        subelement=question.subelement,
-        llm=llm,
-    )
+    # Preserve every existing/future PoolQuestion field and update only llm.
+    return replace(question, llm=llm)
 
 
 def _update_counters(

@@ -11,6 +11,7 @@ from .models import (
     PoolQuestion,
     ProseMeta,
     ProseValidation,
+    QuestionImage,
     QuestionPool,
 )
 
@@ -36,6 +37,7 @@ def to_question_pool(
                 group=parsed.group,
                 subelement=parsed.subelement,
                 image_paths=parsed.image_paths,
+                images=[QuestionImage(path=image_path) for image_path in parsed.image_paths],
             )
         )
     return QuestionPool(
@@ -62,6 +64,7 @@ def write_question_pool(pool: QuestionPool, target: Path) -> None:
                 "group": question.group,
                 "subelement": question.subelement,
                 "image_paths": question.image_paths,
+                "images": _serialize_question_images(question.images),
                 "llm": _serialize_llm_prose(question.llm),
             }
             for question in pool.questions
@@ -78,16 +81,7 @@ def read_question_pool(path: Path) -> QuestionPool:
     questions_payload = cast(list[dict[str, Any]], payload["questions"])
 
     questions = [
-        PoolQuestion(
-            question_id=question_payload["question_id"],
-            question_text=question_payload["question_text"],
-            choices=list(question_payload["choices"]),
-            correct_choice_index=int(question_payload["correct_choice_index"]),
-            group=question_payload["group"],
-            subelement=question_payload["subelement"],
-            image_paths=_to_str_list(question_payload.get("image_paths")),
-            llm=_deserialize_llm_prose(question_payload.get("llm")),
-        )
+        _deserialize_pool_question(question_payload)
         for question_payload in questions_payload
     ]
 
@@ -158,6 +152,75 @@ def _deserialize_llm_prose(payload: object) -> LlmProse | None:
         last_candidate=_to_str_or_none(payload_dict.get("last_candidate")),
         last_error=_to_str_or_none(payload_dict.get("last_error")),
     )
+
+
+def _serialize_question_images(images: list[QuestionImage]) -> list[dict[str, str]]:
+    payload: list[dict[str, str]] = []
+    for image in images:
+        image_payload: dict[str, str] = {}
+        if image.path:
+            image_payload["path"] = image.path
+        if image.data_base64:
+            image_payload["data_base64"] = image.data_base64
+        if image.data_url:
+            image_payload["data_url"] = image.data_url
+        if image.media_type:
+            image_payload["media_type"] = image.media_type
+        if image_payload:
+            payload.append(image_payload)
+    return payload
+
+
+def _deserialize_pool_question(question_payload: dict[str, Any]) -> PoolQuestion:
+    image_paths = _to_str_list(question_payload.get("image_paths"))
+    images = _deserialize_question_images(question_payload.get("images"))
+    if not images and image_paths:
+        images = [QuestionImage(path=image_path) for image_path in image_paths]
+    if not image_paths:
+        image_paths = [image.path for image in images if image.path is not None]
+
+    return PoolQuestion(
+        question_id=question_payload["question_id"],
+        question_text=question_payload["question_text"],
+        choices=list(question_payload["choices"]),
+        correct_choice_index=int(question_payload["correct_choice_index"]),
+        group=question_payload["group"],
+        subelement=question_payload["subelement"],
+        image_paths=image_paths,
+        images=images,
+        llm=_deserialize_llm_prose(question_payload.get("llm")),
+    )
+
+
+def _deserialize_question_images(payload: object) -> list[QuestionImage]:
+    if not isinstance(payload, list):
+        return []
+
+    images: list[QuestionImage] = []
+    for item in cast(list[object], payload):
+        if isinstance(item, str):
+            if item.startswith("data:"):
+                images.append(QuestionImage(data_url=item))
+            else:
+                images.append(QuestionImage(path=item))
+            continue
+        if not isinstance(item, dict):
+            continue
+        item_dict = cast(dict[str, Any], item)
+        path = _first_str(item_dict, "path", "image_path", "src")
+        data_base64 = _first_str(item_dict, "data_base64", "base64", "data")
+        data_url = _first_str(item_dict, "data_url", "data_uri", "dataUri")
+        media_type = _first_str(item_dict, "media_type", "mime_type", "content_type")
+        if path or data_base64 or data_url:
+            images.append(
+                QuestionImage(
+                    path=path,
+                    data_base64=data_base64,
+                    data_url=data_url,
+                    media_type=media_type,
+                )
+            )
+    return images
 
 
 def _serialize_prose_meta(meta: ProseMeta | None) -> dict[str, object] | None:
@@ -247,3 +310,11 @@ def _to_str_map(value: object) -> dict[str, str]:
         if isinstance(key, str) and isinstance(item, str):
             result[key] = item
     return result
+
+
+def _first_str(payload: dict[str, Any], *keys: str) -> str | None:
+    for key in keys:
+        value = payload.get(key)
+        if isinstance(value, str):
+            return value
+    return None

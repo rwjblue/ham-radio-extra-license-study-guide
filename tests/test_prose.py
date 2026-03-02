@@ -1,10 +1,11 @@
 from __future__ import annotations
 
+from dataclasses import replace
 from pathlib import Path
 
 from _pytest.monkeypatch import MonkeyPatch
 
-from extra_facts.models import PoolMetadata, PoolQuestion, QuestionPool
+from extra_facts.models import PoolMetadata, PoolQuestion, QuestionImage, QuestionPool
 from extra_facts.prose import (
     OpenAIProseClient,
     enrich_pool_metadata_with_headings,
@@ -198,6 +199,31 @@ def test_enrich_pool_accepts_valid_output() -> None:
     assert enriched.questions[0].llm.attempt_count == 1
     assert enriched.questions[0].llm.failure_reasons is None
     assert enriched.questions[0].llm.last_candidate == "The maximum power on 2200 meters is 1 W."
+
+
+def test_enrich_pool_preserves_non_llm_fields() -> None:
+    question = PoolQuestion(
+        question_id="E5C10",
+        question_text="Which impedance does this chart show?",
+        choices=["50 ohms", "75 ohms", "100 ohms", "25 ohms"],
+        correct_choice_index=0,
+        group="E5C",
+        subelement="E5",
+        image_paths=["assets/e5c10-01.png"],
+        images=[QuestionImage(path="assets/e5c10-01.png")],
+    )
+
+    enriched, _ = enrich_pool_with_prose(
+        _pool(question),
+        client=_FakeClient("This chart shows 50 ohms."),
+        provider="test",
+        model="fake",
+        prompt_version="v1",
+    )
+
+    enriched_question = enriched.questions[0]
+    assert enriched_question.llm is not None
+    assert enriched_question == replace(question, llm=enriched_question.llm)
 
 
 def test_enrich_pool_retries_and_accepts_on_second_attempt() -> None:

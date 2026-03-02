@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import shutil
 from collections.abc import Callable
 from pathlib import Path
 
@@ -20,6 +21,7 @@ from .models import (
     AudioVerifySummary,
     BuildSummary,
     ExtractSummary,
+    PoolQuestion,
 )
 from .parser import extract_pool_metadata, parse_questions
 from .prose import (
@@ -82,6 +84,7 @@ def build_from_pool_json(
         mode=mode,
         omit_id=omit_id,
         metadata=loaded_pool.metadata,
+        image_root_dir=pool_json_path.parent,
         txt_name=f"{output_prefix}-extra_facts.txt",
         pdf_name=f"{output_prefix}-extra_facts.pdf",
         dark_pdf_name=f"{output_prefix}-extra_facts-dark.pdf",
@@ -127,8 +130,47 @@ def generate_prose_for_pool(
         client=client,
     )
     out_json_path.parent.mkdir(parents=True, exist_ok=True)
+    _copy_referenced_assets(
+        questions=enriched_pool.questions,
+        source_root=pool_json_path.parent,
+        destination_root=out_json_path.parent,
+    )
     write_question_pool(enriched_pool, out_json_path)
     return summary
+
+
+def _copy_referenced_assets(
+    questions: list[PoolQuestion],
+    source_root: Path,
+    destination_root: Path,
+) -> None:
+    if source_root.resolve() == destination_root.resolve():
+        return
+
+    for relative_path in _referenced_image_paths(questions):
+        source_path = source_root / relative_path
+        if not source_path.exists() or not source_path.is_file():
+            continue
+        target_path = destination_root / relative_path
+        target_path.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(source_path, target_path)
+
+
+def _referenced_image_paths(questions: list[PoolQuestion]) -> list[Path]:
+    ordered_paths: list[Path] = []
+    seen_paths: set[Path] = set()
+    for question in questions:
+        image_paths = [*question.image_paths]
+        image_paths.extend(image.path for image in question.images if image.path)
+        for raw_path in image_paths:
+            parsed = Path(raw_path)
+            if parsed.is_absolute() or ".." in parsed.parts:
+                continue
+            if parsed in seen_paths:
+                continue
+            seen_paths.add(parsed)
+            ordered_paths.append(parsed)
+    return ordered_paths
 
 
 def build_audio_script_from_pool_json(

@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import base64
+import binascii
+import io
 import json
 import re
 from pathlib import Path
@@ -24,7 +27,7 @@ from reportlab.platypus import (
 
 from .facts import fact_sentence
 from .intermediate import group_pool_questions
-from .models import PoolMetadata, PoolQuestion
+from .models import PoolMetadata, PoolQuestion, QuestionImage
 
 QUESTION_ID_RE = re.compile(r"^([A-Z]\d[A-Z]\d{2}):\s*(.+)$")
 
@@ -35,6 +38,7 @@ def write_outputs(
     mode: str,
     omit_id: bool,
     metadata: PoolMetadata | None = None,
+    image_root_dir: Path | None = None,
     txt_name: str = "extra_facts.txt",
     pdf_name: str = "extra_facts.pdf",
     dark_pdf_name: str | None = None,
@@ -45,13 +49,31 @@ def write_outputs(
     txt_path = out_dir / txt_name
     _write_text(groups, txt_path, mode, omit_id, metadata)
 
+    resolved_image_root = image_root_dir if image_root_dir is not None else out_dir
+
     pdf_path = out_dir / pdf_name
-    _write_pdf(groups, pdf_path, mode, omit_id, metadata, theme="light")
+    _write_pdf(
+        groups,
+        pdf_path,
+        mode,
+        omit_id,
+        metadata,
+        image_root_dir=resolved_image_root,
+        theme="light",
+    )
 
     dark_pdf_path: Path | None = None
     if dark_pdf_name:
         dark_pdf_path = out_dir / dark_pdf_name
-        _write_pdf(groups, dark_pdf_path, mode, omit_id, metadata, theme="dark")
+        _write_pdf(
+            groups,
+            dark_pdf_path,
+            mode,
+            omit_id,
+            metadata,
+            image_root_dir=resolved_image_root,
+            theme="dark",
+        )
 
     return txt_path, pdf_path, dark_pdf_path
 
@@ -261,6 +283,7 @@ def _write_pdf(
     mode: str,
     omit_id: bool,
     metadata: PoolMetadata | None,
+    image_root_dir: Path,
     theme: str = "light",
 ) -> None:
     palette = _pdf_palette(theme)
@@ -363,7 +386,7 @@ def _write_pdf(
         for question in questions:
             text = fact_sentence(question, mode=mode, omit_id=omit_id)
             story.append(_fact_item(text, body, palette["line"]))
-            image_flowables = _question_image_flowables(question, target.parent)
+            image_flowables = _question_image_flowables(question, image_root_dir)
             if image_flowables:
                 story.extend(image_flowables)
         story.append(Spacer(1, 0.07 * inch))
@@ -553,8 +576,32 @@ def _draw_footer(
 
 def _question_image_flowables(question: PoolQuestion, root_dir: Path) -> list[Flowable]:
     flowables: list[Flowable] = []
+    seen_paths: set[str] = set()
+
+    for image in question.images:
+        embedded_bytes = _embedded_image_bytes(image)
+        if embedded_bytes is not None:
+            flowables.append(_pdf_image(embedded_bytes))
+            flowables.append(Spacer(1, 0.05 * inch))
+            continue
+        if image.path is None:
+            continue
+        normalized_path = image.path.strip()
+        if not normalized_path or normalized_path in seen_paths:
+            continue
+        seen_paths.add(normalized_path)
+        resolved = root_dir / normalized_path
+        if not resolved.exists():
+            continue
+        flowables.append(_pdf_image(resolved))
+        flowables.append(Spacer(1, 0.05 * inch))
+
     for image_path in question.image_paths:
-        resolved = root_dir / image_path
+        normalized_path = image_path.strip()
+        if not normalized_path or normalized_path in seen_paths:
+            continue
+        seen_paths.add(normalized_path)
+        resolved = root_dir / normalized_path
         if not resolved.exists():
             continue
         flowables.append(_pdf_image(resolved))
@@ -562,8 +609,8 @@ def _question_image_flowables(question: PoolQuestion, root_dir: Path) -> list[Fl
     return flowables
 
 
-def _pdf_image(path: Path) -> Image:
-    image = Image(str(path))
+def _pdf_image(source: Path | bytes) -> Image:
+    image = Image(str(source)) if isinstance(source, Path) else Image(io.BytesIO(source))
     max_width = 5.6 * inch
     max_height = 2.8 * inch
     width = float(image.imageWidth)
@@ -573,3 +620,28 @@ def _pdf_image(path: Path) -> Image:
         image.drawWidth = width * scale
         image.drawHeight = height * scale
     return image
+
+
+def _embedded_image_bytes(image: QuestionImage) -> bytes | None:
+    if image.data_base64:
+        return _decode_base64_bytes(image.data_base64)
+    if image.data_url:
+        return _decode_data_url_bytes(image.data_url)
+    return None
+
+
+def _decode_data_url_bytes(value: str) -> bytes | None:
+    match = re.match(r"^data:[^;]+;base64,(.+)$", value.strip(), flags=re.IGNORECASE | re.DOTALL)
+    if match is None:
+        return None
+    return _decode_base64_bytes(match.group(1))
+
+
+def _decode_base64_bytes(value: str) -> bytes | None:
+    normalized = re.sub(r"\s+", "", value)
+    if not normalized:
+        return None
+    try:
+        return base64.b64decode(normalized, validate=True)
+    except binascii.Error:
+        return None

@@ -24,15 +24,22 @@ for file in "${required_files[@]}"; do
   fi
 done
 
+pool_json="${dist_dir}/extra_pool_prose.json"
+assets_dir="$(dirname "${pool_json}")/assets"
+if [ ! -d "${assets_dir}" ]; then
+  echo "Missing required assets directory next to JSON: ${assets_dir}" >&2
+  exit 1
+fi
+
 rm -rf "${out_dir}"
 mkdir -p "${out_dir}"
 
-cp "${dist_dir}/extra_pool_prose.json" "${out_dir}/amateur-extra-license-prep-pool.json"
+cp "${pool_json}" "${out_dir}/amateur-extra-license-prep-pool.json"
 cp "${dist_dir}/audio/extra_facts_audio.txt" "${out_dir}/amateur-extra-license-prep-script.txt"
 cp "${dist_dir}/audio/extra_facts_audio.mp3" "${out_dir}/amateur-extra-license-prep.mp3"
 cp "${dist_dir}/prose/prose-extra_facts.pdf" "${out_dir}/amateur-extra-license-prep-study-workbook.pdf"
 cp "${dist_dir}/prose/prose-extra_facts-dark.pdf" "${out_dir}/amateur-extra-license-prep-study-workbook-dark.pdf"
-cp -R "${dist_dir}/assets" "${out_dir}/assets"
+cp -R "${assets_dir}" "${out_dir}/assets"
 
 cat > "${out_dir}/index.html" <<'HTML'
 <!doctype html>
