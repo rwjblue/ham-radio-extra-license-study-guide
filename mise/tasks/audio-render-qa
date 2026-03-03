@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+#MISE description="Render Q&A audio chapters and merged book"
+#MISE depends=["audio-script-qa"]
+#MISE sources=["dist/audio/qa/manifest.json", "dist/audio/qa/chapters/chapter-*.txt", "src/**/*.py", "pyproject.toml"]
+#MISE outputs=["dist/audio/qa/book.mp3", "dist/audio/qa/chapters/chapter-*.mp3"]
+set -euo pipefail
+
+MANIFEST="${MANIFEST:-dist/audio/qa/manifest.json}" \
+OUT_DIR="${OUT_DIR:-dist/audio/qa}" \
+mise run audio-render-from-manifest

@@ -5,6 +5,7 @@ from collections.abc import Callable
 from pathlib import Path
 
 from .audio import (
+    AudioRenderProgressUpdate,
     DEFAULT_ELEVENLABS_OUTPUT_FORMAT,
     DEFAULT_TTS_INSTRUCTIONS,
     ElevenLabsTtsClient,
@@ -219,6 +220,7 @@ def render_audio_from_chapter_manifest(
     out_manifest_path: Path | None = None,
     jobs: int = 1,
     unit_cache_dir: Path | None = None,
+    progress_callback: Callable[[AudioRenderProgressUpdate], None] | None = None,
 ) -> AudioRenderSummary:
     normalized_provider = provider.strip().lower()
     if normalized_provider == "openai":
@@ -281,6 +283,7 @@ def render_audio_from_chapter_manifest(
         jobs=jobs,
         client_factory=client_factory,
         unit_cache_dir=unit_cache_dir,
+        progress_callback=progress_callback,
     )
     return AudioRenderSummary(
         chapter_count=result.chapter_count,

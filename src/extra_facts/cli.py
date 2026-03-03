@@ -6,7 +6,7 @@ import sys
 import time
 from pathlib import Path
 
-from .audio import DEFAULT_ELEVENLABS_OUTPUT_FORMAT, DEFAULT_TTS_INSTRUCTIONS
+from .audio import AudioRenderProgressUpdate, DEFAULT_ELEVENLABS_OUTPUT_FORMAT, DEFAULT_TTS_INSTRUCTIONS
 from .build import (
     build_audio_script_from_pool_json,
     build_from_pool_json,
@@ -80,6 +80,57 @@ def audio_render_command(args: argparse.Namespace) -> int:
     else:
         raise SystemExit(f"Unsupported audio provider: {args.provider}")
 
+    ci_mode = _is_ci()
+    use_bar = not ci_mode and sys.stdout.isatty()
+    non_tty_emit_interval_seconds = 5.0
+    last_non_tty_emit = 0.0
+
+    def _render_progress(update: AudioRenderProgressUpdate) -> None:
+        nonlocal last_non_tty_emit
+        if update.total_chapters == 0:
+            return
+        if ci_mode:
+            print(
+                (
+                    f"[{update.completed_chapters}/{update.total_chapters}] "
+                    f"rendered_units={update.rendered_units} reused_units={update.reused_units} "
+                    f"chapter={update.chapter_number:02d} {update.phase}"
+                ),
+                flush=True,
+            )
+            return
+        if not use_bar:
+            now = time.monotonic()
+            if (
+                update.phase != "chapter_done"
+                and update.completed_chapters < update.total_chapters
+                and (now - last_non_tty_emit) < non_tty_emit_interval_seconds
+            ):
+                return
+            last_non_tty_emit = now
+            print(
+                (
+                    f"[{update.completed_chapters}/{update.total_chapters}] "
+                    f"rendered_units={update.rendered_units} reused_units={update.reused_units} "
+                    f"chapter={update.chapter_number:02d} {update.phase}"
+                ),
+                flush=True,
+            )
+            return
+        width = 28
+        ratio = update.completed_chapters / update.total_chapters
+        filled = int(width * ratio)
+        bar = "#" * filled + "-" * (width - filled)
+        print(
+            (
+                f"\r[{bar}] {update.completed_chapters}/{update.total_chapters} "
+                f"rendered_units={update.rendered_units} reused_units={update.reused_units} "
+                f"chapter={update.chapter_number:02d} {update.phase}"
+            ),
+            end="",
+            flush=True,
+        )
+
     summary = render_audio_from_chapter_manifest(
         manifest_path=Path(args.manifest),
         out_dir=Path(args.out_dir),
@@ -96,7 +147,10 @@ def audio_render_command(args: argparse.Namespace) -> int:
         out_manifest_path=Path(args.out_manifest) if args.out_manifest else None,
         jobs=args.jobs,
         unit_cache_dir=Path(args.unit_cache_dir) if args.unit_cache_dir else None,
+        progress_callback=_render_progress,
     )
+    if summary.chapter_count > 0 and use_bar:
+        print()
 
     print("Audio render complete")
     print(f"Chapters rendered: {summary.chapter_count}")

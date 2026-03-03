@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 import threading
+from typing import Literal
 from typing import cast
 
 import pytest
@@ -11,6 +12,7 @@ from _pytest.monkeypatch import MonkeyPatch
 
 import extra_facts.audio as audio_module
 from extra_facts.audio import (
+    AudioRenderProgressUpdate,
     DEFAULT_ELEVENLABS_OUTPUT_FORMAT,
     DEFAULT_TTS_INSTRUCTIONS,
     ElevenLabsTtsClient,
@@ -583,6 +585,56 @@ def test_render_audio_from_manifest_supports_parallel_unit_rendering(tmp_path: P
     assert result.chapters_rendered == 1
     assert result.chapters_reused == 0
     assert call_count == 3
+
+
+def test_render_audio_from_manifest_emits_progress_updates(tmp_path: Path) -> None:
+    chapter_path = tmp_path / "audio" / "chapters" / "chapter-01.txt"
+    chapter_path.parent.mkdir(parents=True)
+    chapter_path.write_text("Question one.\n\nQuestion two.", encoding="utf-8")
+    manifest_path = tmp_path / "audio" / "manifest.json"
+    manifest_path.write_text(
+        json.dumps(
+            {
+                "schema_version": 1,
+                "chapter_count": 1,
+                "chapters": [
+                    {
+                        "number": 1,
+                        "code": "E1",
+                        "title": "One",
+                        "groups": ["E1A"],
+                        "text_path": str(chapter_path),
+                    }
+                ],
+            },
+            indent=2,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    phases: list[Literal["chapter_start", "unit_done", "chapter_done"]] = []
+
+    def _progress(update: AudioRenderProgressUpdate) -> None:
+        phases.append(update.phase)
+
+    def _merge(_inputs: list[Path], output: Path) -> None:
+        output.write_bytes(b"merged-audio")
+
+    _ = render_audio_from_manifest(
+        manifest_path=manifest_path,
+        out_dir=tmp_path / "audio",
+        client=_FakeTtsClient(),
+        merge_output=False,
+        merge_audio=_merge,
+        probe_duration=lambda _path: 5.0,
+        render_fingerprint="test-fingerprint",
+        progress_callback=_progress,
+    )
+
+    assert "chapter_start" in phases
+    assert "unit_done" in phases
+    assert phases[-1] == "chapter_done"
 
 
 def test_openai_tts_http_cache_enabled_defaults_true(monkeypatch: MonkeyPatch) -> None:

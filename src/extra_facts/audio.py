@@ -12,7 +12,7 @@ from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
 import threading
-from typing import Any, Protocol, cast
+from typing import Any, Literal, Protocol, cast
 
 import requests
 from requests.adapters import HTTPAdapter
@@ -300,6 +300,16 @@ class AudioRenderResult:
     chapters_reused: int
 
 
+@dataclass(frozen=True)
+class AudioRenderProgressUpdate:
+    completed_chapters: int
+    total_chapters: int
+    rendered_units: int
+    reused_units: int
+    chapter_number: int
+    phase: Literal["chapter_start", "unit_done", "chapter_done"]
+
+
 def render_audio_from_manifest(
     manifest_path: Path,
     out_dir: Path,
@@ -316,6 +326,7 @@ def render_audio_from_manifest(
     jobs: int = 1,
     client_factory: Callable[[], TtsClient] | None = None,
     unit_cache_dir: Path | None = None,
+    progress_callback: Callable[[AudioRenderProgressUpdate], None] | None = None,
 ) -> AudioRenderResult:
     payload = cast(dict[str, Any], json.loads(manifest_path.read_text(encoding="utf-8")))
     chapters_payload = payload.get("chapters")
@@ -350,6 +361,33 @@ def render_audio_from_manifest(
     rendered_paths: list[Path] = []
     chapters_rendered = 0
     chapters_reused = 0
+    rendered_units = 0
+    reused_units = 0
+    completed_chapters = 0
+    total_chapters = len(chapters)
+
+    def _emit_progress(
+        chapter_number: int,
+        phase: Literal["chapter_start", "unit_done", "chapter_done"],
+    ) -> None:
+        if progress_callback is None:
+            return
+        progress_callback(
+            AudioRenderProgressUpdate(
+                completed_chapters=completed_chapters,
+                total_chapters=total_chapters,
+                rendered_units=rendered_units,
+                reused_units=reused_units,
+                chapter_number=chapter_number,
+                phase=phase,
+            )
+        )
+
+    def _on_unit_done(chapter_number: int) -> None:
+        nonlocal rendered_units
+        rendered_units += 1
+        _emit_progress(chapter_number=chapter_number, phase="unit_done")
+
     for chapter in chapters:
         chapter_number = int(chapter["number"])
         text_path_value = chapter.get("text_path")
@@ -384,12 +422,15 @@ def render_audio_from_manifest(
                 render_fingerprint=render_fingerprint,
             )
         ]
+        reused_units += len(units) - len(pending_units)
+        _emit_progress(chapter_number=chapter_number, phase="chapter_start")
 
         if pending_units:
             _render_units(
                 pending_units,
                 synthesize=synthesize_bytes,
                 jobs=jobs,
+                on_unit_complete=lambda: _on_unit_done(chapter_number),
             )
             chapter_rendered = True
         else:
@@ -431,6 +472,8 @@ def render_audio_from_manifest(
         ]
         start_seconds += duration_seconds
         rendered_paths.append(audio_path)
+        completed_chapters += 1
+        _emit_progress(chapter_number=chapter_number, phase="chapter_done")
         _write_manifest_payload(payload, target_manifest)
 
     merged_audio_path: Path | None = None
@@ -750,18 +793,23 @@ def _render_units(
     units: list[dict[str, object]],
     synthesize: Callable[[str], bytes],
     jobs: int,
+    on_unit_complete: Callable[[], None] | None = None,
 ) -> None:
     if not units:
         return
     if jobs == 1:
         for unit in units:
             _render_single_unit(unit, synthesize)
+            if on_unit_complete is not None:
+                on_unit_complete()
         return
 
     with ThreadPoolExecutor(max_workers=jobs) as pool:
         futures = [pool.submit(_render_single_unit, unit, synthesize) for unit in units]
         for future in futures:
             future.result()
+            if on_unit_complete is not None:
+                on_unit_complete()
 
 
 def _render_single_unit(

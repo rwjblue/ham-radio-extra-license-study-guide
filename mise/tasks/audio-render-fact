@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+#MISE description="Render fact/prose audio chapters and merged book"
+#MISE depends=["audio-script-auto"]
+#MISE sources=["dist/audio/fact/manifest.json", "dist/audio/fact/chapters/chapter-*.txt", "src/**/*.py", "pyproject.toml"]
+#MISE outputs=["dist/audio/fact/book.mp3", "dist/audio/fact/chapters/chapter-*.mp3"]
+set -euo pipefail
+
+MANIFEST="${MANIFEST:-dist/audio/fact/manifest.json}" \
+OUT_DIR="${OUT_DIR:-dist/audio/fact}" \
+mise run audio-render-from-manifest
