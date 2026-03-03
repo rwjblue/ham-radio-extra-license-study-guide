@@ -5,7 +5,7 @@ import zipfile
 from pathlib import Path
 
 from extra_facts.build import build_from_pool_json
-from extra_facts.epub import _question_html_lines, write_epub
+from extra_facts.epub import _question_html_lines, write_epub  # pyright: ignore[reportPrivateUsage]
 from extra_facts.intermediate import write_question_pool
 from extra_facts.models import (
     LlmProse,
@@ -210,7 +210,10 @@ def test_write_epub_augmented_qa_includes_about_section(tmp_path: Path) -> None:
         chapter_files = [n for n in zf.namelist() if n.endswith(".xhtml")]
         content = zf.read(chapter_files[0]).decode("utf-8")
         assert "About this edition" in content
-        assert "each question and answer line is verbatim from the official question pool" in content
+        assert (
+            "each question and answer line is verbatim from the official question pool"
+            in content
+        )
 
 
 def test_build_from_pool_json_produces_epub(tmp_path: Path) -> None:

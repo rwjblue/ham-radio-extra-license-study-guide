@@ -46,7 +46,8 @@ def write_epub(
 
     groups = group_pool_questions(questions)
     image_registry: dict[str, str] = {}
-    intro_text = _augmented_intro_text(mode=mode, has_llm=any(question.llm is not None for question in questions))
+    has_llm = any(question.llm is not None for question in questions)
+    intro_text = _augmented_intro_text(mode=mode, has_llm=has_llm)
     intro_written = False
 
     chapters: list[epub.EpubHtml] = []

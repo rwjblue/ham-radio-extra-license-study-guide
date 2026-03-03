@@ -443,15 +443,18 @@ def render_audio_from_manifest(
         audio_file_name = f"chapter-{chapter_number:02d}.{output_format}"
         audio_path = chapters_audio_dir / audio_file_name
         units_payload = _existing_units_by_index(chapter)
-        pending_units = [
-            unit
-            for unit in units
+        pending_units: list[dict[str, object]] = []
+        for unit in units:
+            unit_index = unit.get("index")
+            if not isinstance(unit_index, int):
+                pending_units.append(unit)
+                continue
             if not _can_reuse_render_unit(
                 unit,
-                existing_payload=units_payload.get(unit["index"]),
+                existing_payload=units_payload.get(unit_index),
                 render_fingerprint=render_fingerprint,
-            )
-        ]
+            ):
+                pending_units.append(unit)
         reused_units += len(units) - len(pending_units)
         completed_units = rendered_units + reused_units
         _emit_progress(chapter_number=chapter_number, phase="chapter_start")
@@ -798,12 +801,13 @@ def _existing_units_by_index(chapter: dict[str, Any]) -> dict[int, dict[str, Any
     if not isinstance(payload, list):
         return {}
     by_index: dict[int, dict[str, Any]] = {}
-    for item in payload:
+    for item in cast(list[object], payload):
         if not isinstance(item, dict):
             continue
-        index = item.get("index")
+        item_payload = cast(dict[str, Any], item)
+        index = item_payload.get("index")
         if isinstance(index, int):
-            by_index[index] = cast(dict[str, Any], item)
+            by_index[index] = item_payload
     return by_index
 
 

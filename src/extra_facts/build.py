@@ -3,6 +3,7 @@ from __future__ import annotations
 import shutil
 from collections.abc import Callable
 from pathlib import Path
+from typing import cast
 
 from .audio import (
     DEFAULT_ELEVENLABS_OUTPUT_FORMAT,
@@ -10,6 +11,7 @@ from .audio import (
     AudioRenderProgressUpdate,
     ElevenLabsTtsClient,
     OpenAITtsClient,
+    TtsClient,
     render_audio_from_manifest,
 )
 from .audio_verify import verify_audio_from_manifest
@@ -223,6 +225,7 @@ def render_audio_from_chapter_manifest(
     progress_callback: Callable[[AudioRenderProgressUpdate], None] | None = None,
 ) -> AudioRenderSummary:
     normalized_provider = provider.strip().lower()
+    client_factory: Callable[[], TtsClient]
     if normalized_provider == "openai":
         resolved_instructions = instructions.strip() if instructions else DEFAULT_TTS_INSTRUCTIONS
         render_fingerprint = (
@@ -236,14 +239,19 @@ def render_audio_from_chapter_manifest(
             instructions=resolved_instructions,
         )
         
-        def client_factory() -> OpenAITtsClient:
-            return OpenAITtsClient(
+        def _openai_client_factory() -> TtsClient:
+            return cast(
+                TtsClient,
+                OpenAITtsClient(
                 model=model,
                 voice=voice,
                 response_format=output_format,
                 speed=speed,
                 instructions=resolved_instructions,
+            ),
             )
+
+        client_factory = _openai_client_factory
     elif normalized_provider == "elevenlabs":
         resolved_output_format = (
             elevenlabs_output_format.strip()
@@ -263,14 +271,19 @@ def render_audio_from_chapter_manifest(
             speed=speed,
         )
         
-        def client_factory() -> ElevenLabsTtsClient:
-            return ElevenLabsTtsClient(
+        def _elevenlabs_client_factory() -> TtsClient:
+            return cast(
+                TtsClient,
+                ElevenLabsTtsClient(
                 model=model,
                 voice_id=voice,
                 response_format=resolved_output_format,
                 language_code=resolved_language_code,
                 speed=speed,
+            ),
             )
+
+        client_factory = _elevenlabs_client_factory
     else:
         raise RuntimeError(f"Unsupported audio provider: {provider}")
 
