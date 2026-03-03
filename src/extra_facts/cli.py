@@ -277,8 +277,8 @@ def create_parser() -> argparse.ArgumentParser:
     render_audio.add_argument(
         "--jobs",
         type=int,
-        default=1,
-        help="Number of parallel TTS render workers (default: 1)",
+        default=4,
+        help="Number of parallel TTS render workers (default: 4)",
     )
     render_audio.add_argument(
         "--unit-cache-dir",
