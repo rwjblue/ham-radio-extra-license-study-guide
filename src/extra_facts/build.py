@@ -5,9 +5,9 @@ from collections.abc import Callable
 from pathlib import Path
 
 from .audio import (
-    AudioRenderProgressUpdate,
     DEFAULT_ELEVENLABS_OUTPUT_FORMAT,
     DEFAULT_TTS_INSTRUCTIONS,
+    AudioRenderProgressUpdate,
     ElevenLabsTtsClient,
     OpenAITtsClient,
     render_audio_from_manifest,
@@ -235,13 +235,15 @@ def render_audio_from_chapter_manifest(
             speed=speed,
             instructions=resolved_instructions,
         )
-        client_factory = lambda: OpenAITtsClient(
-            model=model,
-            voice=voice,
-            response_format=output_format,
-            speed=speed,
-            instructions=resolved_instructions,
-        )
+        
+        def client_factory() -> OpenAITtsClient:
+            return OpenAITtsClient(
+                model=model,
+                voice=voice,
+                response_format=output_format,
+                speed=speed,
+                instructions=resolved_instructions,
+            )
     elif normalized_provider == "elevenlabs":
         resolved_output_format = (
             elevenlabs_output_format.strip()
@@ -260,13 +262,15 @@ def render_audio_from_chapter_manifest(
             language_code=resolved_language_code,
             speed=speed,
         )
-        client_factory = lambda: ElevenLabsTtsClient(
-            model=model,
-            voice_id=voice,
-            response_format=resolved_output_format,
-            language_code=resolved_language_code,
-            speed=speed,
-        )
+        
+        def client_factory() -> ElevenLabsTtsClient:
+            return ElevenLabsTtsClient(
+                model=model,
+                voice_id=voice,
+                response_format=resolved_output_format,
+                language_code=resolved_language_code,
+                speed=speed,
+            )
     else:
         raise RuntimeError(f"Unsupported audio provider: {provider}")
 

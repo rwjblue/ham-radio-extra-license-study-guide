@@ -1,17 +1,17 @@
 from __future__ import annotations
 
-from concurrent.futures import ThreadPoolExecutor
 import hashlib
 import json
 import os
 import subprocess
 import tempfile
 import textwrap
+import threading
 from collections.abc import Callable
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
-import threading
 from typing import Any, Literal, Protocol, cast
 
 import requests
@@ -302,12 +302,24 @@ class AudioRenderResult:
 
 @dataclass(frozen=True)
 class AudioRenderProgressUpdate:
+    completed_units: int
+    total_units: int
     completed_chapters: int
     total_chapters: int
     rendered_units: int
     reused_units: int
     chapter_number: int
     phase: Literal["chapter_start", "unit_done", "chapter_done"]
+
+
+ChapterUnitsPayload = tuple[
+    dict[str, Any],
+    int,
+    str,
+    Path,
+    str,
+    list[dict[str, object]],
+]
 
 
 def render_audio_from_manifest(
@@ -363,30 +375,11 @@ def render_audio_from_manifest(
     chapters_reused = 0
     rendered_units = 0
     reused_units = 0
+    completed_units = 0
     completed_chapters = 0
     total_chapters = len(chapters)
-
-    def _emit_progress(
-        chapter_number: int,
-        phase: Literal["chapter_start", "unit_done", "chapter_done"],
-    ) -> None:
-        if progress_callback is None:
-            return
-        progress_callback(
-            AudioRenderProgressUpdate(
-                completed_chapters=completed_chapters,
-                total_chapters=total_chapters,
-                rendered_units=rendered_units,
-                reused_units=reused_units,
-                chapter_number=chapter_number,
-                phase=phase,
-            )
-        )
-
-    def _on_unit_done(chapter_number: int) -> None:
-        nonlocal rendered_units
-        rendered_units += 1
-        _emit_progress(chapter_number=chapter_number, phase="unit_done")
+    total_units = 0
+    chapter_units_payload: list[ChapterUnitsPayload] = []
 
     for chapter in chapters:
         chapter_number = int(chapter["number"])
@@ -398,12 +391,9 @@ def render_audio_from_manifest(
         if not text:
             raise RuntimeError(f"Chapter text is empty: {text_path}")
 
-        audio_file_name = f"chapter-{chapter_number:02d}.{output_format}"
-        audio_path = chapters_audio_dir / audio_file_name
         chapter_text_sha256 = _text_sha256(text)
         chapter_units_dir = unit_cache_root / "units" / f"chapter-{chapter_number:02d}"
         chapter_units_dir.mkdir(parents=True, exist_ok=True)
-
         units = _build_render_units(
             text=text,
             chapter_number=chapter_number,
@@ -412,6 +402,46 @@ def render_audio_from_manifest(
             chapter_units_dir=chapter_units_dir,
             max_chars=TTS_MAX_CHARS,
         )
+        total_units += len(units)
+        chapter_units_payload.append(
+            (chapter, chapter_number, text, text_path, chapter_text_sha256, units)
+        )
+
+    def _emit_progress(
+        chapter_number: int,
+        phase: Literal["chapter_start", "unit_done", "chapter_done"],
+    ) -> None:
+        if progress_callback is None:
+            return
+        progress_callback(
+            AudioRenderProgressUpdate(
+                completed_units=completed_units,
+                total_units=total_units,
+                completed_chapters=completed_chapters,
+                total_chapters=total_chapters,
+                rendered_units=rendered_units,
+                reused_units=reused_units,
+                chapter_number=chapter_number,
+                phase=phase,
+            )
+        )
+
+    def _on_unit_done(chapter_number: int) -> None:
+        nonlocal rendered_units, completed_units
+        rendered_units += 1
+        completed_units = rendered_units + reused_units
+        _emit_progress(chapter_number=chapter_number, phase="unit_done")
+
+    for (
+        chapter,
+        chapter_number,
+        _text,
+        _text_path,
+        chapter_text_sha256,
+        units,
+    ) in chapter_units_payload:
+        audio_file_name = f"chapter-{chapter_number:02d}.{output_format}"
+        audio_path = chapters_audio_dir / audio_file_name
         units_payload = _existing_units_by_index(chapter)
         pending_units = [
             unit
@@ -423,14 +453,18 @@ def render_audio_from_manifest(
             )
         ]
         reused_units += len(units) - len(pending_units)
+        completed_units = rendered_units + reused_units
         _emit_progress(chapter_number=chapter_number, phase="chapter_start")
 
         if pending_units:
+            def on_unit_complete(chapter_number: int = chapter_number) -> None:
+                _on_unit_done(chapter_number)
+
             _render_units(
                 pending_units,
                 synthesize=synthesize_bytes,
                 jobs=jobs,
-                on_unit_complete=lambda: _on_unit_done(chapter_number),
+                on_unit_complete=on_unit_complete,
             )
             chapter_rendered = True
         else:
@@ -473,6 +507,7 @@ def render_audio_from_manifest(
         start_seconds += duration_seconds
         rendered_paths.append(audio_path)
         completed_chapters += 1
+        completed_units = rendered_units + reused_units
         _emit_progress(chapter_number=chapter_number, phase="chapter_done")
         _write_manifest_payload(payload, target_manifest)
 

@@ -1,10 +1,9 @@
 from __future__ import annotations
 
 import json
-from pathlib import Path
 import threading
-from typing import Literal
-from typing import cast
+from pathlib import Path
+from typing import Literal, cast
 
 import pytest
 import requests
@@ -12,9 +11,9 @@ from _pytest.monkeypatch import MonkeyPatch
 
 import extra_facts.audio as audio_module
 from extra_facts.audio import (
-    AudioRenderProgressUpdate,
     DEFAULT_ELEVENLABS_OUTPUT_FORMAT,
     DEFAULT_TTS_INSTRUCTIONS,
+    AudioRenderProgressUpdate,
     ElevenLabsTtsClient,
     OpenAITtsClient,
     render_audio_from_manifest,
