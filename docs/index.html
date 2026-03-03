@@ -6,17 +6,38 @@
     <title>Ham Radio Extra Study Guide Assets</title>
     <style>
       :root {
+        color-scheme: light dark;
         --bg: #f6f9ff;
+        --bg-accent: #e7f0ff;
         --fg: #10243a;
         --muted: #4a5c71;
         --card: #ffffff;
+        --surface: #fdfefe;
+        --surface-active: #f8fbff;
         --border: #d7e1ef;
+        --border-active: #c2d6f3;
         --link: #0057b8;
+        --focus: #0a7bff;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #0d1623;
+          --bg-accent: #1a2a41;
+          --fg: #eaf2ff;
+          --muted: #b7c6de;
+          --card: #142337;
+          --surface: #192b42;
+          --surface-active: #213754;
+          --border: #2e486c;
+          --border-active: #466a99;
+          --link: #89bcff;
+          --focus: #9fc8ff;
+        }
       }
       body {
         margin: 0;
         font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Palatino, serif;
-        background: radial-gradient(circle at top right, #e7f0ff 0%, var(--bg) 55%);
+        background: radial-gradient(circle at top right, var(--bg-accent) 0%, var(--bg) 55%);
         color: var(--fg);
       }
       main {
@@ -62,7 +83,7 @@
         text-decoration: none;
         border: 1px solid var(--border);
         border-radius: 10px;
-        background: #fdfefe;
+        background: var(--surface);
         padding: 12px 14px;
       }
       .asset strong {
@@ -77,8 +98,8 @@
         font-size: 0.94rem;
       }
       .asset:hover {
-        background: #f4f8ff;
-        border-color: #c2d6f3;
+        background: var(--surface-active);
+        border-color: var(--border-active);
       }
       .advanced summary {
         cursor: pointer;
@@ -92,7 +113,7 @@
         margin-top: 10px;
         border: 1px solid var(--border);
         border-radius: 10px;
-        background: #fdfefe;
+        background: var(--surface);
         padding: 10px 12px;
       }
       .style-choice summary {
@@ -101,14 +122,20 @@
         font-weight: 600;
       }
       .style-choice[open] {
-        background: #f8fbff;
-        border-color: #c2d6f3;
+        background: var(--surface-active);
+        border-color: var(--border-active);
       }
       .style-choice p {
         margin: 8px 0 0 0;
       }
       a {
         color: var(--link);
+      }
+      a:focus-visible,
+      summary:focus-visible {
+        outline: 2px solid var(--focus);
+        outline-offset: 2px;
+        border-radius: 4px;
       }
       code {
         font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
