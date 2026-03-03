@@ -129,7 +129,7 @@ The repository workflow `.github/workflows/pages.yml` deploys `docs/` to GitHub 
 ```bash
 extra-facts extract --source-url <docx-url> --out-json dist/pool/extra_pool.json [--cache .cache]
 extra-facts extract --docx <local.docx> --out-json dist/pool/extra_pool.json
-extra-facts prose --pool-json dist/pool/extra_pool.json --out-json dist/pool/extra_pool_prose.json [--model gpt-5-mini] [--prompt-version v1] [--workers 6] [--max-attempts 3] [--max-questions N] [--resume]
+extra-facts prose --pool-json dist/pool/extra_pool.json --out-json dist/pool/extra_pool_prose.json [--model gpt-5] [--prompt-version v1] [--workers 6] [--max-attempts 3] [--max-questions N] [--resume]
 extra-facts build --pool-json dist/pool/extra_pool.json --out-dir dist --mode literal|tts|prose|qa [--omit-id]
 extra-facts audio-script --pool-json dist/pool/extra_pool_prose.json --out-dir dist/audio --mode prose|qa [--include-id]
 extra-facts audio-render --manifest dist/audio/audio_chapters_manifest.json --out-dir dist/audio [--provider elevenlabs|openai] [--model <provider-model>] [--voice <provider-voice>] [--elevenlabs-output-format mp3_44100_128] [--elevenlabs-language-code en] [--speed 1.0] [--instructions "Custom style override"] [--no-merge] [--no-chapter-markers]

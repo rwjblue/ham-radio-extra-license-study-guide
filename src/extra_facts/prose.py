@@ -19,7 +19,7 @@ from requests_cache import CachedSession
 from .facts import fact_sentence
 from .models import LlmProse, PoolMetadata, PoolQuestion, ProseMeta, ProseValidation, QuestionPool
 
-PROSE_SCHEMA_VERSION = 1
+PROSE_SCHEMA_VERSION = 2
 NUM_RE = re.compile(r"\b\d+(?:\.\d+)?\b")
 UNIT_WITH_NUMBER_RE = re.compile(
     r"\b\d+(?:\.\d+)?(?:\s*|-)?"
@@ -51,8 +51,10 @@ class ProseClient(Protocol):
         question_id: str,
         question_text: str,
         correct_answer: str,
+        group: str,
+        subelement: str,
         feedback: str | None = None,
-    ) -> tuple[str, float | None]:
+    ) -> tuple[str, str, float | None]:
         ...
 
 
@@ -111,12 +113,16 @@ class OpenAIProseClient:
         question_id: str,
         question_text: str,
         correct_answer: str,
+        group: str,
+        subelement: str,
         feedback: str | None = None,
-    ) -> tuple[str, float | None]:
+    ) -> tuple[str, str, float | None]:
         prompt = _prompt(
             question_id,
             question_text,
             correct_answer,
+            group,
+            subelement,
             self.prompt_version,
             feedback=feedback,
         )
@@ -139,8 +145,9 @@ class OpenAIProseClient:
         output_text = _extract_output_text(payload)
         data = json.loads(output_text)
         prose_fact = str(data.get("prose_fact", "")).strip()
+        answer_explanation = str(data.get("answer_explanation", "")).strip()
         confidence = _parse_confidence(data.get("confidence"))
-        return prose_fact, confidence
+        return prose_fact, answer_explanation, confidence
 
     def generate_headings(
         self,
@@ -425,6 +432,13 @@ def _canonical_unit(raw: str) -> str:
     return unit
 
 
+def _default_answer_explanation(question: PoolQuestion) -> str:
+    return (
+        "This is the published correct answer for this Amateur Extra exam question "
+        f"in section {question.group}."
+    )
+
+
 def _fallback_llm_prose(
     question: PoolQuestion,
     source_hash: str,
@@ -437,6 +451,7 @@ def _fallback_llm_prose(
 ) -> LlmProse:
     return LlmProse(
         prose_fact=fact_sentence(question, mode="literal", omit_id=True),
+        answer_explanation=_default_answer_explanation(question),
         status=status,
         validation=validation,
         source_hash=source_hash,
@@ -499,16 +514,24 @@ def _prompt(
     question_id: str,
     question_text: str,
     correct_answer: str,
+    group: str,
+    subelement: str,
     prompt_version: str,
     feedback: str | None = None,
 ) -> str:
     prompt = (
         "You are rewriting ham radio exam facts for study clarity. "
         f"Prompt version: {prompt_version}. "
-        "Return strict JSON with keys prose_fact and confidence. "
-        "Rules: one sentence, declarative tone, preserve every number, unit, "
-        "negation, and constraint exactly. "
-        "Do not add information, do not mention wrong choices, do not speculate. "
+        "Return strict JSON with keys prose_fact, answer_explanation, and confidence. "
+        "Context: this content is for amateur radio and the FCC Amateur Extra "
+        "license exam study guide. Include high-level radio context but keep "
+        "it concise and factual. "
+        "Rules: prose_fact must be one sentence in declarative tone and "
+        "preserve every number, unit, negation, and constraint exactly. "
+        "answer_explanation must be 1-2 short sentences explaining why the "
+        "correct answer is right using the exam context. "
+        "Do not mention wrong choices and do not speculate. "
+        f"Section info: subelement {subelement}, group {group}. "
         f"Question ID: {question_id}. Question: {question_text}. Correct answer: {correct_answer}."
     )
     if feedback:
@@ -606,10 +629,12 @@ def _generate_llm_prose(
 
     for attempt in range(1, attempts + 1):
         try:
-            candidate, confidence = client.generate(
+            candidate, answer_explanation, confidence = client.generate(
                 question_id=question.question_id,
                 question_text=question.question_text,
                 correct_answer=question.correct_answer,
+                group=question.group,
+                subelement=question.subelement,
                 feedback=feedback,
             )
         except Exception as error:
@@ -646,8 +671,12 @@ def _generate_llm_prose(
             prose_fact=candidate,
         )
         if _is_valid(validation):
+            normalized_explanation = answer_explanation.strip()
+            if not normalized_explanation:
+                normalized_explanation = _default_answer_explanation(question)
             return LlmProse(
                 prose_fact=candidate,
+                answer_explanation=normalized_explanation,
                 status="accepted",
                 validation=validation,
                 source_hash=source_hash,

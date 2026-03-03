@@ -305,7 +305,7 @@ def create_parser() -> argparse.ArgumentParser:
         default="dist/pool/extra_pool_prose.json",
         help="Output enriched question pool JSON path",
     )
-    prose.add_argument("--model", default="gpt-5-mini", help="Model name")
+    prose.add_argument("--model", default="gpt-5", help="Model name")
     prose.add_argument("--prompt-version", default="v1", help="Prompt version label")
     prose.add_argument("--workers", type=int, default=6, help="Parallel worker count")
     prose.add_argument("--max-attempts", type=int, default=3, help="Retry attempts per question")

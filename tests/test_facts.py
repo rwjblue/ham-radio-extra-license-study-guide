@@ -75,6 +75,7 @@ def test_prose_mode_uses_llm_fact() -> None:
         subelement=q.subelement,
         llm=LlmProse(
             prose_fact="This is cleaner prose.",
+            answer_explanation="Short reason.",
             status="accepted",
             validation=ProseValidation(True, True, True),
             source_hash="sha256:test",

@@ -127,6 +127,7 @@ class ProseValidation:
 @dataclass(frozen=True)
 class LlmProse:
     prose_fact: str
+    answer_explanation: str
     status: Literal["accepted", "fallback", "error"]
     validation: ProseValidation
     source_hash: str
