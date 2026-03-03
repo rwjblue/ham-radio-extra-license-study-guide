@@ -336,4 +336,4 @@ def test_build_audio_script_from_pool_json_qa_mode_uses_qa_filename(tmp_path: Pa
         omit_id=True,
     )
 
-    assert summary.script_path.name == "qa-extra_facts_audio.txt"
+    assert summary.script_path.name == "script.txt"

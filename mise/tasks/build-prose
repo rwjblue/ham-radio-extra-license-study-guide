@@ -1,11 +1,19 @@
 #!/usr/bin/env bash
-#MISE description="Build prose facts outputs"
+#MISE description="Build augmented (LLM) fact and Q & A outputs"
 #MISE depends=["prose"]
 #MISE sources=["dist/pool/extra_pool_prose.json", "src/**/*.py", "pyproject.toml"]
-#MISE outputs=["dist/prose/prose-extra_facts.txt", "dist/prose/prose-extra_facts.pdf", "dist/prose/prose-extra_facts.epub"]
+#MISE outputs=["dist/augmented/facts.txt", "dist/augmented/facts.pdf", "dist/augmented/facts-dark.pdf", "dist/augmented/facts.epub", "dist/augmented/qa.txt", "dist/augmented/qa.pdf", "dist/augmented/qa-dark.pdf", "dist/augmented/qa.epub"]
 set -euo pipefail
 
+out_dir="${AUGMENTED_OUT_DIR:-dist/augmented}"
+prose_json="${PROSE_JSON:-dist/pool/extra_pool_prose.json}"
+
 uv run extra-facts build \
-  --pool-json "${PROSE_JSON:-dist/pool/extra_pool_prose.json}" \
-  --out-dir "${PROSE_OUT_DIR:-dist/prose}" \
+  --pool-json "${prose_json}" \
+  --out-dir "${out_dir}" \
   --mode prose
+
+uv run extra-facts build \
+  --pool-json "${prose_json}" \
+  --out-dir "${out_dir}" \
+  --mode qa

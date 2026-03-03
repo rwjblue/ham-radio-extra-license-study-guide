@@ -190,7 +190,7 @@ def create_parser() -> argparse.ArgumentParser:
         help="Build listenable audio script text from intermediate JSON",
     )
     audio.add_argument("--pool-json", help="Path to prebuilt intermediate question pool JSON")
-    audio.add_argument("--out-dir", default="dist/audio", help="Output directory")
+    audio.add_argument("--out-dir", default="dist/audio/fact", help="Output directory")
     audio.add_argument("--mode", choices=["literal", "tts", "prose", "qa"], default="prose")
     audio.add_argument(
         "--omit-id",
@@ -212,10 +212,10 @@ def create_parser() -> argparse.ArgumentParser:
     )
     render_audio.add_argument(
         "--manifest",
-        default="dist/audio/audio_chapters_manifest.json",
+        default="dist/audio/fact/manifest.json",
         help="Path to chapter manifest JSON from audio-script stage",
     )
-    render_audio.add_argument("--out-dir", default="dist/audio", help="Output directory")
+    render_audio.add_argument("--out-dir", default="dist/audio/fact", help="Output directory")
     render_audio.add_argument(
         "--provider",
         choices=["elevenlabs", "openai"],
@@ -257,7 +257,7 @@ def create_parser() -> argparse.ArgumentParser:
         "--no-merge",
         action="store_false",
         dest="merge",
-        help="Skip merged extra_facts_audio.mp3 generation",
+        help="Skip merged book.mp3 generation",
     )
     render_audio.add_argument(
         "--no-chapter-markers",
@@ -277,7 +277,7 @@ def create_parser() -> argparse.ArgumentParser:
     )
     verify_audio.add_argument(
         "--manifest",
-        default="dist/audio/audio_chapters_manifest.json",
+        default="dist/audio/fact/manifest.json",
         help="Path to chapter manifest JSON from audio-render stage",
     )
     verify_audio.add_argument(

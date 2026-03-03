@@ -3,15 +3,16 @@
 Generate a clean study guide from the public NCVEC Element 4 (Amateur Extra) pool.
 
 This project produces:
-- static facts (`dist/static/static-extra_facts.txt`, `dist/static/static-extra_facts.pdf`, and `dist/static/static-extra_facts-dark.pdf`)
-- Q & A facts (`dist/qa/qa-extra_facts.txt`, `dist/qa/qa-extra_facts.pdf`, and `dist/qa/qa-extra_facts-dark.pdf`)
-- optional LLM prose facts (`dist/prose/prose-extra_facts.txt`, `dist/prose/prose-extra_facts.pdf`, and `dist/prose/prose-extra_facts-dark.pdf`)
-- optional listenable script (`dist/audio/extra_facts_audio.txt`)
-- Q & A audio script (`dist/audio-qa/qa-extra_facts_audio.txt`)
-- per-chapter audio script files (`dist/audio/chapters/chapter-01.txt`, ...)
-- audio chapter manifest (`dist/audio/audio_chapters_manifest.json`)
-- optional rendered chapter audio (`dist/audio/chapters/chapter-01.mp3`, ...)
-- optional merged audio (`dist/audio/extra_facts_audio.mp3`)
+- static facts (`dist/static/facts.txt`, `dist/static/facts.pdf`, `dist/static/facts-dark.pdf`, and `dist/static/facts.epub`)
+- Q & A facts (`dist/qa/qa.txt`, `dist/qa/qa.pdf`, `dist/qa/qa-dark.pdf`, and `dist/qa/qa.epub`)
+- optional augmented facts (`dist/augmented/facts.txt`, `dist/augmented/facts.pdf`, `dist/augmented/facts-dark.pdf`, and `dist/augmented/facts.epub`)
+- optional augmented Q & A facts (`dist/augmented/qa.txt`, `dist/augmented/qa.pdf`, `dist/augmented/qa-dark.pdf`, and `dist/augmented/qa.epub`)
+- fact-based audio script (`dist/audio/fact/script.txt`)
+- Q & A audio script (`dist/audio/qa/script.txt`)
+- per-chapter fact audio script files (`dist/audio/fact/chapters/chapter-01.txt`, ...)
+- fact audio chapter manifest (`dist/audio/fact/manifest.json`)
+- optional rendered chapter audio (`dist/audio/fact/chapters/chapter-01.mp3`, ...)
+- optional merged audio (`dist/audio/fact/book.mp3`)
 - intermediate JSON files (`dist/pool/extra_pool.json`, `dist/pool/extra_pool_prose.json`)
 
 Each fact line includes the question ID and a declarative restatement of the correct answer.
@@ -44,22 +45,22 @@ cp .env.example .env
 mise run full-build
 ```
 
-`mise run full-build` now also generates the listenable audio script, and
-when the configured TTS provider key is set (`ELEVENLABS_API_KEY` by default,
-or `OPENAI_API_KEY` when `TTS_PROVIDER=openai`) it renders and verifies
-chapter/merged MP3 outputs.
-
-
-Build the Q & A pathway (includes both the full question text and the correct answer text):
+`mise run full-build` generates static + Q & A books, augmented books when
+`OPENAI_API_KEY` is set, and both fact/Q&A audio scripts.
+Audio rendering is opt-in:
 
 ```bash
-mise run full-qa-build
+mise run full-build --include-audio
 ```
 
-If you want to regenerate only the audio script from the static pool:
+When `--include-audio` is used, rendered/verified MP3 generation runs only if a
+provider key is available (`ELEVENLABS_API_KEY` by default, or
+`OPENAI_API_KEY` when `TTS_PROVIDER=openai`).
+
+If you want to regenerate only the fact audio script from the static pool:
 
 ```bash
-POOL_JSON=dist/pool/extra_pool.json MODE=tts mise run audio-script
+POOL_JSON=dist/pool/extra_pool.json MODE=tts OUT_DIR=dist/audio/fact mise run audio-script
 ```
 
 Render MP3 audio from chapter text files:
@@ -74,7 +75,7 @@ Verify rendered MP3s, timing metadata, and chapter markers:
 mise run audio-verify
 ```
 
-4. Compare static vs prose text:
+4. Compare static vs augmented text:
 
 ```bash
 mise run compare
@@ -83,20 +84,31 @@ mise run compare
 ## Output Locations
 
 - Static outputs:
-  `dist/static/static-extra_facts.txt`
-  `dist/static/static-extra_facts.pdf`
-  `dist/static/static-extra_facts-dark.pdf`
-- Prose outputs (only when `OPENAI_API_KEY` is set):
-  `dist/prose/prose-extra_facts.txt`
-  `dist/prose/prose-extra_facts.pdf`
-  `dist/prose/prose-extra_facts-dark.pdf`
+  `dist/static/facts.txt`
+  `dist/static/facts.pdf`
+  `dist/static/facts-dark.pdf`
+  `dist/static/facts.epub`
+- Q & A outputs:
+  `dist/qa/qa.txt`
+  `dist/qa/qa.pdf`
+  `dist/qa/qa-dark.pdf`
+  `dist/qa/qa.epub`
+- Augmented outputs (only when `OPENAI_API_KEY` is set):
+  `dist/augmented/facts.txt`
+  `dist/augmented/facts.pdf`
+  `dist/augmented/facts-dark.pdf`
+  `dist/augmented/facts.epub`
+  `dist/augmented/qa.txt`
+  `dist/augmented/qa.pdf`
+  `dist/augmented/qa-dark.pdf`
+  `dist/augmented/qa.epub`
 - Audio script output:
-  `dist/audio/extra_facts_audio.txt`
-  `dist/audio-qa/qa-extra_facts_audio.txt`
-  `dist/audio/chapters/chapter-01.txt` ... `chapter-10.txt`
-  `dist/audio/audio_chapters_manifest.json`
-  `dist/audio/chapters/chapter-01.mp3` ... `chapter-10.mp3`
-  `dist/audio/extra_facts_audio.mp3`
+  `dist/audio/fact/script.txt`
+  `dist/audio/fact/chapters/chapter-01.txt` ... `chapter-10.txt`
+  `dist/audio/fact/manifest.json`
+  `dist/audio/fact/chapters/chapter-01.mp3` ... `chapter-10.mp3`
+  `dist/audio/fact/book.mp3`
+  `dist/audio/qa/script.txt`
 - Intermediate pool JSON:
   `dist/pool/extra_pool.json`
   `dist/pool/extra_pool_prose.json`
@@ -131,9 +143,9 @@ extra-facts extract --source-url <docx-url> --out-json dist/pool/extra_pool.json
 extra-facts extract --docx <local.docx> --out-json dist/pool/extra_pool.json
 extra-facts prose --pool-json dist/pool/extra_pool.json --out-json dist/pool/extra_pool_prose.json [--model gpt-5] [--prompt-version v1] [--workers 6] [--max-attempts 3] [--max-questions N] [--resume]
 extra-facts build --pool-json dist/pool/extra_pool.json --out-dir dist --mode literal|tts|prose|qa [--omit-id]
-extra-facts audio-script --pool-json dist/pool/extra_pool_prose.json --out-dir dist/audio --mode prose|qa [--include-id]
-extra-facts audio-render --manifest dist/audio/audio_chapters_manifest.json --out-dir dist/audio [--provider elevenlabs|openai] [--model <provider-model>] [--voice <provider-voice>] [--elevenlabs-output-format mp3_44100_128] [--elevenlabs-language-code en] [--speed 1.0] [--instructions "Custom style override"] [--no-merge] [--no-chapter-markers]
-extra-facts audio-verify --manifest dist/audio/audio_chapters_manifest.json [--allow-missing-merged] [--skip-chapter-marker-check]
+extra-facts audio-script --pool-json dist/pool/extra_pool_prose.json --out-dir dist/audio/fact --mode prose|qa [--include-id]
+extra-facts audio-render --manifest dist/audio/fact/manifest.json --out-dir dist/audio/fact [--provider elevenlabs|openai] [--model <provider-model>] [--voice <provider-voice>] [--elevenlabs-output-format mp3_44100_128] [--elevenlabs-language-code en] [--speed 1.0] [--instructions "Custom style override"] [--no-merge] [--no-chapter-markers]
+extra-facts audio-verify --manifest dist/audio/fact/manifest.json [--allow-missing-merged] [--skip-chapter-marker-check]
 ```
 
 ## Notes

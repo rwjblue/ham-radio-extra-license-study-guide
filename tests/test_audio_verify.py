@@ -15,7 +15,7 @@ def _write_manifest(tmp_path: Path) -> Path:
     chapters_dir.mkdir(parents=True)
     (chapters_dir / "chapter-01.mp3").write_bytes(b"a")
     (chapters_dir / "chapter-02.mp3").write_bytes(b"b")
-    (audio_dir / "extra_facts_audio.mp3").write_bytes(b"merged")
+    (audio_dir / "book.mp3").write_bytes(b"merged")
 
     manifest = {
         "schema_version": 1,
@@ -39,11 +39,11 @@ def _write_manifest(tmp_path: Path) -> Path:
             },
         ],
         "audio_render": {
-            "merged_audio_path": str((audio_dir / "extra_facts_audio.mp3").resolve()),
+            "merged_audio_path": str((audio_dir / "book.mp3").resolve()),
             "total_duration_seconds": 22.5,
         },
     }
-    path = audio_dir / "audio_chapters_manifest.json"
+    path = audio_dir / "manifest.json"
     path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
     return path
 
@@ -106,7 +106,7 @@ def test_verify_audio_from_manifest_accepts_repo_relative_audio_paths(tmp_path: 
     chapters_dir = dist_audio_dir / "chapters"
     chapters_dir.mkdir(parents=True)
     (chapters_dir / "chapter-01.mp3").write_bytes(b"a")
-    (dist_audio_dir / "extra_facts_audio.mp3").write_bytes(b"merged")
+    (dist_audio_dir / "book.mp3").write_bytes(b"merged")
 
     manifest = {
         "schema_version": 1,
@@ -122,11 +122,11 @@ def test_verify_audio_from_manifest_accepts_repo_relative_audio_paths(tmp_path: 
             }
         ],
         "audio_render": {
-            "merged_audio_path": "dist/audio/extra_facts_audio.mp3",
+            "merged_audio_path": "dist/audio/book.mp3",
             "total_duration_seconds": 10.0,
         },
     }
-    manifest_path = dist_audio_dir / "audio_chapters_manifest.json"
+    manifest_path = dist_audio_dir / "manifest.json"
     manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
 
     cwd = Path.cwd()

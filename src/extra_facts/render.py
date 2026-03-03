@@ -40,8 +40,8 @@ def write_outputs(
     omit_id: bool,
     metadata: PoolMetadata | None = None,
     image_root_dir: Path | None = None,
-    txt_name: str = "extra_facts.txt",
-    pdf_name: str = "extra_facts.pdf",
+    txt_name: str = "facts.txt",
+    pdf_name: str = "facts.pdf",
     dark_pdf_name: str | None = None,
     epub_name: str | None = None,
 ) -> tuple[Path, Path, Path | None, Path | None]:
@@ -129,7 +129,7 @@ def write_audio_script(
     mode: str,
     omit_id: bool,
     metadata: PoolMetadata | None = None,
-    txt_name: str = "extra_facts_audio.txt",
+    txt_name: str = "script.txt",
 ) -> tuple[Path, Path, Path]:
     out_dir.mkdir(parents=True, exist_ok=True)
     groups = group_pool_questions(questions)
@@ -139,7 +139,7 @@ def write_audio_script(
     chapters_dir.mkdir(parents=True, exist_ok=True)
     _write_chapter_texts(chapters, chapters_dir)
 
-    manifest_path = out_dir / "audio_chapters_manifest.json"
+    manifest_path = out_dir / "manifest.json"
     _write_chapter_manifest(chapters, chapters_dir, manifest_path)
 
     txt_path = out_dir / txt_name

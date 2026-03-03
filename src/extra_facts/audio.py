@@ -381,7 +381,7 @@ def render_audio_from_manifest(
     merged_audio_path: Path | None = None
     chapter_markers_embedded = False
     if merge_output and rendered_paths:
-        merged_audio_path = out_dir / f"extra_facts_audio.{output_format}"
+        merged_audio_path = out_dir / f"book.{output_format}"
         merge_fn(rendered_paths, merged_audio_path)
         if embed_chapters and output_format == "mp3":
             embed_fn(chapters, merged_audio_path)

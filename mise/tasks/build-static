@@ -2,7 +2,7 @@
 #MISE description="Build static facts outputs"
 #MISE depends=["extract"]
 #MISE sources=["dist/pool/extra_pool.json", "src/**/*.py", "pyproject.toml"]
-#MISE outputs=["dist/static/static-extra_facts.txt", "dist/static/static-extra_facts.pdf", "dist/static/static-extra_facts.epub"]
+#MISE outputs=["dist/static/facts.txt", "dist/static/facts.pdf", "dist/static/facts-dark.pdf", "dist/static/facts.epub"]
 set -euo pipefail
 
 uv run extra-facts build \

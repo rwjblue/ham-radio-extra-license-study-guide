@@ -1,18 +1,18 @@
 #!/usr/bin/env bash
-#MISE description="Generate audio script from prose when available, else static"
+#MISE description="Generate fact-based audio script from augmented pool when available, else static"
 #MISE depends=["build-static", "build-prose-if-enabled"]
 #MISE sources=["dist/pool/extra_pool.json", "dist/pool/extra_pool_prose.json", "src/**/*.py", "pyproject.toml"]
-#MISE outputs=["dist/audio/extra_facts_audio.txt", "dist/audio/audio_chapters_manifest.json", "dist/audio/chapters/chapter-*.txt"]
+#MISE outputs=["dist/audio/fact/script.txt", "dist/audio/fact/manifest.json", "dist/audio/fact/chapters/chapter-*.txt"]
 set -euo pipefail
 
 if [ -n "${OPENAI_API_KEY:-}" ] && [ -f "${PROSE_JSON:-dist/pool/extra_pool_prose.json}" ]; then
   uv run extra-facts audio-script \
     --pool-json "${PROSE_JSON:-dist/pool/extra_pool_prose.json}" \
-    --out-dir "${AUDIO_OUT_DIR:-dist/audio}" \
+    --out-dir "${AUDIO_OUT_DIR:-dist/audio/fact}" \
     --mode "${AUDIO_MODE:-prose}"
 else
   uv run extra-facts audio-script \
     --pool-json "${POOL_JSON:-dist/pool/extra_pool.json}" \
-    --out-dir "${AUDIO_OUT_DIR:-dist/audio}" \
+    --out-dir "${AUDIO_OUT_DIR:-dist/audio/fact}" \
     --mode tts
 fi

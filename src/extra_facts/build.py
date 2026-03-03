@@ -77,12 +77,7 @@ def build_from_pool_json(
 ) -> BuildSummary:
     loaded_pool = read_question_pool(pool_json_path)
     out_dir.mkdir(parents=True, exist_ok=True)
-    if mode == "prose":
-        output_prefix = "prose"
-    elif mode == "qa":
-        output_prefix = "qa"
-    else:
-        output_prefix = "static"
+    output_name = "qa" if mode == "qa" else "facts"
     text_path, pdf_path, dark_pdf_path, epub_path = write_outputs(
         loaded_pool.questions,
         out_dir=out_dir,
@@ -90,10 +85,10 @@ def build_from_pool_json(
         omit_id=omit_id,
         metadata=loaded_pool.metadata,
         image_root_dir=pool_json_path.parent,
-        txt_name=f"{output_prefix}-extra_facts.txt",
-        pdf_name=f"{output_prefix}-extra_facts.pdf",
-        dark_pdf_name=f"{output_prefix}-extra_facts-dark.pdf",
-        epub_name=f"{output_prefix}-extra_facts.epub",
+        txt_name=f"{output_name}.txt",
+        pdf_name=f"{output_name}.pdf",
+        dark_pdf_name=f"{output_name}-dark.pdf",
+        epub_name=f"{output_name}.epub",
     )
     return BuildSummary(
         question_count=len(loaded_pool.questions),
@@ -188,14 +183,13 @@ def build_audio_script_from_pool_json(
 ) -> AudioScriptSummary:
     loaded_pool = read_question_pool(pool_json_path)
     out_dir.mkdir(parents=True, exist_ok=True)
-    txt_name = "qa-extra_facts_audio.txt" if mode == "qa" else "extra_facts_audio.txt"
     script_path, chapters_dir, chapters_manifest_path = write_audio_script(
         loaded_pool.questions,
         out_dir=out_dir,
         mode=mode,
         omit_id=omit_id,
         metadata=loaded_pool.metadata,
-        txt_name=txt_name,
+        txt_name="script.txt",
     )
     return AudioScriptSummary(
         question_count=len(loaded_pool.questions),

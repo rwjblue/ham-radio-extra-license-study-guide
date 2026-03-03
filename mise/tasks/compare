@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-#MISE description="Compare static and prose text outputs"
+#MISE description="Compare static and augmented text outputs"
 #MISE depends=["build-static", "build-prose-if-enabled"]
-#MISE sources=["dist/static/static-extra_facts.txt", "dist/prose/prose-extra_facts.txt"]
+#MISE sources=["dist/static/facts.txt", "dist/augmented/facts.txt"]
 set -euo pipefail
 
-diff -u "${STATIC_TXT:-dist/static/static-extra_facts.txt}" "${PROSE_TXT:-dist/prose/prose-extra_facts.txt}" || true
+diff -u "${STATIC_TXT:-dist/static/facts.txt}" "${AUGMENTED_TXT:-dist/augmented/facts.txt}" || true

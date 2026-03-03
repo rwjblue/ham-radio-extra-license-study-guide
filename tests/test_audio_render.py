@@ -54,7 +54,7 @@ def test_render_audio_from_manifest_rewrites_pause_markers_for_openai(tmp_path: 
     chapter_path.parent.mkdir(parents=True)
     chapter_path.write_text("Question one.\n[[SHORT_PAUSE]]\nQuestion two.", encoding="utf-8")
 
-    manifest_path = tmp_path / "audio" / "audio_chapters_manifest.json"
+    manifest_path = tmp_path / "audio" / "manifest.json"
     manifest = {
         "schema_version": 1,
         "chapter_count": 1,
@@ -91,7 +91,7 @@ def test_render_audio_from_manifest_rewrites_pause_markers_for_elevenlabs(tmp_pa
     chapter_path.parent.mkdir(parents=True)
     chapter_path.write_text("Question one.\n[[SHORT_PAUSE]]\nQuestion two.", encoding="utf-8")
 
-    manifest_path = tmp_path / "audio" / "audio_chapters_manifest.json"
+    manifest_path = tmp_path / "audio" / "manifest.json"
     manifest = {
         "schema_version": 1,
         "chapter_count": 1,
@@ -130,7 +130,7 @@ def test_render_audio_from_manifest_enriches_manifest_and_merges(tmp_path: Path)
     chapter_1.write_text("Chapter one text", encoding="utf-8")
     chapter_2.write_text("Chapter two text", encoding="utf-8")
 
-    manifest_path = tmp_path / "audio" / "audio_chapters_manifest.json"
+    manifest_path = tmp_path / "audio" / "manifest.json"
     manifest = {
         "schema_version": 1,
         "chapter_count": 2,
@@ -183,7 +183,7 @@ def test_render_audio_from_manifest_enriches_manifest_and_merges(tmp_path: Path)
     assert result.chapter_count == 2
     assert (tmp_path / "audio" / "chapters" / "chapter-01.mp3").exists()
     assert (tmp_path / "audio" / "chapters" / "chapter-02.mp3").exists()
-    assert result.merged_audio_path == (tmp_path / "audio" / "extra_facts_audio.mp3")
+    assert result.merged_audio_path == (tmp_path / "audio" / "book.mp3")
     assert result.merged_audio_path is not None
     assert result.merged_audio_path.exists()
     assert len(merge_calls) == 1
@@ -214,7 +214,7 @@ def test_render_audio_from_manifest_supports_no_merge(tmp_path: Path) -> None:
     chapter_path.parent.mkdir(parents=True)
     chapter_path.write_text("Only chapter", encoding="utf-8")
 
-    manifest_path = tmp_path / "audio" / "audio_chapters_manifest.json"
+    manifest_path = tmp_path / "audio" / "manifest.json"
     manifest = {
         "schema_version": 1,
         "chapter_count": 1,
@@ -250,7 +250,7 @@ def test_render_audio_from_manifest_supports_no_chapter_markers(tmp_path: Path) 
     chapter_path.parent.mkdir(parents=True)
     chapter_path.write_text("Only chapter", encoding="utf-8")
 
-    manifest_path = tmp_path / "audio" / "audio_chapters_manifest.json"
+    manifest_path = tmp_path / "audio" / "manifest.json"
     manifest = {
         "schema_version": 1,
         "chapter_count": 1,
@@ -294,7 +294,7 @@ def test_render_audio_from_manifest_reuses_unchanged_chapters(tmp_path: Path) ->
     chapter_1.write_text("Chapter one text", encoding="utf-8")
     chapter_2.write_text("Chapter two text", encoding="utf-8")
 
-    manifest_path = tmp_path / "audio" / "audio_chapters_manifest.json"
+    manifest_path = tmp_path / "audio" / "manifest.json"
     manifest = {
         "schema_version": 1,
         "chapter_count": 2,
@@ -352,7 +352,7 @@ def test_render_audio_from_manifest_checkpoints_progress_for_resume(tmp_path: Pa
     chapter_1.write_text("Chapter one text", encoding="utf-8")
     chapter_2.write_text("Chapter two text", encoding="utf-8")
 
-    manifest_path = tmp_path / "audio" / "audio_chapters_manifest.json"
+    manifest_path = tmp_path / "audio" / "manifest.json"
     manifest = {
         "schema_version": 1,
         "chapter_count": 2,
@@ -413,7 +413,7 @@ def test_render_audio_from_manifest_chunks_at_paragraph_boundaries(tmp_path: Pat
         "Paragraph one.\n\nParagraph two is here.\n\nParagraph three.",
         encoding="utf-8",
     )
-    manifest_path = tmp_path / "audio" / "audio_chapters_manifest.json"
+    manifest_path = tmp_path / "audio" / "manifest.json"
     manifest_path.write_text(
         json.dumps(
             {
@@ -469,7 +469,7 @@ def test_render_audio_from_manifest_splits_oversize_paragraph_without_breaking_w
         "alpha beta gamma delta epsilon zeta eta theta iota kappa",
         encoding="utf-8",
     )
-    manifest_path = tmp_path / "audio" / "audio_chapters_manifest.json"
+    manifest_path = tmp_path / "audio" / "manifest.json"
     manifest_path.write_text(
         json.dumps(
             {

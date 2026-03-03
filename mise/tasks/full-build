@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-#MISE description="Extract/build all outputs, with optional audio render/verify"
-#MISE depends=["audio-script-auto"]
+#MISE description="Extract/build all text/book outputs and audio scripts; optionally render/verify audio"
+#MISE depends=["build-static", "build-qa", "build-prose-if-enabled", "audio-script-auto", "audio-script-qa"]
 #MISE outputs={auto=true}
+#USAGE flag "--include-audio" help="Also run audio-render and audio-verify"
 set -euo pipefail
 
-if [ -n "${SKIP_AUDIO_RENDER:-}" ]; then
-  echo "SKIP_AUDIO_RENDER set; skipping audio-render and audio-verify"
-  echo "full-build complete"
+if [ -z "${usage_include_audio:-}" ]; then
+  echo "full-build complete (audio rendering skipped; pass --include-audio to enable)"
   exit 0
 fi
 

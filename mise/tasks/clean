@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+#MISE description="Remove generated build artifacts from dist"
+#MISE outputs={auto=true}
+set -euo pipefail
+
+rm -rf dist
+mkdir -p dist
+
+echo "Clean complete: reset dist/ (docs/ preserved)"

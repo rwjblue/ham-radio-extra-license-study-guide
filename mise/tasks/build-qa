@@ -2,7 +2,7 @@
 #MISE description="Build Q & A facts outputs"
 #MISE depends=["extract"]
 #MISE sources=["dist/pool/extra_pool.json", "src/**/*.py", "pyproject.toml"]
-#MISE outputs=["dist/qa/qa-extra_facts.txt", "dist/qa/qa-extra_facts.pdf", "dist/qa/qa-extra_facts.epub"]
+#MISE outputs=["dist/qa/qa.txt", "dist/qa/qa.pdf", "dist/qa/qa-dark.pdf", "dist/qa/qa.epub"]
 set -euo pipefail
 
 uv run extra-facts build \
