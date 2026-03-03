@@ -125,6 +125,7 @@ def test_question_pool_round_trip_with_llm_debug_fields(tmp_path: Path) -> None:
         subelement=question.subelement,
         llm=LlmProse(
             prose_fact="Fact sentence.",
+            answer_explanation="Short reason.",
             status="fallback",
             validation=ProseValidation(
                 numbers_preserved=False,

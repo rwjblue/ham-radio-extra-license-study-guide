@@ -109,6 +109,7 @@ def _serialize_llm_prose(llm: LlmProse | None) -> dict[str, object] | None:
         return None
     return {
         "prose_fact": llm.prose_fact,
+        "answer_explanation": llm.answer_explanation,
         "status": llm.status,
         "validation": {
             "numbers_preserved": llm.validation.numbers_preserved,
@@ -139,6 +140,7 @@ def _deserialize_llm_prose(payload: object) -> LlmProse | None:
 
     return LlmProse(
         prose_fact=str(payload_dict.get("prose_fact", "")),
+        answer_explanation=str(payload_dict.get("answer_explanation", "")),
         status=status,
         validation=ProseValidation(
             numbers_preserved=bool(validation_dict.get("numbers_preserved", False)),

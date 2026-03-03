@@ -23,10 +23,16 @@ class _FakeClient:
         question_id: str,
         question_text: str,
         correct_answer: str,
+        group: str,
+        subelement: str,
         feedback: str | None = None,
-    ) -> tuple[str, float | None]:
-        _ = (question_id, question_text, correct_answer, feedback)
-        return self._prose, 0.9
+    ) -> tuple[str, str, float | None]:
+        _ = (question_id, question_text, correct_answer, group, subelement, feedback)
+        return (
+            self._prose,
+            "Because this is the published correct choice for the Amateur Extra exam context.",
+            0.9,
+        )
 
 
 class _SequencedClient:
@@ -40,14 +46,16 @@ class _SequencedClient:
         question_id: str,
         question_text: str,
         correct_answer: str,
+        group: str,
+        subelement: str,
         feedback: str | None = None,
-    ) -> tuple[str, float | None]:
-        _ = (question_id, question_text, correct_answer)
+    ) -> tuple[str, str, float | None]:
+        _ = (question_id, question_text, correct_answer, group, subelement)
         self.calls += 1
         self.feedbacks.append(feedback)
         if self._responses:
-            return self._responses.pop(0), 0.9
-        return "Fallback response", 0.9
+            return self._responses.pop(0), "Because this aligns with Amateur Extra exam rules.", 0.9
+        return "Fallback response", "Because this is the official correct answer context.", 0.9
 
 
 class _AlwaysErrorClient:
@@ -56,9 +64,11 @@ class _AlwaysErrorClient:
         question_id: str,
         question_text: str,
         correct_answer: str,
+        group: str,
+        subelement: str,
         feedback: str | None = None,
-    ) -> tuple[str, float | None]:
-        _ = (question_id, question_text, correct_answer, feedback)
+    ) -> tuple[str, str, float | None]:
+        _ = (question_id, question_text, correct_answer, group, subelement, feedback)
         raise RuntimeError("boom")
 
 
@@ -323,6 +333,48 @@ def test_enrich_pool_records_error_debug_data() -> None:
     assert enriched.questions[0].llm.attempt_count == 2
     assert enriched.questions[0].llm.failure_reasons == ["llm_error"]
     assert enriched.questions[0].llm.last_error == "boom"
+
+
+def test_enrich_pool_uses_default_explanation_when_model_returns_blank() -> None:
+    class _BlankExplanationClient:
+        def generate(
+            self,
+            question_id: str,
+            question_text: str,
+            correct_answer: str,
+            group: str,
+            subelement: str,
+            feedback: str | None = None,
+        ) -> tuple[str, str, float | None]:
+            _ = (question_id, question_text, correct_answer, group, subelement, feedback)
+            return "The maximum power on 2200 meters is 1 W.", "", 0.9
+
+    question = PoolQuestion(
+        question_id="E1A07",
+        question_text="What is the maximum power on 2200 meters?",
+        choices=["1 W", "5 W", "10 W", "100 W"],
+        correct_choice_index=0,
+        group="E1A",
+        subelement="E1",
+    )
+
+    enriched, summary = enrich_pool_with_prose(
+        _pool(question),
+        client=_BlankExplanationClient(),
+        provider="test",
+        model="fake",
+        prompt_version="v1",
+    )
+
+    assert summary.accepted == 1
+    assert enriched.questions[0].llm is not None
+    assert (
+        enriched.questions[0].llm.answer_explanation
+        == (
+            "This is the published correct answer for this Amateur Extra exam question "
+            "in section E1A."
+        )
+    )
 
 
 def test_openai_http_cache_enabled_defaults_true(monkeypatch: MonkeyPatch) -> None:
