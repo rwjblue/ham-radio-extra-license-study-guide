@@ -90,3 +90,31 @@ def test_qa_mode_uses_question_and_answer_text() -> None:
     assert fact_sentence(q, mode="qa") == (
         "E3A01: Q: What is the purpose of this test? A: To verify Q and A mode."
     )
+
+
+def test_tts_rewrites_half_and_quarter_wavelength() -> None:
+    q_half = _question("E9Z01", "What is a common antenna length?", "1/2 wavelength")
+    half_line = fact_sentence(q_half, mode="tts", omit_id=True)
+    assert "half wavelength" in half_line
+    assert "1 slash 2 wavelength" not in half_line
+
+    q_quarter = _question("E9Z02", "What is another common antenna length?", "1/4 wavelengths")
+    quarter_line = fact_sentence(q_quarter, mode="tts", omit_id=True)
+    assert "quarter wavelengths" in quarter_line
+    assert "1 slash 4 wavelengths" not in quarter_line
+
+    q_half_hyphen = _question(
+        "E9Z03", "What is a common antenna length with punctuation?", "1/2-wavelength"
+    )
+    half_hyphen_line = fact_sentence(q_half_hyphen, mode="tts", omit_id=True)
+    assert "half wavelength" in half_hyphen_line
+    assert "1 slash 2-wavelength" not in half_hyphen_line
+
+    q_quarter_hyphen = _question(
+        "E9Z04",
+        "What is another common antenna length with punctuation?",
+        "1/4-wavelength",
+    )
+    quarter_hyphen_line = fact_sentence(q_quarter_hyphen, mode="tts", omit_id=True)
+    assert "quarter wavelength" in quarter_hyphen_line
+    assert "1 slash 4-wavelength" not in quarter_hyphen_line

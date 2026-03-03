@@ -145,6 +145,18 @@ def _to_tts(text: str) -> str:
         out,
         flags=re.IGNORECASE,
     )
+    out = re.sub(
+        r"\b1\s*/\s*2(?:\s*-\s*|\s+)wavelength(s?)\b",
+        r"half wavelength\1",
+        out,
+        flags=re.IGNORECASE,
+    )
+    out = re.sub(
+        r"\b1\s*/\s*4(?:\s*-\s*|\s+)wavelength(s?)\b",
+        r"quarter wavelength\1",
+        out,
+        flags=re.IGNORECASE,
+    )
     out = re.sub(r"\ban Federal\b", "a Federal", out)
     out = out.replace(";", ",")
     out = out.replace("/", " slash ")
