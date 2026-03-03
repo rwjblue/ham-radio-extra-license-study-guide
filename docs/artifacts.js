@@ -25,27 +25,27 @@ window.HAM_EXTRA_ARTIFACTS = {
     },
     {
       "id": "augmented",
-      "title": "I want extra content",
+      "title": "I want extra content (experimental)",
       "note": "Adds AI-generated prose context on top of canonical answers. Depending on the source pool and build inputs, this may sometimes look close to the non-augmented versions.",
       "items": [
         {
           "href": "./amateur-extra-license-prep-augmented-facts.pdf",
-          "label": "Augmented Facts PDF",
+          "label": "AI Augmented Facts PDF",
           "description": "Facts plus extra explanation context."
         },
         {
           "href": "./amateur-extra-license-prep-augmented-qa.pdf",
-          "label": "Augmented Q&A PDF",
+          "label": "AI Augmented Q&A PDF",
           "description": "Q&A plus extra explanation context."
         },
         {
           "href": "./amateur-extra-license-prep-augmented-facts.epub",
-          "label": "Augmented Facts EPUB",
+          "label": "AI Augmented Facts EPUB",
           "description": "E-reader facts plus extra context."
         },
         {
           "href": "./amateur-extra-license-prep-augmented-qa.epub",
-          "label": "Augmented Q&A EPUB",
+          "label": "AI Augmented Q&A EPUB",
           "description": "E-reader Q&A plus extra context."
         }
       ]
@@ -125,7 +125,7 @@ window.HAM_EXTRA_ARTIFACTS = {
       ]
     },
     {
-      "title": "Augmented (Optional)",
+      "title": "AI Augmented (Optional)",
       "note": "Augmented artifacts include AI-generated prose in addition to the canonical answer.",
       "items": [
       {
