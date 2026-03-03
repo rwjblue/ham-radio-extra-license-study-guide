@@ -12,6 +12,8 @@ cmd=(
   --elevenlabs-output-format "${ELEVENLABS_OUTPUT_FORMAT:-mp3_44100_128}"
   --elevenlabs-language-code "${ELEVENLABS_LANGUAGE_CODE:-en}"
   --speed "${SPEED:-1.0}"
+  --jobs "${JOBS:-1}"
+  --unit-cache-dir "${UNIT_CACHE_DIR:-.cache/audio-render}"
 )
 
 if [[ -n "${provider}" ]]; then

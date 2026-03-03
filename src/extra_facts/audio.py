@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from concurrent.futures import ThreadPoolExecutor
 import hashlib
 import json
 import os
@@ -10,6 +11,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
+import threading
 from typing import Any, Protocol, cast
 
 import requests
@@ -311,6 +313,9 @@ def render_audio_from_manifest(
     embed_chapter_markers: ChapterMarkerEmbedder | None = None,
     render_fingerprint: str = "",
     provider: str = "openai",
+    jobs: int = 1,
+    client_factory: Callable[[], TtsClient] | None = None,
+    unit_cache_dir: Path | None = None,
 ) -> AudioRenderResult:
     payload = cast(dict[str, Any], json.loads(manifest_path.read_text(encoding="utf-8")))
     chapters_payload = payload.get("chapters")
@@ -326,6 +331,20 @@ def render_audio_from_manifest(
     probe_fn = probe_duration or probe_mp3_duration
     merge_fn = merge_audio or merge_mp3_files
     embed_fn = embed_chapter_markers or embed_mp3_chapters
+
+    if jobs < 1:
+        raise RuntimeError("jobs must be >= 1")
+
+    synthesize_bytes = _synthesize_factory(
+        jobs=jobs,
+        client=client,
+        client_factory=client_factory,
+    )
+    unit_cache_root = _resolve_unit_cache_root(
+        manifest_path=manifest_path,
+        out_dir=out_dir,
+        configured=unit_cache_dir,
+    )
 
     start_seconds = 0.0
     rendered_paths: list[Path] = []
@@ -343,37 +362,73 @@ def render_audio_from_manifest(
 
         audio_file_name = f"chapter-{chapter_number:02d}.{output_format}"
         audio_path = chapters_audio_dir / audio_file_name
-        text_sha256 = _text_sha256(text)
+        chapter_text_sha256 = _text_sha256(text)
+        chapter_units_dir = unit_cache_root / "units" / f"chapter-{chapter_number:02d}"
+        chapter_units_dir.mkdir(parents=True, exist_ok=True)
+
+        units = _build_render_units(
+            text=text,
+            chapter_number=chapter_number,
+            provider=provider,
+            output_format=output_format,
+            chapter_units_dir=chapter_units_dir,
+            max_chars=TTS_MAX_CHARS,
+        )
+        units_payload = _existing_units_by_index(chapter)
+        pending_units = [
+            unit
+            for unit in units
+            if not _can_reuse_render_unit(
+                unit,
+                existing_payload=units_payload.get(unit["index"]),
+                render_fingerprint=render_fingerprint,
+            )
+        ]
+
+        if pending_units:
+            _render_units(
+                pending_units,
+                synthesize=synthesize_bytes,
+                jobs=jobs,
+            )
+            chapter_rendered = True
+        else:
+            chapter_rendered = False
+
+        unit_audio_paths = [cast(Path, unit["audio_path"]) for unit in units]
+        if len(unit_audio_paths) == 1:
+            audio_path.write_bytes(unit_audio_paths[0].read_bytes())
+        else:
+            merge_fn(unit_audio_paths, audio_path)
+
         can_reuse = _can_reuse_chapter_audio(
             chapter=chapter,
             audio_path=audio_path,
-            text_sha256=text_sha256,
+            chapter_text_sha256=chapter_text_sha256,
             render_fingerprint=render_fingerprint,
+            chapter_rendered=chapter_rendered,
         )
         if can_reuse:
             chapters_reused += 1
         else:
-            segment_paths = _render_tts_segments(
-                text=text,
-                chapter_number=chapter_number,
-                output_format=output_format,
-                chapters_audio_dir=chapters_audio_dir,
-                client=client,
-                provider=provider,
-            )
-            if len(segment_paths) == 1:
-                audio_path.write_bytes(segment_paths[0].read_bytes())
-            else:
-                merge_fn(segment_paths, audio_path)
-            _cleanup_temp_segments(segment_paths)
             chapters_rendered += 1
 
         duration_seconds = _duration_for_chapter(chapter, audio_path, probe_fn)
         chapter["audio_path"] = str(audio_path.as_posix())
         chapter["duration_seconds"] = round(duration_seconds, 3)
         chapter["start_seconds"] = round(start_seconds, 3)
-        chapter["text_sha256"] = text_sha256
+        chapter["text_sha256"] = chapter_text_sha256
         chapter["render_fingerprint"] = render_fingerprint
+        chapter["units"] = [
+            {
+                "index": cast(int, unit["index"]),
+                "text_path": str(cast(Path, unit["text_path"]).as_posix()),
+                "audio_path": str(cast(Path, unit["audio_path"]).as_posix()),
+                "text_sha256": cast(str, unit["text_sha256"]),
+                "render_fingerprint": render_fingerprint,
+            }
+            for unit in units
+        ]
         start_seconds += duration_seconds
         rendered_paths.append(audio_path)
         _write_manifest_payload(payload, target_manifest)
@@ -398,6 +453,8 @@ def render_audio_from_manifest(
         "chapters_rendered": chapters_rendered,
         "chapters_reused": chapters_reused,
         "render_fingerprint": render_fingerprint,
+        "jobs": jobs,
+        "unit_cache_dir": str(unit_cache_root.as_posix()),
         "rendered_at": datetime.now(UTC).isoformat(),
     }
 
@@ -508,6 +565,17 @@ def _resolve_path(value: str, manifest_path: Path) -> Path:
     return (manifest_path.parent / path).resolve()
 
 
+def _resolve_unit_cache_root(
+    manifest_path: Path,
+    out_dir: Path,
+    configured: Path | None,
+) -> Path:
+    base_dir = configured or Path(".cache/audio-render")
+    scope_key = f"{manifest_path.resolve()}::{out_dir.resolve()}"
+    scope = hashlib.sha256(scope_key.encode("utf-8")).hexdigest()[:16]
+    return (base_dir / scope).resolve()
+
+
 def _text_sha256(text: str) -> str:
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
 
@@ -515,14 +583,17 @@ def _text_sha256(text: str) -> str:
 def _can_reuse_chapter_audio(
     chapter: dict[str, Any],
     audio_path: Path,
-    text_sha256: str,
+    chapter_text_sha256: str,
     render_fingerprint: str,
+    chapter_rendered: bool,
 ) -> bool:
+    if chapter_rendered:
+        return False
     existing_hash = chapter.get("text_sha256")
     existing_fingerprint = chapter.get("render_fingerprint")
     if not isinstance(existing_hash, str):
         return False
-    if existing_hash != text_sha256:
+    if existing_hash != chapter_text_sha256:
         return False
     if existing_fingerprint != render_fingerprint:
         return False
@@ -546,29 +617,6 @@ def _escape_ffmetadata_value(value: str) -> str:
     escaped = escaped.replace(";", "\\;")
     escaped = escaped.replace("#", "\\#")
     return escaped
-
-
-def _render_tts_segments(
-    text: str,
-    chapter_number: int,
-    output_format: str,
-    chapters_audio_dir: Path,
-    client: TtsClient,
-    provider: str,
-) -> list[Path]:
-    prepared_text = apply_provider_pause_markers(text, provider=provider)
-    chunks = _split_text_for_tts(prepared_text, max_chars=TTS_MAX_CHARS)
-    segment_paths: list[Path] = []
-    for segment_index, chunk in enumerate(chunks, start=1):
-        segment_name = (
-            f"chapter-{chapter_number:02d}.segment-{segment_index:03d}.{output_format}"
-        )
-        segment_path = chapters_audio_dir / segment_name
-        segment_path.write_bytes(client.synthesize(chunk))
-        segment_paths.append(segment_path)
-    return segment_paths
-
-
 
 
 def _split_text_for_tts(text: str, max_chars: int) -> list[str]:
@@ -620,9 +668,132 @@ def _split_text_for_tts(text: str, max_chars: int) -> list[str]:
     return chunks
 
 
-def _cleanup_temp_segments(segment_paths: list[Path]) -> None:
-    for segment_path in segment_paths:
-        segment_path.unlink(missing_ok=True)
+def _build_render_units(
+    text: str,
+    chapter_number: int,
+    provider: str,
+    output_format: str,
+    chapter_units_dir: Path,
+    max_chars: int,
+) -> list[dict[str, object]]:
+    blocks = _split_text_blocks(text)
+    units: list[dict[str, object]] = []
+    index = 0
+    for block in blocks:
+        prepared_block = apply_provider_pause_markers(block, provider=provider)
+        for chunk in _split_text_for_tts(prepared_block, max_chars=max_chars):
+            index += 1
+            text_path = chapter_units_dir / f"unit-{index:04d}.txt"
+            audio_path = chapter_units_dir / f"unit-{index:04d}.{output_format}"
+            text_path.write_text(chunk + "\n", encoding="utf-8")
+            units.append(
+                {
+                    "index": index,
+                    "text": chunk,
+                    "text_path": text_path,
+                    "audio_path": audio_path,
+                    "text_sha256": _text_sha256(chunk),
+                    "chapter_number": chapter_number,
+                }
+            )
+    return units
+
+
+def _split_text_blocks(text: str) -> list[str]:
+    blocks: list[str] = []
+    current: list[str] = []
+    for raw_line in text.splitlines():
+        line = raw_line.strip()
+        if not line:
+            if current:
+                blocks.append("\n".join(current))
+                current = []
+            continue
+        current.append(line)
+    if current:
+        blocks.append("\n".join(current))
+    return blocks
+
+
+def _existing_units_by_index(chapter: dict[str, Any]) -> dict[int, dict[str, Any]]:
+    payload = chapter.get("units")
+    if not isinstance(payload, list):
+        return {}
+    by_index: dict[int, dict[str, Any]] = {}
+    for item in payload:
+        if not isinstance(item, dict):
+            continue
+        index = item.get("index")
+        if isinstance(index, int):
+            by_index[index] = cast(dict[str, Any], item)
+    return by_index
+
+
+def _can_reuse_render_unit(
+    unit: dict[str, object],
+    existing_payload: dict[str, Any] | None,
+    render_fingerprint: str,
+) -> bool:
+    if existing_payload is None:
+        return False
+    existing_hash = existing_payload.get("text_sha256")
+    if existing_hash != unit["text_sha256"]:
+        return False
+    existing_fingerprint = existing_payload.get("render_fingerprint")
+    if existing_fingerprint != render_fingerprint:
+        return False
+    path = cast(Path, unit["audio_path"])
+    return path.exists()
+
+
+def _render_units(
+    units: list[dict[str, object]],
+    synthesize: Callable[[str], bytes],
+    jobs: int,
+) -> None:
+    if not units:
+        return
+    if jobs == 1:
+        for unit in units:
+            _render_single_unit(unit, synthesize)
+        return
+
+    with ThreadPoolExecutor(max_workers=jobs) as pool:
+        futures = [pool.submit(_render_single_unit, unit, synthesize) for unit in units]
+        for future in futures:
+            future.result()
+
+
+def _render_single_unit(
+    unit: dict[str, object],
+    synthesize: Callable[[str], bytes],
+) -> None:
+    text = cast(str, unit["text"])
+    audio_path = cast(Path, unit["audio_path"])
+    audio_path.write_bytes(synthesize(text))
+
+
+def _synthesize_factory(
+    jobs: int,
+    client: TtsClient,
+    client_factory: Callable[[], TtsClient] | None,
+) -> Callable[[str], bytes]:
+    if jobs == 1:
+        return client.synthesize
+    if client_factory is None:
+        raise RuntimeError("client_factory is required when jobs > 1")
+
+    local_state = threading.local()
+
+    def _synthesize(text: str) -> bytes:
+        local_client = getattr(local_state, "client", None)
+        if local_client is None:
+            local_client = client_factory()
+            local_state.client = local_client
+        typed_client = cast(TtsClient, local_client)
+        return typed_client.synthesize(text)
+
+    return _synthesize
 
 
 def _write_manifest_payload(payload: dict[str, Any], target_manifest: Path) -> None:

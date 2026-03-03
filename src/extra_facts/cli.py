@@ -94,6 +94,8 @@ def audio_render_command(args: argparse.Namespace) -> int:
         merge_output=args.merge,
         embed_chapters=args.embed_chapters,
         out_manifest_path=Path(args.out_manifest) if args.out_manifest else None,
+        jobs=args.jobs,
+        unit_cache_dir=Path(args.unit_cache_dir) if args.unit_cache_dir else None,
     )
 
     print("Audio render complete")
@@ -106,6 +108,9 @@ def audio_render_command(args: argparse.Namespace) -> int:
     print(f"Chapters rendered: {summary.chapters_rendered}")
     print(f"Chapters reused: {summary.chapters_reused}")
     print(f"Total duration (seconds): {summary.total_duration_seconds}")
+    print(f"Render jobs: {args.jobs}")
+    if args.unit_cache_dir:
+        print(f"Unit cache dir: {args.unit_cache_dir}")
     return 0
 
 
@@ -268,6 +273,17 @@ def create_parser() -> argparse.ArgumentParser:
     render_audio.add_argument(
         "--out-manifest",
         help="Optional path for enriched output manifest (defaults to --manifest)",
+    )
+    render_audio.add_argument(
+        "--jobs",
+        type=int,
+        default=1,
+        help="Number of parallel TTS render workers (default: 1)",
+    )
+    render_audio.add_argument(
+        "--unit-cache-dir",
+        default=".cache/audio-render",
+        help="Cache directory for rendered unit text/audio artifacts",
     )
     render_audio.set_defaults(func=audio_render_command, merge=True, embed_chapters=True)
 

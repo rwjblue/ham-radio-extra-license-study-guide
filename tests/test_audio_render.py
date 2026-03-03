@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+import threading
 from typing import cast
 
 import pytest
@@ -203,10 +204,18 @@ def test_render_audio_from_manifest_enriches_manifest_and_merges(tmp_path: Path)
     assert chapters[1]["start_seconds"] == 10.0
     assert chapters[0]["render_fingerprint"] == "test-fingerprint"
     assert isinstance(chapters[0]["text_sha256"], str)
+    assert isinstance(chapters[0]["units"], list)
+    assert len(chapters[0]["units"]) == 1
+    assert chapters[0]["units"][0]["audio_path"].endswith("unit-0001.mp3")
+    assert chapters[0]["units"][0]["text_path"].endswith("unit-0001.txt")
+    assert Path(chapters[0]["units"][0]["text_path"]).exists()
+    assert Path(chapters[0]["units"][0]["audio_path"]).exists()
     assert enriched["audio_render"]["total_duration_seconds"] == 22.5
     assert enriched["audio_render"]["chapter_markers_embedded"] is True
     assert enriched["audio_render"]["chapters_rendered"] == 2
     assert enriched["audio_render"]["chapters_reused"] == 0
+    assert enriched["audio_render"]["jobs"] == 1
+    assert ".cache/audio-render/" in enriched["audio_render"]["unit_cache_dir"]
 
 
 def test_render_audio_from_manifest_supports_no_merge(tmp_path: Path) -> None:
@@ -515,6 +524,65 @@ def test_render_audio_from_manifest_splits_oversize_paragraph_without_breaking_w
         "eta theta iota",
         "kappa",
     ]
+
+
+def test_render_audio_from_manifest_supports_parallel_unit_rendering(tmp_path: Path) -> None:
+    chapter_path = tmp_path / "audio" / "chapters" / "chapter-01.txt"
+    chapter_path.parent.mkdir(parents=True)
+    chapter_path.write_text(
+        "Question one.\n[[SHORT_PAUSE]]\n\nQuestion two.\n[[SHORT_PAUSE]]\n\nQuestion three.",
+        encoding="utf-8",
+    )
+    manifest_path = tmp_path / "audio" / "manifest.json"
+    manifest_path.write_text(
+        json.dumps(
+            {
+                "schema_version": 1,
+                "chapter_count": 1,
+                "chapters": [
+                    {
+                        "number": 1,
+                        "code": "E1",
+                        "title": "One",
+                        "groups": ["E1A"],
+                        "text_path": str(chapter_path),
+                    }
+                ],
+            },
+            indent=2,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    call_count = 0
+    call_lock = threading.Lock()
+
+    class _ParallelClient:
+        def synthesize(self, text: str) -> bytes:
+            nonlocal call_count
+            with call_lock:
+                call_count += 1
+            return f"audio:{text}".encode()
+
+    def _merge(_inputs: list[Path], output: Path) -> None:
+        output.write_bytes(b"merged-audio")
+
+    result = render_audio_from_manifest(
+        manifest_path=manifest_path,
+        out_dir=tmp_path / "audio",
+        client=_ParallelClient(),
+        client_factory=_ParallelClient,
+        jobs=3,
+        merge_output=False,
+        merge_audio=_merge,
+        probe_duration=lambda _path: 5.0,
+        render_fingerprint="test-fingerprint",
+    )
+
+    assert result.chapters_rendered == 1
+    assert result.chapters_reused == 0
+    assert call_count == 3
 
 
 def test_openai_tts_http_cache_enabled_defaults_true(monkeypatch: MonkeyPatch) -> None:

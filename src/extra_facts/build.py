@@ -217,6 +217,8 @@ def render_audio_from_chapter_manifest(
     merge_output: bool,
     embed_chapters: bool,
     out_manifest_path: Path | None = None,
+    jobs: int = 1,
+    unit_cache_dir: Path | None = None,
 ) -> AudioRenderSummary:
     normalized_provider = provider.strip().lower()
     if normalized_provider == "openai":
@@ -225,6 +227,13 @@ def render_audio_from_chapter_manifest(
             f"openai:{model}:{voice}:{speed}:{output_format}:{resolved_instructions}"
         )
         client = OpenAITtsClient(
+            model=model,
+            voice=voice,
+            response_format=output_format,
+            speed=speed,
+            instructions=resolved_instructions,
+        )
+        client_factory = lambda: OpenAITtsClient(
             model=model,
             voice=voice,
             response_format=output_format,
@@ -249,6 +258,13 @@ def render_audio_from_chapter_manifest(
             language_code=resolved_language_code,
             speed=speed,
         )
+        client_factory = lambda: ElevenLabsTtsClient(
+            model=model,
+            voice_id=voice,
+            response_format=resolved_output_format,
+            language_code=resolved_language_code,
+            speed=speed,
+        )
     else:
         raise RuntimeError(f"Unsupported audio provider: {provider}")
 
@@ -262,6 +278,9 @@ def render_audio_from_chapter_manifest(
         out_manifest_path=out_manifest_path,
         render_fingerprint=render_fingerprint,
         provider=normalized_provider,
+        jobs=jobs,
+        client_factory=client_factory,
+        unit_cache_dir=unit_cache_dir,
     )
     return AudioRenderSummary(
         chapter_count=result.chapter_count,
