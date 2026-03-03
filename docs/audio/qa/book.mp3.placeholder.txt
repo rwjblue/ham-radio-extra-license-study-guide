@@ -1,2 +1,0 @@
-Placeholder for dist/audio/qa/book.mp3.
-Run `mise run audio-render` after generating/rendering Q&A chapter audio.

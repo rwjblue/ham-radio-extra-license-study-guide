@@ -17,9 +17,9 @@ window.HAM_EXTRA_ARTIFACTS = {
           "description": "E-reader exam-style workbook."
         },
         {
-          "href": "./amateur-extra-license-prep-qa.mp3.placeholder.txt",
+          "href": "./amateur-extra-license-prep-qa.mp3",
           "label": "Q&A Audio Book",
-          "description": "Placeholder until Q&A chapter audio is rendered and merged."
+          "description": "Merged Q&A audio book."
         }
       ]
     },
@@ -39,9 +39,9 @@ window.HAM_EXTRA_ARTIFACTS = {
           "description": "E-reader statement-style workbook."
         },
         {
-          "href": "./amateur-extra-license-prep-fact.mp3.placeholder.txt",
+          "href": "./amateur-extra-license-prep-fact.mp3",
           "label": "Facts Audio Book",
-          "description": "Placeholder until rendered chapter audio is merged."
+          "description": "Merged fact audio book."
         }
       ]
     },
@@ -154,9 +154,9 @@ window.HAM_EXTRA_ARTIFACTS = {
       "title": "Audio Artifacts",
       "items": [
         {
-          "href": "./amateur-extra-license-prep-fact.mp3.placeholder.txt",
+          "href": "./amateur-extra-license-prep-fact.mp3",
           "label": "audio/fact/book.mp3",
-          "description": "Placeholder until rendered chapter audio is merged."
+          "description": "Merged fact audio book."
         },
         {
           "href": "./amateur-extra-license-prep-fact-script.txt",
@@ -169,9 +169,9 @@ window.HAM_EXTRA_ARTIFACTS = {
           "description": "Fact chapter manifest for rendering/verification."
         },
         {
-          "href": "./amateur-extra-license-prep-qa.mp3.placeholder.txt",
+          "href": "./amateur-extra-license-prep-qa.mp3",
           "label": "audio/qa/book.mp3",
-          "description": "Placeholder until Q&A chapter audio is rendered and merged."
+          "description": "Merged Q&A audio book."
         },
         {
           "href": "./amateur-extra-license-prep-qa-script.txt",
