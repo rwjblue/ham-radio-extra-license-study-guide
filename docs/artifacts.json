@@ -24,30 +24,8 @@
       ]
     },
     {
-      "id": "facts",
-      "title": "I want concise memorization",
-      "note": "Best for quickly memorizing correct answers in statement form.",
-      "items": [
-        {
-          "href": "./amateur-extra-license-prep-facts.pdf",
-          "label": "Facts PDF",
-          "description": "Printable statement-style workbook."
-        },
-        {
-          "href": "./amateur-extra-license-prep-facts.epub",
-          "label": "Facts EPUB",
-          "description": "E-reader statement-style workbook."
-        },
-        {
-          "href": "./amateur-extra-license-prep-fact.mp3",
-          "label": "Facts Audio Book",
-          "description": "Merged fact audio book."
-        }
-      ]
-    },
-    {
       "id": "augmented",
-      "title": "I want extra context (experimental)",
+      "title": "I want extra content",
       "note": "Adds AI-generated prose context on top of canonical answers. Depending on the source pool and build inputs, this may sometimes look close to the non-augmented versions.",
       "items": [
         {
@@ -69,6 +47,28 @@
           "href": "./amateur-extra-license-prep-augmented-qa.epub",
           "label": "Augmented Q&A EPUB",
           "description": "E-reader Q&A plus extra context."
+        }
+      ]
+    },
+    {
+      "id": "facts",
+      "title": "I want concise memorization",
+      "note": "Best for quickly memorizing correct answers in statement form.",
+      "items": [
+        {
+          "href": "./amateur-extra-license-prep-facts.pdf",
+          "label": "Facts PDF",
+          "description": "Printable statement-style workbook."
+        },
+        {
+          "href": "./amateur-extra-license-prep-facts.epub",
+          "label": "Facts EPUB",
+          "description": "E-reader statement-style workbook."
+        },
+        {
+          "href": "./amateur-extra-license-prep-fact.mp3",
+          "label": "Facts Audio Book",
+          "description": "Merged fact audio book."
         }
       ]
     }

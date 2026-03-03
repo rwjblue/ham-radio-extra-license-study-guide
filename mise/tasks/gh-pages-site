@@ -198,7 +198,7 @@ if [ "${has_augmented}" = true ]; then
   augmented_style_choice=',
     {
       "id": "augmented",
-      "title": "I want extra context (experimental)",
+      "title": "I want extra content",
       "note": "Adds AI-generated prose context on top of canonical answers. Depending on the source pool and build inputs, this may sometimes look close to the non-augmented versions.",
       "items": [
         {
@@ -250,7 +250,7 @@ cat > "${out_dir}/artifacts.json" <<JSON
           "description": "${qa_audio_desc}"
         }
       ]
-    },
+    }${augmented_style_choice},
     {
       "id": "facts",
       "title": "I want concise memorization",
@@ -272,7 +272,7 @@ cat > "${out_dir}/artifacts.json" <<JSON
           "description": "${fact_audio_desc}"
         }
       ]
-    }${augmented_style_choice}
+    }
   ],
   "sections": [
     {
