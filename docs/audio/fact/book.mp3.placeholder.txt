@@ -1,0 +1,2 @@
+Placeholder for dist/audio/fact/book.mp3.
+Run `mise run audio-render` to generate chapter audio and merged book audio.

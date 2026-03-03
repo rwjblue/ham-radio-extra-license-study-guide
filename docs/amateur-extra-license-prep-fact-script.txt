@@ -1,0 +1,1855 @@
+Chapter E1: FCC Rules and Licensing.
+[[SHORT_PAUSE]]
+
+Section E1A.
+
+It is not legal to transmit a 3 kilohertz bandwidth upper side band signal with a carrier frequency of 14.348 megahertz on 20 meters because the upper 1 kilohertz of the signal extends beyond the band edge at 14.350 megahertz.
+[[SHORT_PAUSE]]
+
+When using a transceiver that displays the carrier frequency of phone signals, the lowest frequency at which a properly adjusted lower side band emission will be totally within the band is 3 kilohertz above the lower band edge.
+[[SHORT_PAUSE]]
+
+The highest legal carrier frequency on the 20-meter band for transmitting a 2.8 kilohertz wide upper side band data signal is 14.1472 megahertz.
+[[SHORT_PAUSE]]
+
+An Extra class operator may not answer the CQ of a station on 3.601 megahertz lower side band phone because the sideband components will extend beyond the edge of the 75-meter phone band segment.
+[[SHORT_PAUSE]]
+
+Any person holding an FCC issued amateur license or who is authorized for alien reciprocal operation must be in physical control of the station apparatus of an amateur station aboard any vessel or craft that is documented or registered in the United States.
+[[SHORT_PAUSE]]
+
+For channelized 60 meter operation using CW, the transmitter must be set to the exact center frequency of the assigned channel.
+[[SHORT_PAUSE]]
+
+The maximum power permitted on the 2200-meter band is 1 watt equivalent isotropic radiated power (EIRP).
+[[SHORT_PAUSE]]
+
+If a station in a message forwarding system inadvertently forwards a message that violates FCC rules, the control operator of the originating station is primarily accountable for the rules violation.
+[[SHORT_PAUSE]]
+
+Except in some parts of Alaska, the maximum power permitted on the 630-meter band is 5 watts EIRP.
+[[SHORT_PAUSE]]
+
+If an amateur station is installed aboard a ship or aircraft, its operation must be approved by the master of the ship or the pilot in command of the aircraft.
+[[SHORT_PAUSE]]
+
+When operating an amateur station aboard a US-registered vessel in international waters, any FCC-issued amateur license is sufficient authorization.
+[[SHORT_PAUSE]]
+
+Section E1B.
+
+A spurious emission is an emission outside the signal’s necessary bandwidth that can be reduced or eliminated without affecting the information transmitted.
+[[SHORT_PAUSE]]
+
+An acceptable bandwidth for digital voice or slow-scan TV transmissions made on the HF amateur bands is 3 kilohertz.
+[[SHORT_PAUSE]]
+
+An amateur station must protect an FCC monitoring facility from harmful interference if it is located within 1 mile of that facility.
+[[SHORT_PAUSE]]
+
+If a radiolocation system experiences interference from a repeater operating in the 70-centimeter band, the control operator must cease operation or make changes to the repeater that mitigate the interference.
+[[SHORT_PAUSE]]
+
+The National Radio Quiet Zone is an area surrounding the National Radio Astronomy Observatory.
+[[SHORT_PAUSE]]
+
+If you are erecting an amateur station antenna structure at a site at or near a public use airport, you may have to notify the Federal Aviation Administration and register it with the FCC as required by Part 17 of the FCC rules.
+[[SHORT_PAUSE]]
+
+PRB-1 applies to state and local zoning regulations that affect amateur radio antenna structures.
+[[SHORT_PAUSE]]
+
+If an amateur station with a properly operating transmitter causes interference to domestic broadcast reception in receivers of good engineering design, the FCC may require that the amateur station avoid transmitting during certain hours on the specific frequencies that cause the interference.
+[[SHORT_PAUSE]]
+
+Under RACES rules, any FCC-licensed amateur station certified by the responsible civil defense organization for the area served may be operated.
+[[SHORT_PAUSE]]
+
+Under RACES rules, an amateur station may operate on all amateur service frequencies that are authorized to the control operator.
+[[SHORT_PAUSE]]
+
+PRB-1 requires that state and local regulations affecting amateur radio antenna size and structures must make reasonable accommodations for amateur radio communications and must not preclude amateur service communications altogether.
+[[SHORT_PAUSE]]
+
+Section E1C.
+
+The maximum bandwidth for a data emission on the 60 meter amateur band is 2.8 kilohertz.
+[[SHORT_PAUSE]]
+
+Communications transmitted to amateur stations in foreign countries must be limited to those incidental to the purpose of the amateur service and remarks of a personal nature.
+[[SHORT_PAUSE]]
+
+An amateur operator may begin operating on the 2200-meter or 630-meter band 30 days after filing a notification with the Utilities Technology Council (UTC), provided they have not been informed that their station is within 1 kilometer of PLC systems using those frequencies.
+[[SHORT_PAUSE]]
+
+An International Amateur Radio Permit (IARP) is a permit that allows U.S. amateur radio operators to operate their stations in certain countries of the Americas without obtaining an individual reciprocal license from each country.
+[[SHORT_PAUSE]]
+
+A station may transmit third party communications while being automatically controlled only when transmitting RTTY or data emissions.
+[[SHORT_PAUSE]]
+
+To operate in accordance with CEPT rules in foreign countries where permitted, you must have a copy of FCC Public Notice DA 16-1048.
+[[SHORT_PAUSE]]
+
+Before transmitting on the 630- or 2200-meter amateur bands, operators must inform the Utilities Technology Council (UTC) of their call sign and the coordinates of the station.
+[[SHORT_PAUSE]]
+
+If the control link of a remotely controlled amateur station malfunctions, the maximum permissible duration of the station’s transmissions is 3 minutes.
+[[SHORT_PAUSE]]
+
+For angle modulation emissions below 29.0 megahertz, the highest permitted modulation index at the highest modulation frequency is 1.0.
+[[SHORT_PAUSE]]
+
+The maximum mean power level for a spurious emission below 30 megahertz is -43 dB with respect to the fundamental emission.
+[[SHORT_PAUSE]]
+
+The operating arrangement that allows an FCC-licensed US citizen to operate in many European countries, and amateurs from many European countries to operate in the US, is the CEPT agreement.
+[[SHORT_PAUSE]]
+
+In the 630-meter band, phone emissions are permitted over the entire band.
+[[SHORT_PAUSE]]
+
+Section E1D.
+
+Telemetry is defined as the one-way transmission of measurements at a distance from the measuring instrument.
+[[SHORT_PAUSE]]
+
+Telecommand signals from a space telecommand station may transmit encrypted messages under the FCC Amateur Extra rules.
+[[SHORT_PAUSE]]
+
+A space telecommand station is an amateur station that transmits communications to initiate, modify, or terminate functions of a space station.
+[[SHORT_PAUSE]]
+
+Identification transmissions from a balloon-borne telemetry station must include the station's FCC-assigned call sign.
+[[SHORT_PAUSE]]
+
+When a station is being operated by telecommand on or within 50 kilometers of the Earth’s surface, the posting at the station location must include the FCC licensee’s name, the station call sign, and the address and telephone number of the station licensee or designated control point, since all these choices are correct.
+[[SHORT_PAUSE]]
+
+The maximum permitted transmitter output power when operating a model craft by telecommand is 1 watt.
+[[SHORT_PAUSE]]
+
+The HF amateur bands that include allocations for space stations are 40 meters, 20 meters, 15 meters, and 10 meters.
+[[SHORT_PAUSE]]
+
+On the 2-meter VHF amateur band, specific frequencies are authorized for use by amateur space stations.
+[[SHORT_PAUSE]]
+
+The UHF amateur bands that have frequencies authorized for space stations are 70 centimeters and 13 centimeters.
+[[SHORT_PAUSE]]
+
+Any amateur station so designated by the space station licensee is eligible to be the telecommand station of an amateur space station, subject to the privileges of the class of operator license held by the control operator.
+[[SHORT_PAUSE]]
+
+Any amateur station is eligible to operate as an Earth station, subject to the privileges of the class of operator license held by the control operator.
+[[SHORT_PAUSE]]
+
+One-way communications are permitted from an amateur space station, beacon station, or telecommand station.
+[[SHORT_PAUSE]]
+
+Section E1E.
+
+Under Part 97 rules, Volunteer Examiners (VEs) and Volunteer Examiner Coordinators (VECs) may be reimbursed for out-of-pocket expenses directly related to preparing, processing, administering, and coordinating an examination for an amateur radio operator license.
+[[SHORT_PAUSE]]
+
+In the United States, Part 97 assigns the responsibility for maintaining the pools of questions for all amateur radio license examinations to the Volunteer Examiner Coordinators (VECs).
+[[SHORT_PAUSE]]
+
+A Volunteer Examiner Coordinator is an organization that has entered into an agreement with the FCC to coordinate, prepare, and administer amateur operator license examinations.
+[[SHORT_PAUSE]]
+
+To be accredited as a Volunteer Examiner, a Volunteer Examiner Coordinator must confirm that the VE applicant meets all FCC requirements to serve as an examiner.
+[[SHORT_PAUSE]]
+
+If an examinee does not pass the exam, the Volunteer Examiner (VE) team must return the application document to the examinee.
+[[SHORT_PAUSE]]
+
+Each administering VE is responsible for the proper conduct and necessary supervision during an amateur operator license examination session.
+[[SHORT_PAUSE]]
+
+If a candidate fails to comply with the examiner’s instructions during an amateur operator license examination, the Volunteer Examiner (VE) must immediately terminate the candidate’s examination.
+[[SHORT_PAUSE]]
+
+A Volunteer Examiner (VE) may not administer an amateur radio license examination to any relative specified in the FCC rules.
+[[SHORT_PAUSE]]
+
+The penalty for a VE who fraudulently administers or certifies an examination may be revocation of the VE’s amateur station license grant and the suspension of the VE’s amateur operator license grant.
+[[SHORT_PAUSE]]
+
+After the administration of a successful examination for an amateur operator license, the administering VEs must submit the application document to the coordinating VEC according to the coordinating VEC instructions.
+[[SHORT_PAUSE]]
+
+If an examinee earns a passing grade on all examination elements required for an upgrade or new amateur radio license, three volunteer examiners (VEs) must certify that the examinee is qualified for the license grant and that they have complied with all administering VE requirements.
+[[SHORT_PAUSE]]
+
+Section E1F.
+
+Spread spectrum transmissions are permitted only on amateur frequencies above 222 megahertz.
+[[SHORT_PAUSE]]
+
+In the United States, a person holding an amateur service license granted by the government of Canada is authorized to operate under the terms and conditions of their Canadian amateur service license, but their privileges may not exceed those of a US Amateur Extra class license.
+[[SHORT_PAUSE]]
+
+A dealer may sell an external RF power amplifier capable of operation below 144 megahertz if it has not been granted FCC certification only when the amplifier is constructed or modified by an amateur radio operator for use at an amateur station.
+[[SHORT_PAUSE]]
+
+"Line A" is a line roughly parallel to and south of the border between the US and Canada.
+[[SHORT_PAUSE]]
+
+Amateur stations located in the contiguous 48 states and north of Line A may not transmit in the 420 megahertz to 430 megahertz frequency segment.
+[[SHORT_PAUSE]]
+
+The FCC might issue a Special Temporary Authority (STA) to an amateur station to provide for experimental amateur communications.
+[[SHORT_PAUSE]]
+
+An amateur station may send a message to a business only when neither the amateur nor their employer has any pecuniary interest in the communications.
+[[SHORT_PAUSE]]
+
+Amateur station communications transmitted for hire or material compensation are prohibited, except as otherwise specifically allowed by the FCC rules.
+[[SHORT_PAUSE]]
+
+Messages encoded to obscure their meaning cannot be transmitted over an amateur radio mesh network.
+[[SHORT_PAUSE]]
+
+Only Technician, General, Advanced, or Amateur Extra class operators may be the control operator of an auxiliary station.
+[[SHORT_PAUSE]]
+
+To qualify for a grant of FCC certification, an external RF power amplifier must satisfy the FCC’s spurious emission standards when operated at the lesser of 1500 watts or its full output power.
+[[SHORT_PAUSE]]
+
+That wraps up chapter E1.
+
+Chapter E2: Operating and On-Air Procedures.
+[[SHORT_PAUSE]]
+
+Section E2A.
+
+The direction of an ascending pass for an amateur satellite is from south to north.
+[[SHORT_PAUSE]]
+
+An inverting linear transponder produces an output signal that is the conjugate of the input, reverses the sideband orientation (upper to lower and lower to upper), and reverses the frequency spectrum of the transmitted passband, so all these choices are correct.
+[[SHORT_PAUSE]]
+
+In an inverting linear transponder, the upload signal is mixed with a local oscillator signal and the difference product is transmitted.
+[[SHORT_PAUSE]]
+
+The “mode” of an amateur radio satellite is the designation of its uplink and downlink frequency bands.
+[[SHORT_PAUSE]]
+
+In a satellite’s mode designator, the letters specify the uplink and downlink frequency ranges.
+[[SHORT_PAUSE]]
+
+Keplerian elements are parameters that define the orbit of a satellite.
+[[SHORT_PAUSE]]
+
+A linear transponder can relay single sideband voice, FM, CW, RTTY, PSK, and other digital signals as long as they all fit within its passband.
+[[SHORT_PAUSE]]
+
+Effective radiated power (ERP) should be limited to a satellite that uses a linear transponder to avoid reducing the downlink power to all other users.
+[[SHORT_PAUSE]]
+
+In amateur radio satellite and microwave operation, the terms “L band” and “S band” specify the 23- and 13-centimeter bands, respectively.
+[[SHORT_PAUSE]]
+
+A geostationary satellite appears to stay in one fixed position in the sky relative to an observer on Earth.
+[[SHORT_PAUSE]]
+
+A circularly polarized antenna can be used to minimize the effects of spin modulation and Faraday rotation.
+[[SHORT_PAUSE]]
+
+Section E2B.
+
+In digital television, a coding rate of 3/4 means that 25% of the data sent is forward error correction data.
+[[SHORT_PAUSE]]
+
+A fast-scan NTSC television frame is made up of 525 horizontal lines.
+[[SHORT_PAUSE]]
+
+In a fast-scan NTSC television system, an interlaced scanning pattern is generated by scanning the odd-numbered lines in one field and the even-numbered lines in the next field.
+[[SHORT_PAUSE]]
+
+In analog SSTV, color information is sent by transmitting the separate color lines sequentially.
+[[SHORT_PAUSE]]
+
+In analog fast-scan TV transmissions, vestigial sideband reduces the bandwidth while increasing the fidelity of low frequency video components.
+[[SHORT_PAUSE]]
+
+Vestigial sideband modulation is amplitude modulation in which one complete sideband and a portion of the other are transmitted.
+[[SHORT_PAUSE]]
+
+Amateur television DVB-T signals use QAM and QPSK modulation.
+[[SHORT_PAUSE]]
+
+Commercial analog TV receivers can be used for fast-scan TV operations on the 70-centimeter band by transmitting on channels shared with cable TV.
+[[SHORT_PAUSE]]
+
+A single side band receiver can be used to receive and decode slow-scan television (SSTV) using the Digital Radio Mondiale (DRM) protocol.
+[[SHORT_PAUSE]]
+
+In an analog slow-scan television (SSTV) signal, the brightness of the picture is encoded by the tone frequency.
+[[SHORT_PAUSE]]
+
+In an SSTV transmission, the vertical interval signaling (VIS) code functions to identify the SSTV mode being used.
+[[SHORT_PAUSE]]
+
+In slow-scan television (SSTV), specific tone frequencies signal the receiving software to begin a new picture line.
+[[SHORT_PAUSE]]
+
+Section E2C.
+
+When a US-licensed amateur station is operated by remote control and the remote transmitter is located in the United States, no additional indicator is required in the station identification.
+[[SHORT_PAUSE]]
+
+The ADIF file format is used for exchanging amateur radio log data.
+[[SHORT_PAUSE]]
+
+Amateur radio contesting is generally excluded from the 30-meter band.
+[[SHORT_PAUSE]]
+
+Amateur radio mesh networks can use frequencies that are shared with various unlicensed wireless data services.
+[[SHORT_PAUSE]]
+
+The function of a DX QSL Manager is to handle the receiving and sending of confirmations for a DX station.
+[[SHORT_PAUSE]]
+
+During a VHF/UHF contest, you would expect to find the highest level of single side band or CW activity in the weak signal segment of the band, with most of the activity near the calling frequency.
+[[SHORT_PAUSE]]
+
+The Cabrillo format is a standard for submission of electronic contest logs.
+[[SHORT_PAUSE]]
+
+The Logbook of The World (LoTW) system can be used to confirm all types of amateur radio contacts that it supports, including domestic and DX QSOs, for award and confirmation purposes.
+[[SHORT_PAUSE]]
+
+An amateur radio mesh network is commonly implemented using a wireless router running custom firmware.
+[[SHORT_PAUSE]]
+
+DX stations often transmit and receive on different frequencies in order to reduce interference, to shift the interfering signal from the station frequency, and to allow stations to call and listen on different frequencies.
+[[SHORT_PAUSE]]
+
+When attempting to contact a DX station during a contest or in a pileup, you should generally identify your station by sending your full call sign once or twice.
+[[SHORT_PAUSE]]
+
+Latency indicates the delay between a control operator action and the corresponding change in the transmitted signal.
+[[SHORT_PAUSE]]
+
+Section E2D.
+
+MSK144 is the digital mode specifically designed for meteor scatter communications.
+[[SHORT_PAUSE]]
+
+When using the FT8 or FT4 modes in a VHF contest, grid square information replaces signal-to-noise ratio in the exchange.
+[[SHORT_PAUSE]]
+
+Q65 is a digital mode specifically designed for Earth-Moon-Earth (EME) communications.
+[[SHORT_PAUSE]]
+
+Real-time tracking of balloons carrying amateur radio transmitters is commonly accomplished using Automatic Packet Reporting System (APRS).
+[[SHORT_PAUSE]]
+
+The JT65 digital mode is characterized by its ability to decode signals with a very low signal-to-noise ratio.
+[[SHORT_PAUSE]]
+
+A method for establishing EME contacts is to use time-synchronous transmissions that alternate between the participating stations.
+[[SHORT_PAUSE]]
+
+The digital protocol used by APRS is AX.25.
+[[SHORT_PAUSE]]
+
+APRS beacon data is transmitted using an Unnumbered Information packet frame.
+[[SHORT_PAUSE]]
+
+JT65 uses multitone audio frequency-shift keying (AFSK) modulation.
+[[SHORT_PAUSE]]
+
+The packet path WIDE3-1 designates that three digipeater hops were originally requested and that one digipeater hop remains available to be used.
+[[SHORT_PAUSE]]
+
+APRS stations relay data by packet digipeaters.
+[[SHORT_PAUSE]]
+
+Section E2E.
+
+FSK modulation is used for data emissions below 30 megahertz.
+[[SHORT_PAUSE]]
+
+WSJT-X digital mode transmit and receive timing is synchronized by synchronization of computer clocks.
+[[SHORT_PAUSE]]
+
+In the context of the FT4 digital mode used on the amateur radio bands, the "4" refers to its use of four-tone continuous-phase frequency shift keying.
+[[SHORT_PAUSE]]
+
+The FST4 mode is a digital communication mode designed for very weak signal work that uses fixed-length structured transmissions with selectable time periods and narrow bandwidth, and incorporates forward error correction, time synchronization, and low-rate data encoding to optimize performance on paths such as MF and LF propagation, EME, and other challenging propagation modes.
+[[SHORT_PAUSE]]
+
+WSPR is a digital mode that does not support real-time keyboard-to-keyboard operation.
+[[SHORT_PAUSE]]
+
+The length of an FT8 transmission cycle is 15 seconds.
+[[SHORT_PAUSE]]
+
+Q65 differs from JT65 in that Q65 uses multiple receive cycles that are averaged together.
+[[SHORT_PAUSE]]
+
+PACTOR is an HF digital mode that can be used to transfer binary files.
+[[SHORT_PAUSE]]
+
+PSK31 is the HF digital mode that uses variable-length character coding.
+[[SHORT_PAUSE]]
+
+FT8 is the digital mode among the listed choices that has the narrowest occupied bandwidth.
+[[SHORT_PAUSE]]
+
+The difference between direct FSK and audio FSK is that direct FSK modulates the transmitter VFO.
+[[SHORT_PAUSE]]
+
+Automatic Link Establishment (ALE) stations establish contact by constantly scanning a programmed list of frequencies and automatically activating the radio when the designated call sign is received.
+[[SHORT_PAUSE]]
+
+Under clear communication conditions, PACTOR IV provides the highest data throughput among common amateur radio digital modes.
+[[SHORT_PAUSE]]
+
+That wraps up chapter E2.
+
+Chapter E3: Radio Wave Propagation Basics.
+[[SHORT_PAUSE]]
+
+Section E3A.
+
+The approximate maximum separation measured along the surface of the Earth between two stations communicating by EME is 12,000 miles, if the Moon is visible by both stations.
+[[SHORT_PAUSE]]
+
+Libration fading of an EME signal is characterized by a fluttery, irregular fading.
+[[SHORT_PAUSE]]
+
+When scheduling Earth-Moon-Earth (EME) contacts, the least path loss generally occurs when the Moon is at perigee.
+[[SHORT_PAUSE]]
+
+An electromagnetic wave travels in a direction that is at a right angle (perpendicular) to both its electric field and its magnetic field.
+[[SHORT_PAUSE]]
+
+The electric and magnetic fields that make up an electromagnetic wave are oriented at right angles to each other and to the direction of wave propagation.
+[[SHORT_PAUSE]]
+
+To continue a long-distance contact when the MUF for that path decreases due to darkness, an amateur operator should switch to a lower frequency HF band.
+[[SHORT_PAUSE]]
+
+Atmospheric ducts capable of propagating microwave signals often form over large bodies of water.
+[[SHORT_PAUSE]]
+
+When a meteor strikes the Earth’s atmosphere, a linear ionized region is formed in the E region of the ionosphere.
+[[SHORT_PAUSE]]
+
+The frequency range most suited for meteor-scatter communications is 28 megahertz to 148 megahertz.
+[[SHORT_PAUSE]]
+
+The speed of electromagnetic waves through a medium is determined by the medium’s index of refraction.
+[[SHORT_PAUSE]]
+
+A typical range for tropospheric duct propagation of microwave signals is 100 miles to 300 miles.
+[[SHORT_PAUSE]]
+
+Auroral propagation is most likely to result from severe geomagnetic storms.
+[[SHORT_PAUSE]]
+
+CW is the best emission mode for auroral propagation.
+[[SHORT_PAUSE]]
+
+Circularly polarized electromagnetic waves are waves with rotating electric and magnetic fields.
+[[SHORT_PAUSE]]
+
+Section E3B.
+
+Transequatorial propagation (TEP) is most likely to occur between points separated by 2,000 miles to 3,000 miles over a path that is perpendicular to the geomagnetic equator.
+[[SHORT_PAUSE]]
+
+The approximate maximum range for signals using transequatorial propagation is 5,000 miles.
+[[SHORT_PAUSE]]
+
+Transequatorial propagation is most likely to occur during the afternoon or early evening.
+[[SHORT_PAUSE]]
+
+In ionospheric propagation, “extraordinary” and “ordinary” waves are independently propagating, elliptically polarized waves created in the ionosphere.
+[[SHORT_PAUSE]]
+
+On 160 meters, a path that is entirely in darkness is most likely to support long-distance radio wave propagation.
+[[SHORT_PAUSE]]
+
+Long-path propagation is most frequent on the 40-meter and 20-meter amateur bands.
+[[SHORT_PAUSE]]
+
+Lowering a signal’s transmitted elevation angle increases the distance covered by each ionospheric HF skip hop.
+[[SHORT_PAUSE]]
+
+The maximum range of ground-wave propagation decreases as the signal frequency is increased.
+[[SHORT_PAUSE]]
+
+Sporadic-E propagation is most likely to occur around the solstices, especially the summer solstice.
+[[SHORT_PAUSE]]
+
+Chordal-hop propagation causes a signal to experience less loss compared to multi-hop propagation that uses the Earth as a reflector.
+[[SHORT_PAUSE]]
+
+Sporadic-E propagation is most likely to occur between sunrise and sunset.
+[[SHORT_PAUSE]]
+
+Chordal-hop propagation is successive ionospheric refractions without an intermediate reflection from the ground.
+[[SHORT_PAUSE]]
+
+Ground-wave propagation supports vertical polarization.
+[[SHORT_PAUSE]]
+
+Section E3C.
+
+Short-term radio blackouts are caused by solar flares.
+[[SHORT_PAUSE]]
+
+A rising A-index or K-index indicates increasing disturbance of the geomagnetic field.
+[[SHORT_PAUSE]]
+
+When the A-index or K-index is elevated, radio signals traveling through the auroral oval are most likely to experience high levels of absorption.
+[[SHORT_PAUSE]]
+
+The value of Bz (B sub z) represents the north-south strength of the interplanetary magnetic field.
+[[SHORT_PAUSE]]
+
+A southward orientation of Bz (B sub z) increases the likelihood that charged particles from the Sun will cause disturbed conditions.
+[[SHORT_PAUSE]]
+
+The VHF/UHF radio horizon is approximately 15 percent farther than the geographic horizon.
+[[SHORT_PAUSE]]
+
+The greatest solar flare intensity is indicated by Class X.
+[[SHORT_PAUSE]]
+
+The space-weather term for an extreme geomagnetic storm is G5.
+[[SHORT_PAUSE]]
+
+Amateur radio propagation reporting networks report data on digital-mode and CW signals.
+[[SHORT_PAUSE]]
+
+The 304A solar parameter measures ultraviolet (UV) emissions at 304 angstroms, which are correlated to the solar flux index.
+[[SHORT_PAUSE]]
+
+VOACAP software models HF propagation.
+[[SHORT_PAUSE]]
+
+A sudden rise in radio background noise across a large portion of the HF spectrum indicates that a coronal mass ejection impact or a solar flare has occurred.
+[[SHORT_PAUSE]]
+
+That wraps up chapter E3.
+
+Chapter E4: Amateur Station Operating Practices.
+[[SHORT_PAUSE]]
+
+Section E4A.
+
+On a digital oscilloscope, the highest frequency signal that can be accurately displayed is limited by the sampling rate of the analog-to-digital converter.
+[[SHORT_PAUSE]]
+
+A spectrum analyzer displays signal amplitude on the vertical axis and frequency on the horizontal axis.
+[[SHORT_PAUSE]]
+
+A spectrum analyzer is used to display spurious signals and intermodulation distortion products generated by a single side band transmitter.
+[[SHORT_PAUSE]]
+
+Compensation of an oscilloscope probe is performed by displaying a square wave and adjusting the probe until the horizontal portions of the displayed wave are as nearly flat as possible.
+[[SHORT_PAUSE]]
+
+The purpose of using a prescaler with a frequency counter is to reduce the signal frequency to within the counter's operating range.
+[[SHORT_PAUSE]]
+
+On a digital oscilloscope, aliasing causes a false, jittery low-frequency version of the waveform to be displayed.
+[[SHORT_PAUSE]]
+
+An advantage of using an antenna analyzer compared to an SWR bridge is that antenna analyzers compute SWR and impedance automatically.
+[[SHORT_PAUSE]]
+
+Standing wave ratio (SWR) can be measured with an antenna analyzer, an RF power meter with a reverse power function, or an SWR bridge.
+[[SHORT_PAUSE]]
+
+When using an oscilloscope probe, it is good practice to minimize the length of the probe's ground connection.
+[[SHORT_PAUSE]]
+
+The most effective oscilloscope trigger mode for measuring a linear power supply’s output ripple is the Line trigger mode.
+[[SHORT_PAUSE]]
+
+An antenna analyzer can be used to measure SWR, antenna impedance, and the resonant frequency of an antenna system.
+[[SHORT_PAUSE]]
+
+Section E4B.
+
+The factor that most affects the accuracy of a frequency counter is the accuracy of its time base.
+[[SHORT_PAUSE]]
+
+The significance of voltmeter sensitivity expressed in ohms per volt is that the full scale reading of the voltmeter multiplied by its ohms per volt rating is the input impedance of the voltmeter.
+[[SHORT_PAUSE]]
+
+The S parameter equivalent to forward gain is S21.
+[[SHORT_PAUSE]]
+
+The S parameter S11 represents the input port return loss or reflection coefficient, which is equivalent to VSWR.
+[[SHORT_PAUSE]]
+
+The three test loads used to calibrate an RF vector network analyzer are a short circuit, an open circuit, and a 50-ohm load.
+[[SHORT_PAUSE]]
+
+When a directional power meter between a transmitter and a terminating load reads 100 watts forward power and 25 watts reflected power, the load is absorbing 75 watts of power.
+[[SHORT_PAUSE]]
+
+The subscripts of S parameters represent the port or ports at which measurements are made.
+[[SHORT_PAUSE]]
+
+The Q of a series-tuned circuit can be determined from the bandwidth of the circuit's frequency response.
+[[SHORT_PAUSE]]
+
+A two-port vector network analyzer can be used to measure the frequency response of a filter.
+[[SHORT_PAUSE]]
+
+Intermodulation distortion in a single side band transmitter is measured by modulating the transmitter with two AF signals having non-harmonically related frequencies and observing the RF output with a spectrum analyzer.
+[[SHORT_PAUSE]]
+
+A vector network analyzer can be used to measure input impedance, transmission loss, reflection coefficient, and return loss of a device or network.
+[[SHORT_PAUSE]]
+
+Section E4C.
+
+Excessive phase noise in an SDR receiver’s master clock oscillator can combine with strong signals on nearby frequencies to generate interference.
+[[SHORT_PAUSE]]
+
+A receiver front-end filter or preselector can be effective in eliminating interference from strong out-of-band signals by attenuating unwanted frequencies before they reach later stages of the receiver.
+[[SHORT_PAUSE]]
+
+The suppression in an FM receiver of one signal by another stronger signal on the same frequency is called the capture effect.
+[[SHORT_PAUSE]]
+
+The noise figure of a receiver is the ratio in dB of the noise generated by the receiver to the theoretical minimum noise.
+[[SHORT_PAUSE]]
+
+A receiver noise floor of -174 dBm represents the theoretical noise in a 1 Hz bandwidth at the input of a perfect receiver at room temperature.
+[[SHORT_PAUSE]]
+
+Increasing a receiver’s bandwidth from 50 Hz to 1,000 Hz raises the receiver’s noise floor by 13 dB.
+[[SHORT_PAUSE]]
+
+The MDS of a receiver represents the minimum discernible signal.
+[[SHORT_PAUSE]]
+
+An SDR receiver is overloaded when input signals exceed the reference voltage of the analog-to-digital converter.
+[[SHORT_PAUSE]]
+
+A good reason for selecting a high intermediate frequency (IF) for a superheterodyne HF or VHF communications receiver is that it is easier for the front-end circuitry to eliminate image responses.
+[[SHORT_PAUSE]]
+
+An advantage of having a variety of receiver bandwidths from which to select is that the receive bandwidth can be set to match the modulation bandwidth, maximizing signal-to-noise ratio and minimizing interference.
+[[SHORT_PAUSE]]
+
+Input attenuation reduces receiver overload on the lower frequency HF bands with little or no impact on signal-to-noise ratio because atmospheric noise is generally greater than internally generated noise even after attenuation.
+[[SHORT_PAUSE]]
+
+A narrow-band roofing filter improves receiver blocking dynamic range by attenuating strong signals that are near the receive frequency.
+[[SHORT_PAUSE]]
+
+Reciprocal mixing is interference to desired signals caused by local oscillator phase noise mixing with adjacent strong signals.
+[[SHORT_PAUSE]]
+
+The purpose of the receiver IF Shift control is to reduce interference from stations transmitting on adjacent frequencies.
+[[SHORT_PAUSE]]
+
+Section E4D.
+
+The blocking dynamic range of a receiver is the difference in dB between the noise floor and the level of an incoming signal that will cause 1 dB of gain compression.
+[[SHORT_PAUSE]]
+
+Poor dynamic range in a receiver causes spurious signals due to cross modulation and desensitization from strong adjacent signals.
+[[SHORT_PAUSE]]
+
+Intermodulation interference between two repeaters in close proximity is created when their output signals mix in the final amplifier of one or both transmitters.
+[[SHORT_PAUSE]]
+
+Desensitization is the reduction in receiver sensitivity caused by a strong signal near the received frequency.
+[[SHORT_PAUSE]]
+
+Receiver desensitization is reduced by inserting attenuation before the first RF stage.
+[[SHORT_PAUSE]]
+
+Intermodulation in an electronic circuit is caused by nonlinear circuits or devices.
+[[SHORT_PAUSE]]
+
+The purpose of the preselector in a communications receiver is to increase the rejection of signals outside the band being received.
+[[SHORT_PAUSE]]
+
+A third-order intercept level of 40 dBm means that a pair of 40 dBm input signals will theoretically generate a third-order intermodulation product that has the same output amplitude as either of the input signals.
+[[SHORT_PAUSE]]
+
+Odd-order intermodulation products created within a receiver are of particular interest because odd-order products of two signals in the band being received are also likely to be within the band.
+[[SHORT_PAUSE]]
+
+The link margin in a system with a transmit power level of 10 W (+40 dBm), a system antenna gain of 10 dBi, a cable loss of 3 dB, a path loss of 136 dB, a receiver minimum discernable signal of -103 dBm, and a required signal-to-noise ratio of 6 dB is +8 dB.
+[[SHORT_PAUSE]]
+
+With a transmit power of 10 W (+40 dBm), a transmit antenna gain of 6 dBi, a receive antenna gain of 3 dBi, and a path loss of 100 dB, the received signal level is -51 dBm.
+[[SHORT_PAUSE]]
+
+A receiver minimum discernible signal of -100 dBm represents a power level of 0.1 picowatts.
+[[SHORT_PAUSE]]
+
+Section E4E.
+
+When using an automatic notch filter (ANF) to remove interfering carriers while receiving CW signals, the ANF can remove the CW signal as well as the interfering carrier.
+[[SHORT_PAUSE]]
+
+Digital noise reduction can often reduce locally generated noise, ignition noise, and line noise.
+[[SHORT_PAUSE]]
+
+Conducted noise from an automobile battery charging system can be suppressed by installing ferrite chokes on the charging system leads.
+[[SHORT_PAUSE]]
+
+Radio frequency interference from a line-driven AC motor is suppressed by using a brute-force AC-line filter in series with the motor’s power leads.
+[[SHORT_PAUSE]]
+
+Computer network equipment can cause electrical interference that appears as unstable modulated or unmodulated signals at specific frequencies.
+[[SHORT_PAUSE]]
+
+Shielded cables can radiate or receive interference when common-mode currents flow on both the shield and the conductors.
+[[SHORT_PAUSE]]
+
+Common-mode current is the type of current that flows equally on all conductors of an unshielded multiconductor cable.
+[[SHORT_PAUSE]]
+
+When using a noise blanker, strong signals may be distorted and appear to cause spurious emissions.
+[[SHORT_PAUSE]]
+
+Intermittent loud roaring or buzzing AC line interference can be caused by any of several different AC-powered devices and connections, so all these choices are correct.
+[[SHORT_PAUSE]]
+
+Local AM broadcast band signals can combine and generate spurious signals on the MF or HF bands when nearby corroded metal connections act as nonlinear mixers and reradiate the broadcast signals.
+[[SHORT_PAUSE]]
+
+Interference received as a series of carriers at regular intervals across a wide frequency range is caused by switch-mode power supplies.
+[[SHORT_PAUSE]]
+
+A station AC surge protector should be installed on the single point ground panel.
+[[SHORT_PAUSE]]
+
+The purpose of a single point ground panel is to ensure all lightning protectors activate at the same time.
+[[SHORT_PAUSE]]
+
+That wraps up chapter E4.
+
+Chapter E5: Core Electrical Principles.
+[[SHORT_PAUSE]]
+
+Section E5A.
+
+In a series RLC circuit, the voltage across the individual reactive components can exceed the applied source voltage when the circuit is at resonance.
+[[SHORT_PAUSE]]
+
+The resonant frequency of an RLC circuit with R = 22 ohms, L = 50 microhenries, and C = 40 picofarads is 3.56 megahertz.
+[[SHORT_PAUSE]]
+
+At resonance, the magnitude of the impedance of a series RLC circuit is approximately equal to the circuit resistance.
+[[SHORT_PAUSE]]
+
+The magnitude of the impedance of a parallel RLC circuit at resonance is approximately equal to the circuit resistance.
+[[SHORT_PAUSE]]
+
+Increasing the Q of an impedance-matching circuit decreases its matching bandwidth.
+[[SHORT_PAUSE]]
+
+The magnitude of the circulating current within the components of a parallel LC circuit at resonance is at a maximum.
+[[SHORT_PAUSE]]
+
+The magnitude of the current at the input of a parallel RLC circuit at resonance is at a minimum.
+[[SHORT_PAUSE]]
+
+At resonance in a series resonant circuit, the voltage across the circuit and the current through the circuit are in phase.
+[[SHORT_PAUSE]]
+
+The Q of an RLC parallel resonant circuit is calculated as the resistance divided by the reactance of either the inductance or the capacitance.
+[[SHORT_PAUSE]]
+
+The resonant frequency of an RLC circuit with R equal to 33 ohms, L equal to 50 microhenries, and C equal to 10 picofarads is 7.12 megahertz.
+[[SHORT_PAUSE]]
+
+The half-power bandwidth of a resonant circuit with a resonant frequency of 7.1 megahertz and a Q of 150 is 47.3 kilohertz.
+[[SHORT_PAUSE]]
+
+The half-power bandwidth of a resonant circuit with a resonant frequency of 3.7 megahertz and a Q of 118 is 31.4 kilohertz.
+[[SHORT_PAUSE]]
+
+In a series resonant circuit, increasing the Q causes the internal voltages across the reactive components to increase.
+[[SHORT_PAUSE]]
+
+Section E5B.
+
+The time required for the capacitor in an RC circuit to charge to 63.2% of the applied voltage or to discharge to 36.8% of its initial voltage is called one time constant.
+[[SHORT_PAUSE]]
+
+In AC circuit analysis, the letter B is commonly used to represent susceptance.
+[[SHORT_PAUSE]]
+
+Impedance in polar form is converted to an equivalent admittance by taking the reciprocal of the magnitude and changing the sign of the angle.
+[[SHORT_PAUSE]]
+
+The time constant of a circuit having two 220-microfarad capacitors and two 1-megohm resistors, all connected in parallel, is 220 seconds.
+[[SHORT_PAUSE]]
+
+When pure reactance is converted to susceptance, its magnitude is replaced by its reciprocal.
+[[SHORT_PAUSE]]
+
+Susceptance is the imaginary part of admittance.
+[[SHORT_PAUSE]]
+
+In a series RLC circuit where XC is 500 ohms, R is 1 kilohm, and XL is 250 ohms, the phase angle between the voltage across and the current through the circuit is 14.0 degrees with the voltage lagging the current.
+[[SHORT_PAUSE]]
+
+In a series RLC circuit with XC = 300 ohms, R = 100 ohms, and XL = 100 ohms, the phase angle between the voltage across and the current through the circuit is 63 degrees with the voltage lagging the current.
+[[SHORT_PAUSE]]
+
+In a capacitor with alternating current, the AC current through the capacitor leads the voltage across the capacitor by 90 degrees in phase.
+[[SHORT_PAUSE]]
+
+In an inductor with AC applied, the voltage across the inductor leads the current through the inductor by 90 degrees.
+[[SHORT_PAUSE]]
+
+In a series RLC circuit with XC = 25 ohms, R = 100 ohms, and XL = 75 ohms, the phase angle between the voltage across and the current through the circuit is 27 degrees with the voltage leading the current.
+[[SHORT_PAUSE]]
+
+Admittance is the inverse of impedance.
+[[SHORT_PAUSE]]
+
+Section E5C. 3 questions that require figures were removed from this section.
+
+A pure capacitive reactance of 100 ohms is represented in rectangular notation as 0 - j100.
+[[SHORT_PAUSE]]
+
+Impedances are described in polar coordinates by magnitude and phase angle.
+[[SHORT_PAUSE]]
+
+A pure inductive reactance is represented in polar coordinates by a positive 90 degree phase angle between voltage and current.
+[[SHORT_PAUSE]]
+
+A logarithmic scale is most often used on the Y-axis for graphs of circuit frequency response.
+[[SHORT_PAUSE]]
+
+A phasor diagram is used to show the phase relationship between impedances at a given frequency.
+[[SHORT_PAUSE]]
+
+The impedance 50 - j25 ohms represents a circuit with 50 ohms of resistance in series with 25 ohms of capacitive reactance.
+[[SHORT_PAUSE]]
+
+The impedance of a pure resistance is plotted on the horizontal axis when using rectangular coordinates.
+[[SHORT_PAUSE]]
+
+Polar coordinates are often used to display the phase angle of a circuit containing resistance, inductive reactance, and/or capacitive reactance.
+[[SHORT_PAUSE]]
+
+When using rectangular coordinates to graph the impedance of a circuit, the X axis represents the resistive component and the Y axis represents the reactive component.
+[[SHORT_PAUSE]]
+
+Section E5D.
+
+Conductor skin effect causes resistance to increase as frequency increases because RF current flows closer to the surface of the conductor.
+[[SHORT_PAUSE]]
+
+It is important to keep lead lengths short for components used in circuits for VHF and above to minimize inductive reactance.
+[[SHORT_PAUSE]]
+
+For reactive power, the current and voltage are 90 degrees out of phase.
+[[SHORT_PAUSE]]
+
+Short connections are used at microwave frequencies to reduce phase shift along the connection.
+[[SHORT_PAUSE]]
+
+Electrolytic capacitors are unsuitable for use at RF because their parasitic inductance degrades their performance at high frequencies.
+[[SHORT_PAUSE]]
+
+An inductor’s self-resonance is created by the inter-turn capacitance that exists between its windings.
+[[SHORT_PAUSE]]
+
+The self-resonance of a component is created by the combination of the component’s nominal reactance and its parasitic reactance.
+[[SHORT_PAUSE]]
+
+The primary cause of loss in film capacitors at RF is skin effect.
+[[SHORT_PAUSE]]
+
+In ideal inductors and capacitors, energy is stored in magnetic or electric fields, but power is not dissipated.
+[[SHORT_PAUSE]]
+
+As a conductor’s diameter increases, its electrical length increases.
+[[SHORT_PAUSE]]
+
+In a circuit with a 100-ohm resistor in series with a 100-ohm inductive reactance drawing 1 ampere, the real power consumed is 100 watts.
+[[SHORT_PAUSE]]
+
+Reactive power is wattless, nonproductive power.
+[[SHORT_PAUSE]]
+
+That wraps up chapter E5.
+
+Chapter E6: Electronic and RF Components.
+[[SHORT_PAUSE]]
+
+Section E6A. 2 questions that require figures were removed from this section.
+
+Gallium arsenide is used as a semiconductor material in microwave circuits.
+[[SHORT_PAUSE]]
+
+N-type semiconductor material contains an excess of free electrons.
+[[SHORT_PAUSE]]
+
+A PN-junction diode does not conduct current when reverse biased because the applied voltage separates the holes in the P-type material and the electrons in the N-type material, widening the depletion region.
+[[SHORT_PAUSE]]
+
+An impurity atom that adds holes to a semiconductor crystal structure is called an acceptor impurity.
+[[SHORT_PAUSE]]
+
+The DC input impedance at the gate of a field-effect transistor (FET) is higher than the DC input impedance at the base of a bipolar transistor.
+[[SHORT_PAUSE]]
+
+The beta of a bipolar junction transistor is the change in collector current with respect to the change in base current.
+[[SHORT_PAUSE]]
+
+A silicon NPN junction transistor is biased on when the base-to-emitter voltage is approximately 0.6 volts to 0.7 volts.
+[[SHORT_PAUSE]]
+
+The frequency at which the grounded-base current gain of a bipolar junction transistor has decreased to 0.7 of the gain obtainable at 1 kilohertz is called the alpha cutoff frequency.
+[[SHORT_PAUSE]]
+
+A depletion-mode field-effect transistor (FET) is an FET that exhibits a current flow between source and drain when no gate voltage is applied.
+[[SHORT_PAUSE]]
+
+Zener diodes are often connected between a MOSFET gate and its source or drain to protect the gate from static damage.
+[[SHORT_PAUSE]]
+
+Section E6B. One question that requires a figure was removed from this section.
+
+The most useful characteristic of a Zener diode is that it maintains a constant voltage drop under conditions of varying current.
+[[SHORT_PAUSE]]
+
+A Schottky diode is a better choice than a silicon junction diode for use as a power supply rectifier because it has a lower forward voltage drop.
+[[SHORT_PAUSE]]
+
+The forward voltage drop of an LED is determined by the band gap of its semiconductor material.
+[[SHORT_PAUSE]]
+
+A varactor diode is a semiconductor device specifically designed to function as a voltage-controlled capacitor in radio-frequency circuits.
+[[SHORT_PAUSE]]
+
+A PIN diode is useful as an RF switch because it has low junction capacitance.
+[[SHORT_PAUSE]]
+
+A common use of a Schottky diode is as a VHF/UHF mixer or detector.
+[[SHORT_PAUSE]]
+
+A junction diode fails from excessive current when the junction temperature becomes excessively high.
+[[SHORT_PAUSE]]
+
+A Schottky barrier diode is a metal-semiconductor junction.
+[[SHORT_PAUSE]]
+
+A common use for point-contact diodes is as an RF detector.
+[[SHORT_PAUSE]]
+
+The attenuation of RF signals by a PIN diode is controlled by the forward DC bias current applied to the diode.
+[[SHORT_PAUSE]]
+
+Section E6C. 3 questions that require figures were removed from this section.
+
+The function of hysteresis in a comparator is to prevent input noise from causing unstable output signals.
+[[SHORT_PAUSE]]
+
+When the level of a comparator’s input signal crosses the threshold voltage, the comparator changes its output state.
+[[SHORT_PAUSE]]
+
+Tri-state logic refers to logic devices that can produce three distinct output states: logic 0, logic 1, and a high-impedance (effectively disconnected) state.
+[[SHORT_PAUSE]]
+
+An advantage of BiCMOS logic is that it has the high input impedance of CMOS and the low output impedance of bipolar transistors.
+[[SHORT_PAUSE]]
+
+Among the common digital logic families, CMOS has the lowest power consumption.
+[[SHORT_PAUSE]]
+
+CMOS digital integrated circuits have high immunity to noise on the input signal or power supply because the input switching threshold is about half the power supply voltage.
+[[SHORT_PAUSE]]
+
+A pull-up or pull-down resistor is a resistor connected to the positive or negative supply used to establish a defined voltage when an input or output is an open circuit.
+[[SHORT_PAUSE]]
+
+A field-programmable gate array (FPGA) is configured and designed using a hardware description language (HDL).
+[[SHORT_PAUSE]]
+
+Section E6D.
+
+Piezoelectricity is a characteristic of materials that generate a voltage when mechanically stressed and that flex when a voltage is applied.
+[[SHORT_PAUSE]]
+
+The equivalent circuit of a quartz crystal is a series RLC network in parallel with a shunt capacitor representing electrode and stray capacitance.
+[[SHORT_PAUSE]]
+
+An aspect of the piezoelectric effect is the mechanical deformation of a material due to the application of a voltage.
+[[SHORT_PAUSE]]
+
+Cores of inductors and transformers are sometimes constructed of thin layers to reduce power loss from eddy currents in the core.
+[[SHORT_PAUSE]]
+
+Ferrite cores generally require fewer turns to produce a given inductance value than powdered iron cores when used as inductor cores.
+[[SHORT_PAUSE]]
+
+Powdered iron has the highest temperature stability of its magnetic characteristics among commonly used core materials in amateur radio circuits.
+[[SHORT_PAUSE]]
+
+Ferrite beads are commonly used as VHF and UHF parasitic suppressors at the input and output terminals of a transistor HF amplifier.
+[[SHORT_PAUSE]]
+
+A primary advantage of using a toroidal core instead of a solenoidal core in an inductor is that toroidal cores confine most of the magnetic field within the core material.
+[[SHORT_PAUSE]]
+
+Brass is a type of core material that decreases inductance when inserted into a coil.
+[[SHORT_PAUSE]]
+
+Inductor saturation is caused by operating the inductor at excessive magnetic flux.
+[[SHORT_PAUSE]]
+
+Section E6E.
+
+Gallium arsenide (GaAs) is useful for semiconductor devices operating at UHF and higher frequencies because it has higher electron mobility.
+[[SHORT_PAUSE]]
+
+A Dual In-line Package (DIP) is a through-hole type device package.
+[[SHORT_PAUSE]]
+
+Gallium nitride supports the highest frequency of operation when used in monolithic microwave integrated circuits (MMICs).
+[[SHORT_PAUSE]]
+
+The most common input and output impedance of monolithic microwave integrated circuits (MMICs) is 50 ohms.
+[[SHORT_PAUSE]]
+
+A typical noise figure value for a low-noise UHF preamplifier is 0.5 dB.
+[[SHORT_PAUSE]]
+
+Monolithic microwave integrated circuits (MMICs) are popular for VHF through microwave circuits because they provide controlled gain, low noise figure, and constant input and output impedance over the specified frequency range.
+[[SHORT_PAUSE]]
+
+Microstrip transmission line is often used for connections to MMICs.
+[[SHORT_PAUSE]]
+
+In the most common type of MMIC, power is supplied through a resistor and/or RF choke connected to the amplifier output lead.
+[[SHORT_PAUSE]]
+
+Surface mount component package types have the least parasitic effects at frequencies above the HF range.
+[[SHORT_PAUSE]]
+
+At RF, surface-mount technology offers multiple advantages over through-hole components, including reduced lead inductance, smaller parasitic capacitances, and more compact layouts that improve high-frequency performance.
+[[SHORT_PAUSE]]
+
+A characteristic of DIP packaging used for integrated circuits is that it has two rows of connecting pins on opposite sides of the package.
+[[SHORT_PAUSE]]
+
+DIP through-hole package ICs are not typically used at UHF and higher frequencies because their excessive lead length introduces parasitic inductance and capacitance that degrade performance at those frequencies.
+[[SHORT_PAUSE]]
+
+Section E6F.
+
+In a photovoltaic cell, the energy from incident light is absorbed by electrons in the material.
+[[SHORT_PAUSE]]
+
+When light shines on photoconductive material, its electrical resistance decreases.
+[[SHORT_PAUSE]]
+
+The most common configuration of an optoisolator or optocoupler is an LED and a phototransistor.
+[[SHORT_PAUSE]]
+
+The photovoltaic effect is the conversion of light to electrical energy.
+[[SHORT_PAUSE]]
+
+An optical shaft encoder is a device that detects rotation by interrupting a light source with a patterned wheel.
+[[SHORT_PAUSE]]
+
+Photoconductive devices are most commonly created from crystalline semiconductor material.
+[[SHORT_PAUSE]]
+
+A solid-state relay is a device that uses semiconductors to implement the functions of an electromechanical relay.
+[[SHORT_PAUSE]]
+
+Optoisolators are often used with solid-state circuits that control 120 VAC circuits because they provide electrical isolation between the low-voltage control circuit and the high-voltage circuit being switched.
+[[SHORT_PAUSE]]
+
+The efficiency of a photovoltaic cell is the relative fraction of light that is converted to current.
+[[SHORT_PAUSE]]
+
+The most common material used in power-generating photovoltaic cells is silicon.
+[[SHORT_PAUSE]]
+
+A fully illuminated silicon photovoltaic cell produces an open-circuit voltage of approximately 0.5 volts.
+[[SHORT_PAUSE]]
+
+That wraps up chapter E6.
+
+Chapter E7: Practical Radio Circuits.
+[[SHORT_PAUSE]]
+
+Section E7A.
+
+A flip-flop is a bistable circuit.
+[[SHORT_PAUSE]]
+
+A decade counter produces one output pulse for every 10 input pulses.
+[[SHORT_PAUSE]]
+
+A flip-flop can divide the frequency of a pulse train by 2.
+[[SHORT_PAUSE]]
+
+4 flip-flops are required in series to divide a signal frequency by 16.
+[[SHORT_PAUSE]]
+
+An astable multivibrator is a circuit that continuously alternates between two states without requiring an external clock signal.
+[[SHORT_PAUSE]]
+
+A characteristic of a monostable multivibrator is that it switches temporarily to an alternate state for a set time.
+[[SHORT_PAUSE]]
+
+A NAND gate produces a 0 at its output only if all inputs are 1.
+[[SHORT_PAUSE]]
+
+An OR gate is a digital logic circuit that produces a 1 at its output if any input is 1.
+[[SHORT_PAUSE]]
+
+A two-input exclusive NOR gate produces a 0 at its output if one and only one of its inputs is 1.
+[[SHORT_PAUSE]]
+
+A truth table is a list of inputs and corresponding outputs for a digital device.
+[[SHORT_PAUSE]]
+
+In positive logic, a high voltage represents a logic 1 and a low voltage represents a logic 0.
+[[SHORT_PAUSE]]
+
+Section E7B. 3 questions that require figures were removed from this section.
+
+In a push-pull, Class AB amplifier, each active element conducts for more than 180 degrees but less than 360 degrees of the signal cycle.
+[[SHORT_PAUSE]]
+
+A Class D amplifier is an amplifier that uses switching technology to achieve high efficiency.
+[[SHORT_PAUSE]]
+
+A filter to remove harmonic content is required at the output of an RF switching amplifier.
+[[SHORT_PAUSE]]
+
+The operating point of a Class A common emitter amplifier is approximately halfway between saturation and cutoff.
+[[SHORT_PAUSE]]
+
+Unwanted oscillations in an RF power amplifier can be prevented by installing parasitic suppressors and/or neutralizing the stage.
+[[SHORT_PAUSE]]
+
+A characteristic of a grounded-grid amplifier is low input impedance.
+[[SHORT_PAUSE]]
+
+Using a Class C amplifier to amplify a single-sideband phone signal will cause signal distortion and excessive bandwidth.
+[[SHORT_PAUSE]]
+
+Switching amplifiers are more efficient than linear amplifiers because the switching device operates at saturation or cutoff most of the time.
+[[SHORT_PAUSE]]
+
+An emitter follower, or common collector amplifier, produces input and output signals that are in-phase.
+[[SHORT_PAUSE]]
+
+Section E7C.
+
+In a low-pass filter Pi-network, a capacitor is connected between the input and ground, another capacitor is connected between the output and ground, and an inductor is connected between the input and output.
+[[SHORT_PAUSE]]
+
+A T-network with series capacitors and a shunt inductor has a high-pass frequency response.
+[[SHORT_PAUSE]]
+
+Adding an inductor to a Pi-network to create a Pi-L-network provides greater harmonic suppression.
+[[SHORT_PAUSE]]
+
+An impedance-matching circuit transforms a complex impedance into a resistive impedance by canceling the reactive part of the impedance and changing the resistive part to the desired value.
+[[SHORT_PAUSE]]
+
+A Chebyshev filter has ripple in the passband and a sharp cutoff.
+[[SHORT_PAUSE]]
+
+An elliptical filter has an extremely sharp cutoff with one or more notches in the stop band.
+[[SHORT_PAUSE]]
+
+A Pi-L network is a Pi-network with an additional output series inductor.
+[[SHORT_PAUSE]]
+
+A helical filter is most frequently used as a band-pass or notch filter in VHF and UHF transceivers.
+[[SHORT_PAUSE]]
+
+A crystal lattice filter is a filter for low-level signals made using quartz crystals.
+[[SHORT_PAUSE]]
+
+A cavity filter is used in a 2-meter band repeater duplexer to allow simultaneous transmit and receive on closely spaced frequencies while providing very high isolation between them.
+[[SHORT_PAUSE]]
+
+A filter’s ability to reject signals in adjacent channels is measured by its shape factor.
+[[SHORT_PAUSE]]
+
+Section E7D. 3 questions that require figures were removed from this section.
+
+A linear electronic voltage regulator works by varying the conduction of a control element to maintain a constant output voltage.
+[[SHORT_PAUSE]]
+
+A switchmode voltage regulator works by varying the duty cycle of pulses input to a filter.
+[[SHORT_PAUSE]]
+
+A Zener diode is used as a stable voltage reference.
+[[SHORT_PAUSE]]
+
+A three-terminal voltage regulator is a series regulator.
+[[SHORT_PAUSE]]
+
+A shunt regulator is a type of linear voltage regulator that operates by loading the unregulated voltage source.
+[[SHORT_PAUSE]]
+
+Battery operating time is calculated by dividing the battery capacity in amp-hours by the average current drawn from the battery.
+[[SHORT_PAUSE]]
+
+A switching type power supply is less expensive and lighter than an equivalent linear power supply because the high frequency inverter design uses much smaller transformers and filter components for an equivalent power output.
+[[SHORT_PAUSE]]
+
+An inverter connected to a solar panel output converts the panel’s direct current (DC) output into alternating current (AC).
+[[SHORT_PAUSE]]
+
+The dropout voltage of a linear voltage regulator is the minimum input-to-output voltage required to maintain regulation.
+[[SHORT_PAUSE]]
+
+In a series linear voltage regulator, the power dissipated by the regulator is equal to the voltage difference from input to output multiplied by the output current.
+[[SHORT_PAUSE]]
+
+The purpose of a step-start circuit in a high-voltage power supply is to allow the filter capacitors to charge gradually.
+[[SHORT_PAUSE]]
+
+Section E7E.
+
+FM phone signals can be generated by reactance modulation of a local oscillator.
+[[SHORT_PAUSE]]
+
+A reactance modulator produces phase modulation (PM) or frequency modulation (FM) signals by varying a capacitance in the RF oscillator or amplifier circuit.
+[[SHORT_PAUSE]]
+
+A frequency discriminator is a circuit for detecting FM signals.
+[[SHORT_PAUSE]]
+
+One way to produce a single-sideband phone signal is to use a balanced modulator followed by a filter.
+[[SHORT_PAUSE]]
+
+A pre-emphasis network is added to an FM speech channel to boost the higher audio frequencies.
+[[SHORT_PAUSE]]
+
+De-emphasis is used in FM communications receivers for compatibility with transmitters using phase modulation.
+[[SHORT_PAUSE]]
+
+In radio communications, the term “baseband” means the frequency range occupied by a message signal prior to modulation.
+[[SHORT_PAUSE]]
+
+The principal frequencies that appear at the output of a mixer are the two input frequencies along with their sum and difference frequencies.
+[[SHORT_PAUSE]]
+
+When the input signal levels to a mixer are too high, spurious mixer products are generated.
+[[SHORT_PAUSE]]
+
+A diode envelope detector functions by rectification and filtering of RF signals.
+[[SHORT_PAUSE]]
+
+A product detector is used for demodulating single side band signals.
+[[SHORT_PAUSE]]
+
+Section E7F.
+
+In software defined radios, “direct sampling” means the incoming RF is digitized by an analog-to-digital converter without being mixed with a local oscillator signal.
+[[SHORT_PAUSE]]
+
+An adaptive filter is the type of digital signal processing audio filter used to remove unwanted noise from a received single side band signal.
+[[SHORT_PAUSE]]
+
+A Hilbert-transform filter is the type of digital signal processing filter used to generate a single sideband (single side band) signal.
+[[SHORT_PAUSE]]
+
+A single side band signal is generated using digital signal processing by combining signals in a quadrature phase relationship.
+[[SHORT_PAUSE]]
+
+An analog signal must be sampled at least twice the rate of the highest frequency component of the signal to be accurately reproduced.
+[[SHORT_PAUSE]]
+
+The minimum number of bits required to sample a signal with a range of 1 volt at a resolution of 1 millivolt is 10 bits.
+[[SHORT_PAUSE]]
+
+A Fast Fourier Transform converts signals from the time domain to the frequency domain.
+[[SHORT_PAUSE]]
+
+The function of decimation is reducing the effective sample rate by removing samples.
+[[SHORT_PAUSE]]
+
+An anti-aliasing filter is required in a decimator because it removes high-frequency signal components that would otherwise be reproduced as lower frequency components when the sampling rate is reduced.
+[[SHORT_PAUSE]]
+
+In a direct-sampling software defined radio (SDR), the receiver analog-to-digital converter's sample rate determines the maximum receive bandwidth.
+[[SHORT_PAUSE]]
+
+In a direct-sampling software defined receiver with no atmospheric or thermal noise, the minimum detectable signal level is set by the reference voltage level and the sample width in bits.
+[[SHORT_PAUSE]]
+
+Finite Impulse Response (FIR) filters can delay all frequency components of the signal by the same amount.
+[[SHORT_PAUSE]]
+
+In a digital signal processing filter, taps provide incremental signal delays used by the filter algorithms to shape the frequency response.
+[[SHORT_PAUSE]]
+
+A digital signal processing filter can create a sharper filter response by using more taps.
+[[SHORT_PAUSE]]
+
+Section E7G. 3 questions that require figures were removed from this section.
+
+The typical output impedance of an operational amplifier (op-amp) is very low.
+[[SHORT_PAUSE]]
+
+If a capacitor is added across the feedback resistor in the circuit of figure E7-3, the overall frequency response becomes that of a low-pass filter.
+[[SHORT_PAUSE]]
+
+The typical input impedance of an op-amp is very high.
+[[SHORT_PAUSE]]
+
+Op-amp input offset voltage is the differential input voltage needed to bring the open loop output voltage to zero.
+[[SHORT_PAUSE]]
+
+Unwanted ringing and audio instability in an op-amp audio filter can be prevented by restricting both the gain and the Q.
+[[SHORT_PAUSE]]
+
+The gain-bandwidth of an operational amplifier is the frequency at which the open-loop gain of the amplifier equals one.
+[[SHORT_PAUSE]]
+
+The voltage gain expected from the circuit in Figure E73 when R1 is 10 ohms and RF is 470 ohms is 47.
+[[SHORT_PAUSE]]
+
+In an ideal operational amplifier, the gain does not vary with frequency.
+[[SHORT_PAUSE]]
+
+An operational amplifier is a high-gain, direct-coupled differential amplifier with very high input impedance and very low output impedance.
+[[SHORT_PAUSE]]
+
+Section E7H.
+
+Three common oscillator circuits used in amateur radio are the Colpitts, Hartley, and Pierce oscillators.
+[[SHORT_PAUSE]]
+
+A microphonic is a condition in which mechanical vibration causes changes in oscillator frequency.
+[[SHORT_PAUSE]]
+
+A phase-locked loop is an electronic servo loop consisting of a phase detector, a low-pass filter, a voltage-controlled oscillator, and a stable reference oscillator.
+[[SHORT_PAUSE]]
+
+In a Colpitts oscillator, positive feedback is supplied through a capacitive divider.
+[[SHORT_PAUSE]]
+
+In a Pierce oscillator, positive feedback is supplied through a quartz crystal.
+[[SHORT_PAUSE]]
+
+A phase-locked loop can perform both frequency synthesis and FM demodulation.
+[[SHORT_PAUSE]]
+
+An oscillator’s microphonic responses can be reduced by mechanically isolating the oscillator circuitry from its enclosure.
+[[SHORT_PAUSE]]
+
+NP0 capacitors can be used to reduce thermal drift in crystal oscillators.
+[[SHORT_PAUSE]]
+
+A direct digital synthesizer is a type of frequency synthesizer circuit that uses a phase accumulator, lookup table, digital-to-analog converter, and a low-pass anti-alias filter.
+[[SHORT_PAUSE]]
+
+In a direct digital synthesizer (DDS), the lookup table contains amplitude values that represent the desired waveform.
+[[SHORT_PAUSE]]
+
+The major spectral impurity components of direct digital synthesizers are spurious signals at discrete frequencies.
+[[SHORT_PAUSE]]
+
+Providing the crystal with the specified parallel capacitance ensures that a crystal oscillator operates on the frequency specified by the crystal manufacturer.
+[[SHORT_PAUSE]]
+
+Highly accurate and stable oscillators needed for microwave transmission and reception can be implemented using a crystal oscillator followed by frequency multipliers, using a dielectric resonator oscillator, and by using a phase-locked loop to control the oscillator frequency.
+[[SHORT_PAUSE]]
+
+That wraps up chapter E7.
+
+Chapter E8: Signals, Modes, and Emissions.
+[[SHORT_PAUSE]]
+
+Section E8A.
+
+Fourier analysis shows that a square wave is made up of a sine wave and its odd harmonics.
+[[SHORT_PAUSE]]
+
+Successive approximation is a type of analog-to-digital conversion used to convert continuous analog signals into discrete digital values in radio systems.
+[[SHORT_PAUSE]]
+
+In the time domain, a signal is described by how its amplitude varies at different times.
+[[SHORT_PAUSE]]
+
+With respect to analog-to-digital converters, dither is a small amount of noise added to the input signal to reduce quantization noise.
+[[SHORT_PAUSE]]
+
+The benefit of making voltage measurements with a true-RMS calculating meter is that RMS is measured for both sinusoidal and non-sinusoidal signals.
+[[SHORT_PAUSE]]
+
+The approximate ratio of peak envelope power (PEP) to average power in an unprocessed single-sideband phone signal is 2.5 to 1.
+[[SHORT_PAUSE]]
+
+The peak envelope power (PEP)-to-average power ratio of an unprocessed single-sideband phone signal is determined by the characteristics of the speech being transmitted.
+[[SHORT_PAUSE]]
+
+Direct or flash conversion analog-to-digital converters are used for a software defined radio because their very high speed allows digitizing high frequencies.
+[[SHORT_PAUSE]]
+
+An analog-to-digital converter with 8-bit resolution can encode 256 different discrete input levels.
+[[SHORT_PAUSE]]
+
+A low-pass filter used at the output of a digital-to-analog converter removes spurious sampling artifacts from the output signal.
+[[SHORT_PAUSE]]
+
+Total harmonic distortion is a measure of the quality of an analog-to-digital converter.
+[[SHORT_PAUSE]]
+
+Section E8B.
+
+The modulation index of an FM signal is the ratio of frequency deviation to the modulating signal frequency.
+[[SHORT_PAUSE]]
+
+In phase modulation, the modulation index does not depend on the RF carrier frequency.
+[[SHORT_PAUSE]]
+
+The modulation index of an FM phone signal with a maximum frequency deviation of 3000 Hz either side of the carrier and a highest modulating frequency of 1000 Hz is 3.
+[[SHORT_PAUSE]]
+
+The modulation index of an FM phone signal with a maximum carrier deviation of plus or minus 6 kilohertz and a highest modulating frequency of 2 kilohertz is 3.
+[[SHORT_PAUSE]]
+
+The deviation ratio of an FM phone signal with a maximum frequency swing of plus or minus 5 kilohertz and a highest modulation frequency of 3 kilohertz is 1.67.
+[[SHORT_PAUSE]]
+
+The deviation ratio of an FM phone signal with a maximum frequency swing of plus or minus 7.5 kilohertz and a highest modulation frequency of 3.5 kilohertz is 2.14.
+[[SHORT_PAUSE]]
+
+Orthogonal frequency-division multiplexing (OFDM) is a technique used for digital modes in amateur communication.
+[[SHORT_PAUSE]]
+
+Orthogonal frequency-division multiplexing (OFDM) is a digital modulation technique that uses multiple subcarriers at carefully chosen orthogonal frequencies to avoid intersymbol interference.
+[[SHORT_PAUSE]]
+
+Deviation ratio is the ratio of the maximum carrier frequency deviation to the highest audio modulating frequency in an FM signal.
+[[SHORT_PAUSE]]
+
+Frequency division multiplexing (FDM) is the technique of dividing the transmitted signal into separate frequency bands that each carry a different data stream.
+[[SHORT_PAUSE]]
+
+Digital time division multiplexing is a technique in which two or more signals are arranged to share discrete time slots of a data transmission.
+[[SHORT_PAUSE]]
+
+Section E8C.
+
+Quadrature Amplitude Modulation (QAM) is the transmission of data by modulating the amplitude of two carriers of the same frequency but 90 degrees out of phase.
+[[SHORT_PAUSE]]
+
+In a digital transmission, the symbol rate is defined as the rate at which the waveform changes to convey information.
+[[SHORT_PAUSE]]
+
+The phase of a PSK signal should be changed at the zero crossing of the RF signal to minimize bandwidth.
+[[SHORT_PAUSE]]
+
+The bandwidth of a PSK31 signal is minimized by using sinusoidal data pulses.
+[[SHORT_PAUSE]]
+
+The approximate bandwidth of a 13-WPM International Morse Code transmission is 52 Hz.
+[[SHORT_PAUSE]]
+
+The bandwidth of an FT8 signal is 50 Hz.
+[[SHORT_PAUSE]]
+
+The bandwidth of a 4,800-Hz frequency shift, 9,600-baud ASCII FM transmission is 15.36 kilohertz.
+[[SHORT_PAUSE]]
+
+In ARQ error correction, if errors are detected in the received data, a retransmission of the affected data is requested from the sender.
+[[SHORT_PAUSE]]
+
+Gray code is a digital code in which only one bit changes between sequential code values.
+[[SHORT_PAUSE]]
+
+Data rate can be increased without increasing bandwidth by using a more efficient digital code.
+[[SHORT_PAUSE]]
+
+In the context of digital communications, symbol rate and baud are the same thing, both referring to the number of symbol changes (signaling events) per second.
+[[SHORT_PAUSE]]
+
+The bandwidth of a transmitted CW signal is affected by the keying speed and the shape factor, specifically the rise and fall time of the keying envelope.
+[[SHORT_PAUSE]]
+
+The constellation diagram of a QAM or QPSK signal describes the possible phase and amplitude states for each symbol.
+[[SHORT_PAUSE]]
+
+In a mesh network, nodes use Internet Protocol (IP) addresses.
+[[SHORT_PAUSE]]
+
+Individual nodes in a mesh network use discovery and link establishment protocols to form the network.
+[[SHORT_PAUSE]]
+
+Section E8D.
+
+Received spread spectrum signals are resistant to interference because signals not using the spread spectrum algorithm are suppressed in the receiver.
+[[SHORT_PAUSE]]
+
+Direct sequence spread spectrum uses a high-speed binary bit stream to shift the phase of an RF carrier.
+[[SHORT_PAUSE]]
+
+Spread spectrum frequency hopping is the technique of rapidly varying the frequency of a transmitted signal according to a pseudorandom sequence.
+[[SHORT_PAUSE]]
+
+The primary effect of extremely short rise or fall time on a CW signal is the generation of key clicks.
+[[SHORT_PAUSE]]
+
+The most common method of reducing key clicks is to increase keying waveform rise and fall times.
+[[SHORT_PAUSE]]
+
+The advantage of including parity bits in ASCII characters is that some types of errors can be detected.
+[[SHORT_PAUSE]]
+
+A common cause of overmodulation of AFSK signals is excessive transmit audio levels.
+[[SHORT_PAUSE]]
+
+Intermodulation Distortion (IMD) is the parameter used to evaluate distortion of an AFSK signal caused by excessive input audio levels.
+[[SHORT_PAUSE]]
+
+An acceptable maximum intermodulation distortion (IMD) level for an idling PSK signal is -30 dB.
+[[SHORT_PAUSE]]
+
+Baudot uses 5 data bits per character and 2 characters as letters/figures shift codes, while ASCII uses 7 or 8 data bits per character and has no letters/figures shift code.
+[[SHORT_PAUSE]]
+
+One advantage of using ASCII code for data communications is that it is possible to transmit both uppercase and lowercase text.
+[[SHORT_PAUSE]]
+
+That wraps up chapter E8.
+
+Chapter E9: Antennas and Feed Lines.
+[[SHORT_PAUSE]]
+
+Section E9A.
+
+An isotropic radiator is a hypothetical, lossless antenna having equal radiation intensity in all directions that is used as a reference for antenna gain.
+[[SHORT_PAUSE]]
+
+The effective radiated power (ERP) of a repeater station with 150 watts transmitter power output, 2 dB feed line loss, 2.2 dB duplexer loss, and 7 dBd antenna gain is 286 watts.
+[[SHORT_PAUSE]]
+
+The term describing total radiated power that takes into account all gains and losses is called effective radiated power.
+[[SHORT_PAUSE]]
+
+Antenna height affects the feed point impedance of an antenna.
+[[SHORT_PAUSE]]
+
+Ground gain is an increase in signal strength from ground reflections in the environment of the antenna.
+[[SHORT_PAUSE]]
+
+The effective radiated power (ERP) of a repeater station with 200 watts transmitter power output, 4 dB feed line loss, 3.2 dB duplexer loss, 0.8 dB circulator loss, and 10 dBd antenna gain is 317 watts.
+[[SHORT_PAUSE]]
+
+The effective isotropic radiated power (EIRP) of a repeater station with 200 watts transmitter power output, 2 dB feed line loss, 2.8 dB duplexer loss, 1.2 dB circulator loss, and 7 dBi antenna gain is 252 watts.
+[[SHORT_PAUSE]]
+
+The 5.8 gigahertz frequency band has the smallest first Fresnel zone.
+[[SHORT_PAUSE]]
+
+Antenna efficiency is defined as the radiation resistance divided by the total resistance of the antenna system.
+[[SHORT_PAUSE]]
+
+Installing a ground radial system improves the efficiency of a ground-mounted quarter-wave vertical antenna.
+[[SHORT_PAUSE]]
+
+Soil conductivity determines the ground losses for a ground-mounted vertical antenna operating on HF.
+[[SHORT_PAUSE]]
+
+An antenna that has 6 dB gain over an isotropic radiator has 3.85 dB gain over a half-wavelength dipole.
+[[SHORT_PAUSE]]
+
+Section E9B. 5 questions that require figures were removed from this section.
+
+The front-to-back ratio of the radiation pattern shown in Figure E9-2 is 28 dB.
+[[SHORT_PAUSE]]
+
+The radiated power from a lossless antenna with gain is the same as that from an isotropic radiator when both are driven by the same power.
+[[SHORT_PAUSE]]
+
+The far field of an antenna is the region where the shape of the radiation pattern no longer varies with distance.
+[[SHORT_PAUSE]]
+
+The Method of Moments is a type of analysis commonly used for modeling antennas.
+[[SHORT_PAUSE]]
+
+In a Method of Moments analysis, a wire is modeled as a series of segments, each having a uniform value of current.
+[[SHORT_PAUSE]]
+
+A disadvantage of decreasing the number of wire segments in an antenna model below 10 segments per half-wavelength is that the computed feed point impedance may be incorrect.
+[[SHORT_PAUSE]]
+
+Section E9C.
+
+Two 1/4-wavelength vertical antennas spaced 1/2-wavelength apart and fed 180 degrees out of phase produce a figure-eight radiation pattern oriented along the axis of the array.
+[[SHORT_PAUSE]]
+
+Two 1/4-wavelength vertical antennas spaced 1/4-wavelength apart and fed 90 degrees out of phase produce a cardioid radiation pattern.
+[[SHORT_PAUSE]]
+
+Two 1/4-wavelength vertical antennas spaced 1/2-wavelength apart and fed in phase produce a figure-eight radiation pattern broadside to the axis of the array.
+[[SHORT_PAUSE]]
+
+As the length of an unterminated long wire antenna is increased, additional lobes form in its radiation pattern and the major lobes become increasingly aligned with the axis of the antenna.
+[[SHORT_PAUSE]]
+
+The purpose of feeding an off-center-fed dipole (OCFD) between the center and one end instead of at the midpoint is to create a similar feed point impedance on multiple bands.
+[[SHORT_PAUSE]]
+
+Adding a terminating resistor to a rhombic or long-wire antenna changes its radiation pattern from bidirectional to unidirectional.
+[[SHORT_PAUSE]]
+
+The approximate feed point impedance at the center of a two-wire half-wave folded dipole antenna is 300 ohms.
+[[SHORT_PAUSE]]
+
+A folded dipole antenna is a half-wave dipole with an additional parallel wire connecting its two ends.
+[[SHORT_PAUSE]]
+
+A G5RV antenna is a wire antenna center-fed through a specific length of open-wire line connected to a balun and coaxial feed line.
+[[SHORT_PAUSE]]
+
+A Zepp antenna is an end-fed half-wavelength dipole.
+[[SHORT_PAUSE]]
+
+The far-field elevation pattern of a vertically polarized antenna mounted over seawater shows increased radiation at low angles compared to mounting it over soil.
+[[SHORT_PAUSE]]
+
+An extended double Zepp antenna is a center-fed 1.25-wavelength dipole antenna.
+[[SHORT_PAUSE]]
+
+As the height of a horizontally polarized antenna above ground increases, the takeoff angle of the lowest elevation lobe decreases.
+[[SHORT_PAUSE]]
+
+For a horizontally-polarized antenna mounted above a long slope, the main lobe takeoff angle decreases in the downhill direction compared with the same antenna mounted over flat ground.
+[[SHORT_PAUSE]]
+
+Section E9D.
+
+The gain of an ideal parabolic reflector antenna increases by 6 dB when the operating frequency is doubled.
+[[SHORT_PAUSE]]
+
+Two linearly polarized Yagi antennas can be used to produce circular polarization by arranging them on the same axis and perpendicular to each other with the driven elements at the same point on the boom and feeding them 90 degrees out of phase.
+[[SHORT_PAUSE]]
+
+The most efficient location for a loading coil on an electrically short whip is near the center of the vertical radiator.
+[[SHORT_PAUSE]]
+
+Antenna loading coils should have a high ratio of reactance to resistance to maximize efficiency.
+[[SHORT_PAUSE]]
+
+A Yagi antenna’s driven element is approximately 1/2 wavelength long.
+[[SHORT_PAUSE]]
+
+When one or more loading coils are used to resonate an electrically short antenna, the SWR bandwidth is decreased.
+[[SHORT_PAUSE]]
+
+An advantage of top loading an electrically short HF vertical antenna is improved radiation efficiency.
+[[SHORT_PAUSE]]
+
+As the Q of an antenna increases, its SWR bandwidth decreases.
+[[SHORT_PAUSE]]
+
+The function of a loading coil in an electrically short antenna is to resonate the antenna by cancelling the capacitive reactance.
+[[SHORT_PAUSE]]
+
+The radiation resistance of a base-fed whip antenna decreases when it is operated below its resonant frequency.
+[[SHORT_PAUSE]]
+
+Most two-element Yagis with normal element spacing use a reflector instead of a director because this configuration provides higher gain.
+[[SHORT_PAUSE]]
+
+The purpose of making a Yagi’s parasitic elements either longer or shorter than resonance is to control phase shift.
+[[SHORT_PAUSE]]
+
+Section E9E.
+
+A beta or hairpin matching system for Yagi antennas requires the driven element to be insulated from the boom.
+[[SHORT_PAUSE]]
+
+A gamma match is an antenna matching system that matches coaxial cable to an antenna by connecting the coax shield to the center of the antenna and the coax center conductor a fraction of a wavelength to one side.
+[[SHORT_PAUSE]]
+
+A stub match is a matching system that uses a short length of transmission line connected in parallel with the feed line at or near the feed point.
+[[SHORT_PAUSE]]
+
+In a gamma match, the series capacitor is used to cancel unwanted inductive reactance so the antenna system can be brought to resonance and properly matched to the feed line.
+[[SHORT_PAUSE]]
+
+A beta or hairpin matching system requires a Yagi driven element feed point impedance that is capacitive, meaning the driven element is electrically shorter than 1/2 wavelength.
+[[SHORT_PAUSE]]
+
+A 75-ohm transmission line is suitable for constructing a quarter-wave Q-section to match a 100-ohm feed point impedance to a 50-ohm transmission line.
+[[SHORT_PAUSE]]
+
+The parameter that describes the interaction of a load and a transmission line is the reflection coefficient.
+[[SHORT_PAUSE]]
+
+A Wilkinson divider is used to divide power equally between two 50-ohm loads while maintaining a 50-ohm input impedance.
+[[SHORT_PAUSE]]
+
+The purpose of using multiple driven elements connected through phasing lines is to control the antenna’s radiation pattern.
+[[SHORT_PAUSE]]
+
+Section E9F.
+
+The velocity factor of a transmission line is the velocity of a wave in the transmission line divided by the velocity of light in a vacuum.
+[[SHORT_PAUSE]]
+
+The insulating dielectric material has the biggest effect on the velocity factor of a transmission line.
+[[SHORT_PAUSE]]
+
+The electrical length of a coaxial cable is longer than its physical length because electromagnetic waves move more slowly in a coaxial cable than in air.
+[[SHORT_PAUSE]]
+
+A 1/2-wavelength transmission line that is shorted at the far end presents a very low impedance to an RF generator at the input.
+[[SHORT_PAUSE]]
+
+Microstrip is a type of precision printed circuit conductor above a ground plane that provides constant impedance interconnects at microwave frequencies.
+[[SHORT_PAUSE]]
+
+The approximate physical length of an air-insulated, parallel conductor transmission line that is electrically 1/2 wavelength long at 14.10 megahertz is 10.6 meters.
+[[SHORT_PAUSE]]
+
+Parallel conductor transmission line has lower loss than coaxial cable with a plastic dielectric.
+[[SHORT_PAUSE]]
+
+Assuming all other parameters are the same, foam dielectric coaxial cable differs significantly from solid dielectric coaxial cable in that it has a different velocity factor, different loss characteristics, and different power-handling capability, so all these choices are correct.
+[[SHORT_PAUSE]]
+
+A 1/4-wavelength transmission line that is shorted at the far end presents a very high impedance to an RF generator at the input end.
+[[SHORT_PAUSE]]
+
+A 1/8-wavelength transmission line that is shorted at the far end presents an inductive reactance to an RF generator.
+[[SHORT_PAUSE]]
+
+A 1/8-wavelength transmission line that is open at the far end presents a capacitive reactance to an RF generator.
+[[SHORT_PAUSE]]
+
+A 1/4-wavelength transmission line that is open at the far end presents a very low impedance to an RF generator at the input.
+[[SHORT_PAUSE]]
+
+Section E9G. 2 questions that require figures were removed from this section.
+
+A Smith chart can be used to calculate impedance along transmission lines.
+[[SHORT_PAUSE]]
+
+A Smith chart uses a coordinate system of resistance circles and reactance arcs to represent complex impedances and reflection coefficients.
+[[SHORT_PAUSE]]
+
+Impedance and SWR values in transmission lines are often determined using a Smith chart.
+[[SHORT_PAUSE]]
+
+A Smith chart is composed of two families of curves: resistance circles and reactance arcs.
+[[SHORT_PAUSE]]
+
+A common use for a Smith chart is to determine the length and position of an impedance matching stub.
+[[SHORT_PAUSE]]
+
+A Smith chart is normalized by reassigning the prime center’s impedance value.
+[[SHORT_PAUSE]]
+
+Constant-SWR circles are often added as a third family of circles to a Smith chart during the process of designing impedance matching networks.
+[[SHORT_PAUSE]]
+
+On a Smith chart, the arcs represent points with constant reactance.
+[[SHORT_PAUSE]]
+
+On a Smith chart, the wavelength scales are calibrated in fractions of the transmission line electrical wavelength.
+[[SHORT_PAUSE]]
+
+Section E9H.
+
+When constructing a Beverage antenna for good performance at the desired frequency, it should be at least one wavelength long.
+[[SHORT_PAUSE]]
+
+For 160- and 80-meter receiving antennas, atmospheric noise is so high that directivity is much more important than losses.
+[[SHORT_PAUSE]]
+
+Receiving directivity factor (RDF) is the peak antenna gain compared to the average gain over the hemisphere around and above the antenna.
+[[SHORT_PAUSE]]
+
+The purpose of placing an electrostatic shield around a small-loop direction-finding antenna is to eliminate unbalanced capacitive coupling to the antenna’s surroundings, improving the depth of its nulls.
+[[SHORT_PAUSE]]
+
+A small wire-loop antenna used for direction finding presents the challenge that it has a bidirectional null pattern.
+[[SHORT_PAUSE]]
+
+The correct value of terminating resistance for a Beverage antenna is indicated by minimum variation in SWR over the desired frequency range.
+[[SHORT_PAUSE]]
+
+A Beverage antenna’s termination resistor functions to absorb signals from the reverse direction so that the antenna remains unidirectional.
+[[SHORT_PAUSE]]
+
+The function of a sense antenna is to modify the pattern of a direction-finding (DF) antenna so that it provides a null in only one direction.
+[[SHORT_PAUSE]]
+
+A single-turn, terminated loop such as a pennant antenna produces a cardioid radiation pattern.
+[[SHORT_PAUSE]]
+
+The output voltage of a multiple-turn receiving loop antenna can be increased by increasing the number of turns and/or the area enclosed by the loop.
+[[SHORT_PAUSE]]
+
+A cardioid pattern antenna is useful for direction-finding because it has a single null in its radiation pattern.
+[[SHORT_PAUSE]]
+
+That wraps up chapter E9.
+
+Chapter E0: Amateur Radio Safety.
+[[SHORT_PAUSE]]
+
+Section E0A.
+
+The primary function of an external earth connection or ground rod in an amateur radio station is lightning charge dissipation.
+[[SHORT_PAUSE]]
+
+When evaluating RF exposure levels from your station at a neighbor’s home, you must ensure signals from your station are less than the uncontrolled maximum permissible exposure (MPE) limits.
+[[SHORT_PAUSE]]
+
+The FCC human body RF exposure limits are most restrictive over the frequency range from 30 to 300 megahertz.
+[[SHORT_PAUSE]]
+
+When evaluating a site with multiple transmitters operating at the same time, the operators and licensees of each transmitter that produces 5 percent or more of its MPE limit in areas where the total MPE limit is exceeded are responsible for mitigating over-exposure situations.
+[[SHORT_PAUSE]]
+
+At microwave frequencies, the high gain antennas commonly used can result in high RF exposure levels.
+[[SHORT_PAUSE]]
+
+There are separate electric (E) and magnetic (H) MPE limits at frequencies below 300 megahertz because both electric and magnetic field strengths must be controlled to protect against excessive RF exposure to humans.
+[[SHORT_PAUSE]]
+
+In tower safety, “100% tie-off” means that at least one lanyard must be attached to the tower at all times.
+[[SHORT_PAUSE]]
+
+Specific Absorption Rate (SAR) measures the rate at which RF energy is absorbed by the body.
+[[SHORT_PAUSE]]
+
+Hand-held transceivers sold before May 3, 2021 are exempt from RF exposure evaluations.
+[[SHORT_PAUSE]]
+
+An RF exposure evaluation must always be performed on an amateur station operating on 80 meters.
+[[SHORT_PAUSE]]
+
+While climbing, lanyards should be attached to the tower legs.
+[[SHORT_PAUSE]]
+
+When working above ground on a tower, a shock-absorbing lanyard should be attached to the tower at a point above the climber’s head level.
+[[SHORT_PAUSE]]
+
+That wraps up chapter E0.
+
+End of audio study guide.

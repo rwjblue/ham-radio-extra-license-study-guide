@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 #MISE description="Build GitHub Pages site payload from existing dist artifacts"
 #MISE depends=["deps-dev"]
-#MISE sources=["dist/pool/extra_pool_prose.json", "dist/audio/fact/script.txt", "dist/audio/fact/book.mp3", "dist/augmented/facts.pdf", "dist/augmented/facts-dark.pdf", "dist/augmented/facts.epub", "dist/pool/assets/**"]
-# Audio files (mp3 + txt script) are optional; the script skips them if missing.
+#MISE sources=["dist/pool/extra_pool.json", "dist/pool/extra_pool_prose.json", "dist/pool/assets/**", "dist/static/facts.txt", "dist/static/facts.pdf", "dist/static/facts-dark.pdf", "dist/static/facts.epub", "dist/qa/qa.txt", "dist/qa/qa.pdf", "dist/qa/qa-dark.pdf", "dist/qa/qa.epub", "dist/augmented/facts.txt", "dist/augmented/facts.pdf", "dist/augmented/facts-dark.pdf", "dist/augmented/facts.epub", "dist/augmented/qa.txt", "dist/augmented/qa.pdf", "dist/augmented/qa-dark.pdf", "dist/augmented/qa.epub", "dist/audio/fact/script.txt", "dist/audio/fact/manifest.json", "dist/audio/qa/script.txt", "dist/audio/qa/manifest.json", "dist/audio/fact/book.mp3", "dist/audio/qa/book.mp3"]
+# Audio book files (mp3) and augmented artifacts are optional; placeholders are created as needed.
 #MISE outputs={auto=true}
 set -euo pipefail
 
@@ -11,17 +11,20 @@ dist_dir="${DIST_DIR:-${repo_root}/dist}"
 out_dir="${PAGES_DIR:-${repo_root}/docs}"
 
 required_files=(
-  "${dist_dir}/pool/extra_pool_prose.json"
-  "${dist_dir}/augmented/facts.pdf"
-  "${dist_dir}/augmented/facts-dark.pdf"
-  "${dist_dir}/augmented/facts.epub"
+  "${dist_dir}/pool/extra_pool.json"
+  "${dist_dir}/static/facts.txt"
+  "${dist_dir}/static/facts.pdf"
+  "${dist_dir}/static/facts-dark.pdf"
+  "${dist_dir}/static/facts.epub"
+  "${dist_dir}/qa/qa.txt"
+  "${dist_dir}/qa/qa.pdf"
+  "${dist_dir}/qa/qa-dark.pdf"
+  "${dist_dir}/qa/qa.epub"
+  "${dist_dir}/audio/fact/script.txt"
+  "${dist_dir}/audio/fact/manifest.json"
+  "${dist_dir}/audio/qa/script.txt"
+  "${dist_dir}/audio/qa/manifest.json"
 )
-
-# Audio files are optional
-has_audio=false
-if [ -f "${dist_dir}/audio/fact/book.mp3" ] && [ -f "${dist_dir}/audio/fact/script.txt" ]; then
-  has_audio=true
-fi
 
 for file in "${required_files[@]}"; do
   if [ ! -f "${file}" ]; then
@@ -30,46 +33,129 @@ for file in "${required_files[@]}"; do
   fi
 done
 
-pool_json="${dist_dir}/pool/extra_pool_prose.json"
+pool_json="${dist_dir}/pool/extra_pool.json"
 assets_dir="$(dirname "${pool_json}")/assets"
 if [ ! -d "${assets_dir}" ]; then
   echo "Missing required assets directory next to JSON: ${assets_dir}" >&2
   exit 1
 fi
 
-# Preserve existing audio files if we won't be replacing them
-audio_backup_dir=""
-if [ "${has_audio}" = false ] && [ -d "${out_dir}" ]; then
-  audio_backup_dir="$(mktemp -d)"
-  for f in amateur-extra-license-prep.mp3 amateur-extra-license-prep-script.txt; do
-    if [ -f "${out_dir}/${f}" ]; then
-      cp "${out_dir}/${f}" "${audio_backup_dir}/${f}"
-    fi
-  done
-fi
-
 rm -rf "${out_dir}"
-mkdir -p "${out_dir}"
+mkdir -p \
+  "${out_dir}/pool" \
+  "${out_dir}/static" \
+  "${out_dir}/qa" \
+  "${out_dir}/audio/fact" \
+  "${out_dir}/audio/qa"
 
-cp "${pool_json}" "${out_dir}/amateur-extra-license-prep-pool.json"
-if [ "${has_audio}" = true ]; then
-  cp "${dist_dir}/audio/fact/script.txt" "${out_dir}/amateur-extra-license-prep-script.txt"
-  cp "${dist_dir}/audio/fact/book.mp3" "${out_dir}/amateur-extra-license-prep.mp3"
-elif [ -n "${audio_backup_dir}" ]; then
-  # Restore previously existing audio files
-  for f in amateur-extra-license-prep.mp3 amateur-extra-license-prep-script.txt; do
-    if [ -f "${audio_backup_dir}/${f}" ]; then
-      cp "${audio_backup_dir}/${f}" "${out_dir}/${f}"
+cp "${pool_json}" "${out_dir}/pool/extra_pool.json"
+if [ -f "${dist_dir}/pool/extra_pool_prose.json" ]; then
+  cp "${dist_dir}/pool/extra_pool_prose.json" "${out_dir}/pool/extra_pool_prose.json"
+fi
+cp -R "${assets_dir}" "${out_dir}/pool/assets"
+
+cp "${dist_dir}/static/facts.txt" "${out_dir}/static/facts.txt"
+cp "${dist_dir}/static/facts.pdf" "${out_dir}/static/facts.pdf"
+cp "${dist_dir}/static/facts-dark.pdf" "${out_dir}/static/facts-dark.pdf"
+cp "${dist_dir}/static/facts.epub" "${out_dir}/static/facts.epub"
+cp "${dist_dir}/static/facts.txt" "${out_dir}/amateur-extra-license-prep-facts.txt"
+cp "${dist_dir}/static/facts.pdf" "${out_dir}/amateur-extra-license-prep-facts.pdf"
+cp "${dist_dir}/static/facts-dark.pdf" "${out_dir}/amateur-extra-license-prep-facts-dark.pdf"
+cp "${dist_dir}/static/facts.epub" "${out_dir}/amateur-extra-license-prep-facts.epub"
+
+cp "${dist_dir}/qa/qa.txt" "${out_dir}/qa/qa.txt"
+cp "${dist_dir}/qa/qa.pdf" "${out_dir}/qa/qa.pdf"
+cp "${dist_dir}/qa/qa-dark.pdf" "${out_dir}/qa/qa-dark.pdf"
+cp "${dist_dir}/qa/qa.epub" "${out_dir}/qa/qa.epub"
+cp "${dist_dir}/qa/qa.txt" "${out_dir}/amateur-extra-license-prep-qa.txt"
+cp "${dist_dir}/qa/qa.pdf" "${out_dir}/amateur-extra-license-prep-qa.pdf"
+cp "${dist_dir}/qa/qa-dark.pdf" "${out_dir}/amateur-extra-license-prep-qa-dark.pdf"
+cp "${dist_dir}/qa/qa.epub" "${out_dir}/amateur-extra-license-prep-qa.epub"
+
+if [ -d "${dist_dir}/augmented" ]; then
+  mkdir -p "${out_dir}/augmented"
+  for file in facts.txt facts.pdf facts-dark.pdf facts.epub qa.txt qa.pdf qa-dark.pdf qa.epub; do
+    if [ -f "${dist_dir}/augmented/${file}" ]; then
+      cp "${dist_dir}/augmented/${file}" "${out_dir}/augmented/${file}"
     fi
   done
-  rm -rf "${audio_backup_dir}"
 fi
-cp "${dist_dir}/augmented/facts.pdf" "${out_dir}/amateur-extra-license-prep-study-workbook.pdf"
-cp "${dist_dir}/augmented/facts-dark.pdf" "${out_dir}/amateur-extra-license-prep-study-workbook-dark.pdf"
-cp "${dist_dir}/augmented/facts.epub" "${out_dir}/amateur-extra-license-prep-study-workbook.epub"
-cp -R "${assets_dir}" "${out_dir}/assets"
 
-cat > "${out_dir}/index.html" <<'HTML'
+if [ -f "${dist_dir}/augmented/facts.txt" ]; then
+  cp "${dist_dir}/augmented/facts.txt" "${out_dir}/amateur-extra-license-prep-augmented-facts.txt"
+fi
+if [ -f "${dist_dir}/augmented/facts.pdf" ]; then
+  cp "${dist_dir}/augmented/facts.pdf" "${out_dir}/amateur-extra-license-prep-augmented-facts.pdf"
+fi
+if [ -f "${dist_dir}/augmented/facts-dark.pdf" ]; then
+  cp "${dist_dir}/augmented/facts-dark.pdf" "${out_dir}/amateur-extra-license-prep-augmented-facts-dark.pdf"
+fi
+if [ -f "${dist_dir}/augmented/facts.epub" ]; then
+  cp "${dist_dir}/augmented/facts.epub" "${out_dir}/amateur-extra-license-prep-augmented-facts.epub"
+fi
+if [ -f "${dist_dir}/augmented/qa.txt" ]; then
+  cp "${dist_dir}/augmented/qa.txt" "${out_dir}/amateur-extra-license-prep-augmented-qa.txt"
+fi
+if [ -f "${dist_dir}/augmented/qa.pdf" ]; then
+  cp "${dist_dir}/augmented/qa.pdf" "${out_dir}/amateur-extra-license-prep-augmented-qa.pdf"
+fi
+if [ -f "${dist_dir}/augmented/qa-dark.pdf" ]; then
+  cp "${dist_dir}/augmented/qa-dark.pdf" "${out_dir}/amateur-extra-license-prep-augmented-qa-dark.pdf"
+fi
+if [ -f "${dist_dir}/augmented/qa.epub" ]; then
+  cp "${dist_dir}/augmented/qa.epub" "${out_dir}/amateur-extra-license-prep-augmented-qa.epub"
+fi
+
+cp "${dist_dir}/audio/fact/script.txt" "${out_dir}/audio/fact/script.txt"
+cp "${dist_dir}/audio/fact/manifest.json" "${out_dir}/audio/fact/manifest.json"
+cp "${dist_dir}/audio/qa/script.txt" "${out_dir}/audio/qa/script.txt"
+cp "${dist_dir}/audio/qa/manifest.json" "${out_dir}/audio/qa/manifest.json"
+cp "${dist_dir}/audio/fact/script.txt" "${out_dir}/amateur-extra-license-prep-fact-script.txt"
+cp "${dist_dir}/audio/fact/manifest.json" "${out_dir}/amateur-extra-license-prep-fact-manifest.json"
+cp "${dist_dir}/audio/qa/script.txt" "${out_dir}/amateur-extra-license-prep-qa-script.txt"
+cp "${dist_dir}/audio/qa/manifest.json" "${out_dir}/amateur-extra-license-prep-qa-manifest.json"
+
+fact_audio_href="./amateur-extra-license-prep-fact.mp3"
+fact_audio_desc="Merged fact audio book."
+if [ -f "${dist_dir}/audio/fact/book.mp3" ]; then
+  cp "${dist_dir}/audio/fact/book.mp3" "${out_dir}/audio/fact/book.mp3"
+  cp "${dist_dir}/audio/fact/book.mp3" "${out_dir}/amateur-extra-license-prep-fact.mp3"
+else
+  fact_audio_href="./amateur-extra-license-prep-fact.mp3.placeholder.txt"
+  fact_audio_desc="Placeholder until rendered chapter audio is merged."
+  cat > "${out_dir}/audio/fact/book.mp3.placeholder.txt" <<'TEXT'
+Placeholder for dist/audio/fact/book.mp3.
+Run `mise run audio-render` to generate chapter audio and merged book audio.
+TEXT
+  cp "${out_dir}/audio/fact/book.mp3.placeholder.txt" "${out_dir}/amateur-extra-license-prep-fact.mp3.placeholder.txt"
+fi
+
+qa_audio_href="./amateur-extra-license-prep-qa.mp3"
+qa_audio_desc="Merged Q&A audio book."
+if [ -f "${dist_dir}/audio/qa/book.mp3" ]; then
+  cp "${dist_dir}/audio/qa/book.mp3" "${out_dir}/audio/qa/book.mp3"
+  cp "${dist_dir}/audio/qa/book.mp3" "${out_dir}/amateur-extra-license-prep-qa.mp3"
+else
+  qa_audio_href="./amateur-extra-license-prep-qa.mp3.placeholder.txt"
+  qa_audio_desc="Placeholder until Q&A chapter audio is rendered and merged."
+  cat > "${out_dir}/audio/qa/book.mp3.placeholder.txt" <<'TEXT'
+Placeholder for dist/audio/qa/book.mp3.
+Run `mise run audio-render` after generating/rendering Q&A chapter audio.
+TEXT
+  cp "${out_dir}/audio/qa/book.mp3.placeholder.txt" "${out_dir}/amateur-extra-license-prep-qa.mp3.placeholder.txt"
+fi
+
+has_augmented=false
+if [ -d "${out_dir}/augmented" ]; then
+  has_augmented=true
+fi
+
+augmented_note="No augmented artifacts available in this build."
+if [ "${has_augmented}" = true ]; then
+  augmented_note="Augmented artifacts include AI-generated prose in addition to the canonical answer."
+fi
+
+cat > "${out_dir}/index.html" <<HTML
 <!doctype html>
 <html lang="en">
   <head>
@@ -122,6 +208,16 @@ cat > "${out_dir}/index.html" <<'HTML'
         gap: 10px;
         margin: 16px 0 0 0;
       }
+      .section {
+        margin-top: 22px;
+      }
+      .section h2 {
+        font-size: 1.05rem;
+        margin: 0;
+      }
+      .section p {
+        margin: 8px 0 0 0;
+      }
       .asset {
         display: block;
         text-decoration: none;
@@ -148,6 +244,9 @@ cat > "${out_dir}/index.html" <<'HTML'
       a {
         color: var(--link);
       }
+      code {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      }
     </style>
   </head>
   <body>
@@ -156,38 +255,118 @@ cat > "${out_dir}/index.html" <<'HTML'
         <h1>Ham Radio Extra Study Guide Assets</h1>
         <p class="pipeline">
           New here? Start with the
-          <a href="https://ncvec.org/">official NCVEC question pool</a>. This site provides study materials generated from the official NCVEC Amateur Extra pool: printable PDFs, audio, and machine-readable JSON.
+          <a href="https://ncvec.org/">official NCVEC question pool</a>. This site publishes generated artifacts directly using the current <code>dist/</code> layout.
         </p>
-        <div class="assets">
-          <a class="asset" href="./amateur-extra-license-prep-study-workbook.pdf">
-            <strong>Study Workbook PDF</strong>
-            <span>Printable workbook built from the official question pool.</span>
-          </a>
-          <a class="asset" href="./amateur-extra-license-prep-study-workbook-dark.pdf">
-            <strong>Study Workbook PDF (Dark)</strong>
-            <span>Dark-theme version of the workbook for easier on-screen reading.</span>
-          </a>
-          <a class="asset" href="./amateur-extra-license-prep-study-workbook.epub">
-            <strong>Study Workbook EPUB</strong>
-            <span>E-reader version of the workbook for Kindle, Kobo, Apple Books, etc.</span>
-          </a>
-          <a class="asset" href="./amateur-extra-license-prep.mp3">
-            <strong>Audio Book</strong>
-            <span>Audio version of the study guide for listening practice.</span>
-          </a>
-          <a class="asset" href="./amateur-extra-license-prep-script.txt">
-            <strong>Audio Script (Automation)</strong>
-            <span>Full narration text used to generate the audio.</span>
-          </a>
-          <a class="asset" href="./amateur-extra-license-prep-pool.json">
-            <strong>Question Pool JSON (Automation)</strong>
-            <span>Structured question data for integrations. Figure image files are in <code>assets/</code>.</span>
-          </a>
-          <a class="asset" href="https://github.com/rwjblue/ham-radio-extra-license-study-guide/releases/latest">
-            <strong>Release Bundles</strong>
-            <span>Download complete JSON + image bundles from the latest GitHub release.</span>
-          </a>
-        </div>
+        <section class="section">
+          <h2>Static Facts</h2>
+          <div class="assets">
+            <a class="asset" href="./amateur-extra-license-prep-facts.pdf">
+              <strong>facts.pdf</strong>
+              <span>Printable static facts workbook.</span>
+            </a>
+            <a class="asset" href="./amateur-extra-license-prep-facts-dark.pdf">
+              <strong>facts-dark.pdf</strong>
+              <span>Dark-theme static facts workbook.</span>
+            </a>
+            <a class="asset" href="./amateur-extra-license-prep-facts.epub">
+              <strong>facts.epub</strong>
+              <span>E-reader version of static facts.</span>
+            </a>
+            <a class="asset" href="./amateur-extra-license-prep-facts.txt">
+              <strong>facts.txt</strong>
+              <span>Plain-text static facts output.</span>
+            </a>
+          </div>
+        </section>
+        <section class="section">
+          <h2>Q&A Facts</h2>
+          <div class="assets">
+            <a class="asset" href="./amateur-extra-license-prep-qa.pdf">
+              <strong>qa.pdf</strong>
+              <span>Printable Q&A workbook.</span>
+            </a>
+            <a class="asset" href="./amateur-extra-license-prep-qa-dark.pdf">
+              <strong>qa-dark.pdf</strong>
+              <span>Dark-theme Q&A workbook.</span>
+            </a>
+            <a class="asset" href="./amateur-extra-license-prep-qa.epub">
+              <strong>qa.epub</strong>
+              <span>E-reader version of Q&A output.</span>
+            </a>
+            <a class="asset" href="./amateur-extra-license-prep-qa.txt">
+              <strong>qa.txt</strong>
+              <span>Plain-text Q&A output.</span>
+            </a>
+          </div>
+        </section>
+        <section class="section">
+          <h2>Augmented (Optional)</h2>
+          <p>${augmented_note}</p>
+          <div class="assets">
+            <a class="asset" href="./amateur-extra-license-prep-augmented-facts.pdf">
+              <strong>augmented/facts.pdf</strong>
+              <span>Augmented static facts PDF.</span>
+            </a>
+            <a class="asset" href="./amateur-extra-license-prep-augmented-qa.pdf">
+              <strong>augmented/qa.pdf</strong>
+              <span>Augmented Q&A PDF.</span>
+            </a>
+            <a class="asset" href="./amateur-extra-license-prep-augmented-facts.epub">
+              <strong>augmented/facts.epub</strong>
+              <span>Augmented static facts EPUB.</span>
+            </a>
+            <a class="asset" href="./amateur-extra-license-prep-augmented-qa.epub">
+              <strong>augmented/qa.epub</strong>
+              <span>Augmented Q&A EPUB.</span>
+            </a>
+          </div>
+        </section>
+        <section class="section">
+          <h2>Audio Artifacts</h2>
+          <div class="assets">
+            <a class="asset" href="${fact_audio_href}">
+              <strong>audio/fact/book.mp3</strong>
+              <span>${fact_audio_desc}</span>
+            </a>
+            <a class="asset" href="./amateur-extra-license-prep-fact-script.txt">
+              <strong>audio/fact/script.txt</strong>
+              <span>Fact narration script.</span>
+            </a>
+            <a class="asset" href="./amateur-extra-license-prep-fact-manifest.json">
+              <strong>audio/fact/manifest.json</strong>
+              <span>Fact chapter manifest for rendering/verification.</span>
+            </a>
+            <a class="asset" href="${qa_audio_href}">
+              <strong>audio/qa/book.mp3</strong>
+              <span>${qa_audio_desc}</span>
+            </a>
+            <a class="asset" href="./amateur-extra-license-prep-qa-script.txt">
+              <strong>audio/qa/script.txt</strong>
+              <span>Q&A narration script.</span>
+            </a>
+            <a class="asset" href="./amateur-extra-license-prep-qa-manifest.json">
+              <strong>audio/qa/manifest.json</strong>
+              <span>Q&A chapter manifest for rendering/verification.</span>
+            </a>
+          </div>
+        </section>
+        <section class="section">
+          <h2>Pool Data</h2>
+          <div class="assets">
+            <a class="asset" href="./pool/extra_pool.json" download="amateur-extra-license-prep-pool.json">
+              <strong>pool/extra_pool.json</strong>
+              <span>Canonical extracted pool JSON. Figure files are in <code>pool/assets/</code>.</span>
+            </a>
+            <a class="asset" href="./pool/extra_pool_prose.json" download="amateur-extra-license-prep-pool-prose.json">
+              <strong>pool/extra_pool_prose.json</strong>
+              <span>Optional prose-augmented pool JSON (if generated).</span>
+            </a>
+            <a class="asset" href="https://github.com/rwjblue/ham-radio-extra-license-study-guide/releases/latest">
+              <strong>Release Bundles</strong>
+              <span>Download complete JSON + image bundles from the latest GitHub release.</span>
+            </a>
+          </div>
+        </section>
         <p>
           Created by N1RWJ. Source repository:
           <a href="https://github.com/rwjblue/ham-radio-extra-license-study-guide">github.com/rwjblue/ham-radio-extra-license-study-guide</a>.

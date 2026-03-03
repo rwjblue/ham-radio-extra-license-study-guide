@@ -124,12 +124,16 @@ mise run gh-pages-site
 ```
 
 This creates `docs/` with:
-- `docs/amateur-extra-license-prep-pool.json`
-- `docs/assets/*.png`
-- `docs/amateur-extra-license-prep-script.txt`
-- `docs/amateur-extra-license-prep.mp3`
-- `docs/amateur-extra-license-prep-study-workbook.pdf`
-- `docs/amateur-extra-license-prep-study-workbook-dark.pdf`
+- `docs/pool/extra_pool.json`
+- `docs/pool/extra_pool_prose.json` (if available)
+- `docs/pool/assets/*.png`
+- `docs/static/facts.txt`, `docs/static/facts.pdf`, `docs/static/facts-dark.pdf`, `docs/static/facts.epub`
+- `docs/qa/qa.txt`, `docs/qa/qa.pdf`, `docs/qa/qa-dark.pdf`, `docs/qa/qa.epub`
+- `docs/augmented/{facts,qa}.{txt,pdf,*-dark.pdf,epub}` (if available)
+- `docs/audio/fact/{script.txt,manifest.json,book.mp3}`
+- `docs/audio/qa/{script.txt,manifest.json,book.mp3}`
+- placeholder files `docs/audio/{fact,qa}/book.mp3.placeholder.txt` when merged MP3s have not been rendered yet
+- root-level alias downloads using `amateur-extra-license-prep-*` filenames for cleaner saved file names in browsers
 - `docs/index.html`
 
 For downloadable JSON+assets bundles, use GitHub Releases.

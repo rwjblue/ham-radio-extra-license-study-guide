@@ -1,0 +1,136 @@
+{
+  "schema_version": 1,
+  "chapter_count": 10,
+  "chapters": [
+    {
+      "number": 1,
+      "code": "E1",
+      "title": "COMMISSION RULES",
+      "groups": [
+        "E1A",
+        "E1B",
+        "E1C",
+        "E1D",
+        "E1E",
+        "E1F"
+      ],
+      "text_path": "dist/audio/qa/chapters/chapter-01.txt"
+    },
+    {
+      "number": 2,
+      "code": "E2",
+      "title": "OPERATING PROCEDURES",
+      "groups": [
+        "E2A",
+        "E2B",
+        "E2C",
+        "E2D",
+        "E2E"
+      ],
+      "text_path": "dist/audio/qa/chapters/chapter-02.txt"
+    },
+    {
+      "number": 3,
+      "code": "E3",
+      "title": "RADIO WAVE PROPAGATION",
+      "groups": [
+        "E3A",
+        "E3B",
+        "E3C"
+      ],
+      "text_path": "dist/audio/qa/chapters/chapter-03.txt"
+    },
+    {
+      "number": 4,
+      "code": "E4",
+      "title": "AMATEUR PRACTICES",
+      "groups": [
+        "E4A",
+        "E4B",
+        "E4C",
+        "E4D",
+        "E4E"
+      ],
+      "text_path": "dist/audio/qa/chapters/chapter-04.txt"
+    },
+    {
+      "number": 5,
+      "code": "E5",
+      "title": "ELECTRICAL PRINCIPLES",
+      "groups": [
+        "E5A",
+        "E5B",
+        "E5C",
+        "E5D"
+      ],
+      "text_path": "dist/audio/qa/chapters/chapter-05.txt"
+    },
+    {
+      "number": 6,
+      "code": "E6",
+      "title": "CIRCUIT COMPONENTS",
+      "groups": [
+        "E6A",
+        "E6B",
+        "E6C",
+        "E6D",
+        "E6E",
+        "E6F"
+      ],
+      "text_path": "dist/audio/qa/chapters/chapter-06.txt"
+    },
+    {
+      "number": 7,
+      "code": "E7",
+      "title": "PRACTICAL CIRCUITS",
+      "groups": [
+        "E7A",
+        "E7B",
+        "E7C",
+        "E7D",
+        "E7E",
+        "E7F",
+        "E7G",
+        "E7H"
+      ],
+      "text_path": "dist/audio/qa/chapters/chapter-07.txt"
+    },
+    {
+      "number": 8,
+      "code": "E8",
+      "title": "SIGNALS AND EMISSIONS",
+      "groups": [
+        "E8A",
+        "E8B",
+        "E8C",
+        "E8D"
+      ],
+      "text_path": "dist/audio/qa/chapters/chapter-08.txt"
+    },
+    {
+      "number": 9,
+      "code": "E9",
+      "title": "ANTENNAS AND TRANSMISSION LINES",
+      "groups": [
+        "E9A",
+        "E9B",
+        "E9C",
+        "E9D",
+        "E9E",
+        "E9F",
+        "E9G",
+        "E9H"
+      ],
+      "text_path": "dist/audio/qa/chapters/chapter-09.txt"
+    },
+    {
+      "number": 10,
+      "code": "E0",
+      "title": "SAFETY",
+      "groups": [
+        "E0A"
+      ],
+      "text_path": "dist/audio/qa/chapters/chapter-10.txt"
+    }
+  ]
+}

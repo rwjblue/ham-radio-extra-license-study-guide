@@ -50,6 +50,16 @@
         gap: 10px;
         margin: 16px 0 0 0;
       }
+      .section {
+        margin-top: 22px;
+      }
+      .section h2 {
+        font-size: 1.05rem;
+        margin: 0;
+      }
+      .section p {
+        margin: 8px 0 0 0;
+      }
       .asset {
         display: block;
         text-decoration: none;
@@ -76,6 +86,9 @@
       a {
         color: var(--link);
       }
+      code {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      }
     </style>
   </head>
   <body>
@@ -84,38 +97,118 @@
         <h1>Ham Radio Extra Study Guide Assets</h1>
         <p class="pipeline">
           New here? Start with the
-          <a href="https://ncvec.org/">official NCVEC question pool</a>. This site provides study materials generated from the official NCVEC Amateur Extra pool: printable PDFs, audio, and machine-readable JSON.
+          <a href="https://ncvec.org/">official NCVEC question pool</a>. This site publishes generated artifacts directly using the current <code>dist/</code> layout.
         </p>
-        <div class="assets">
-          <a class="asset" href="./amateur-extra-license-prep-study-workbook.pdf">
-            <strong>Study Workbook PDF</strong>
-            <span>Printable workbook built from the official question pool.</span>
-          </a>
-          <a class="asset" href="./amateur-extra-license-prep-study-workbook-dark.pdf">
-            <strong>Study Workbook PDF (Dark)</strong>
-            <span>Dark-theme version of the workbook for easier on-screen reading.</span>
-          </a>
-          <a class="asset" href="./amateur-extra-license-prep-study-workbook.epub">
-            <strong>Study Workbook EPUB</strong>
-            <span>E-reader version of the workbook for Kindle, Kobo, Apple Books, etc.</span>
-          </a>
-          <a class="asset" href="./amateur-extra-license-prep.mp3">
-            <strong>Audio Book</strong>
-            <span>Audio version of the study guide for listening practice.</span>
-          </a>
-          <a class="asset" href="./amateur-extra-license-prep-script.txt">
-            <strong>Audio Script (Automation)</strong>
-            <span>Full narration text used to generate the audio.</span>
-          </a>
-          <a class="asset" href="./amateur-extra-license-prep-pool.json">
-            <strong>Question Pool JSON (Automation)</strong>
-            <span>Structured question data for integrations. Figure image files are in <code>assets/</code>.</span>
-          </a>
-          <a class="asset" href="https://github.com/rwjblue/ham-radio-extra-license-study-guide/releases/latest">
-            <strong>Release Bundles</strong>
-            <span>Download complete JSON + image bundles from the latest GitHub release.</span>
-          </a>
-        </div>
+        <section class="section">
+          <h2>Static Facts</h2>
+          <div class="assets">
+            <a class="asset" href="./amateur-extra-license-prep-facts.pdf">
+              <strong>facts.pdf</strong>
+              <span>Printable static facts workbook.</span>
+            </a>
+            <a class="asset" href="./amateur-extra-license-prep-facts-dark.pdf">
+              <strong>facts-dark.pdf</strong>
+              <span>Dark-theme static facts workbook.</span>
+            </a>
+            <a class="asset" href="./amateur-extra-license-prep-facts.epub">
+              <strong>facts.epub</strong>
+              <span>E-reader version of static facts.</span>
+            </a>
+            <a class="asset" href="./amateur-extra-license-prep-facts.txt">
+              <strong>facts.txt</strong>
+              <span>Plain-text static facts output.</span>
+            </a>
+          </div>
+        </section>
+        <section class="section">
+          <h2>Q&A Facts</h2>
+          <div class="assets">
+            <a class="asset" href="./amateur-extra-license-prep-qa.pdf">
+              <strong>qa.pdf</strong>
+              <span>Printable Q&A workbook.</span>
+            </a>
+            <a class="asset" href="./amateur-extra-license-prep-qa-dark.pdf">
+              <strong>qa-dark.pdf</strong>
+              <span>Dark-theme Q&A workbook.</span>
+            </a>
+            <a class="asset" href="./amateur-extra-license-prep-qa.epub">
+              <strong>qa.epub</strong>
+              <span>E-reader version of Q&A output.</span>
+            </a>
+            <a class="asset" href="./amateur-extra-license-prep-qa.txt">
+              <strong>qa.txt</strong>
+              <span>Plain-text Q&A output.</span>
+            </a>
+          </div>
+        </section>
+        <section class="section">
+          <h2>Augmented (Optional)</h2>
+          <p>Augmented artifacts include AI-generated prose in addition to the canonical answer.</p>
+          <div class="assets">
+            <a class="asset" href="./amateur-extra-license-prep-augmented-facts.pdf">
+              <strong>augmented/facts.pdf</strong>
+              <span>Augmented static facts PDF.</span>
+            </a>
+            <a class="asset" href="./amateur-extra-license-prep-augmented-qa.pdf">
+              <strong>augmented/qa.pdf</strong>
+              <span>Augmented Q&A PDF.</span>
+            </a>
+            <a class="asset" href="./amateur-extra-license-prep-augmented-facts.epub">
+              <strong>augmented/facts.epub</strong>
+              <span>Augmented static facts EPUB.</span>
+            </a>
+            <a class="asset" href="./amateur-extra-license-prep-augmented-qa.epub">
+              <strong>augmented/qa.epub</strong>
+              <span>Augmented Q&A EPUB.</span>
+            </a>
+          </div>
+        </section>
+        <section class="section">
+          <h2>Audio Artifacts</h2>
+          <div class="assets">
+            <a class="asset" href="./amateur-extra-license-prep-fact.mp3.placeholder.txt">
+              <strong>audio/fact/book.mp3</strong>
+              <span>Placeholder until rendered chapter audio is merged.</span>
+            </a>
+            <a class="asset" href="./amateur-extra-license-prep-fact-script.txt">
+              <strong>audio/fact/script.txt</strong>
+              <span>Fact narration script.</span>
+            </a>
+            <a class="asset" href="./amateur-extra-license-prep-fact-manifest.json">
+              <strong>audio/fact/manifest.json</strong>
+              <span>Fact chapter manifest for rendering/verification.</span>
+            </a>
+            <a class="asset" href="./amateur-extra-license-prep-qa.mp3.placeholder.txt">
+              <strong>audio/qa/book.mp3</strong>
+              <span>Placeholder until Q&A chapter audio is rendered and merged.</span>
+            </a>
+            <a class="asset" href="./amateur-extra-license-prep-qa-script.txt">
+              <strong>audio/qa/script.txt</strong>
+              <span>Q&A narration script.</span>
+            </a>
+            <a class="asset" href="./amateur-extra-license-prep-qa-manifest.json">
+              <strong>audio/qa/manifest.json</strong>
+              <span>Q&A chapter manifest for rendering/verification.</span>
+            </a>
+          </div>
+        </section>
+        <section class="section">
+          <h2>Pool Data</h2>
+          <div class="assets">
+            <a class="asset" href="./pool/extra_pool.json" download="amateur-extra-license-prep-pool.json">
+              <strong>pool/extra_pool.json</strong>
+              <span>Canonical extracted pool JSON. Figure files are in <code>pool/assets/</code>.</span>
+            </a>
+            <a class="asset" href="./pool/extra_pool_prose.json" download="amateur-extra-license-prep-pool-prose.json">
+              <strong>pool/extra_pool_prose.json</strong>
+              <span>Optional prose-augmented pool JSON (if generated).</span>
+            </a>
+            <a class="asset" href="https://github.com/rwjblue/ham-radio-extra-license-study-guide/releases/latest">
+              <strong>Release Bundles</strong>
+              <span>Download complete JSON + image bundles from the latest GitHub release.</span>
+            </a>
+          </div>
+        </section>
         <p>
           Created by N1RWJ. Source repository:
           <a href="https://github.com/rwjblue/ham-radio-extra-license-study-guide">github.com/rwjblue/ham-radio-extra-license-study-guide</a>.
