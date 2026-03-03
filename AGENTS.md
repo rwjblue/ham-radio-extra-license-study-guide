@@ -12,6 +12,15 @@
   - `mise run typecheck`
   - `mise run test`
 
+## Completion Gate
+
+- Before declaring the requested work complete (i.e., before the final handoff to the user), run and pass:
+  - `mise run lint`
+  - `mise run typecheck`
+  - `mise run test`
+- Running them individually is fine.
+- If any check fails, report the failure and continue working until all pass, or clearly state why completion is blocked.
+
 ## Source and Input Rules
 
 - Canonical upstream source is the NCVEC public Extra Class `.docx` release URL.
