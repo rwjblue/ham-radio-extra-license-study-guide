@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import base64
+import time
 from pathlib import Path
 
 from extra_facts.build import build_from_pool_json
@@ -161,3 +162,35 @@ def test_build_prose_mode_uses_augmented_file_prefix(tmp_path: Path) -> None:
     assert summary.dark_pdf_path.name == "facts-dark.pdf"
     assert summary.epub_path is not None
     assert summary.epub_path.name == "facts.epub"
+
+
+def test_build_outputs_are_deterministic_across_runs(tmp_path: Path) -> None:
+    pool_json = tmp_path / "pool.json"
+    write_question_pool(
+        QuestionPool(
+            schema_version=1,
+            excluded_count=0,
+            questions=[
+                PoolQuestion(
+                    question_id="E1A01",
+                    question_text="What is one purpose of the Amateur Radio Service?",
+                    choices=["Advance the art", "Entertainment", "Advertising", "None"],
+                    correct_choice_index=0,
+                    group="E1A",
+                    subelement="E1",
+                )
+            ],
+        ),
+        pool_json,
+    )
+
+    out_a = tmp_path / "out-a"
+    out_b = tmp_path / "out-b"
+
+    build_from_pool_json(pool_json, out_dir=out_a, mode="literal", omit_id=False)
+    # Ensure runtime clocks advance so timestamp-based metadata would differ.
+    time.sleep(1.1)
+    build_from_pool_json(pool_json, out_dir=out_b, mode="literal", omit_id=False)
+
+    for file_name in ("facts.txt", "facts.pdf", "facts-dark.pdf", "facts.epub"):
+        assert (out_a / file_name).read_bytes() == (out_b / file_name).read_bytes()

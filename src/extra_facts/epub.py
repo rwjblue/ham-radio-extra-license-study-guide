@@ -5,6 +5,9 @@ import base64
 import binascii
 import mimetypes
 import re
+import tempfile
+import zipfile
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
@@ -13,6 +16,7 @@ from ebooklib import epub  # type: ignore[import-untyped]
 from .facts import fact_sentence
 from .intermediate import group_pool_questions
 from .models import PoolMetadata, PoolQuestion, QuestionImage
+from .repro import deterministic_utc_datetime
 
 QUESTION_ID_RE = re.compile(r"^([A-Z]\d[A-Z]\d{2}):\s*(.+)$")
 QA_PAIR_RE = re.compile(r"^Q:\s*(.+?)\s+A:\s*(.+)$")
@@ -26,6 +30,7 @@ def write_epub(
     metadata: PoolMetadata | None = None,
     image_root_dir: Path | None = None,
 ) -> Path:
+    generated_at = deterministic_utc_datetime()
     book = epub.EpubBook()
     book.set_identifier("fcc-amateur-extra-study-facts")
     book.set_title("FCC Amateur Extra (Element 4) Statements of Fact")
@@ -88,8 +93,41 @@ def write_epub(
     book.spine = ["nav", *chapters]
 
     target.parent.mkdir(parents=True, exist_ok=True)
-    epub.write_epub(str(target), book)
+    epub.write_epub(str(target), book, options={"mtime": generated_at})
+    _normalize_zip_timestamps(target, generated_at)
     return target
+
+
+def _normalize_zip_timestamps(target: Path, generated_at: datetime) -> None:
+    fixed_date_time: tuple[int, int, int, int, int, int] = (
+        generated_at.year,
+        generated_at.month,
+        generated_at.day,
+        generated_at.hour,
+        generated_at.minute,
+        generated_at.second,
+    )
+
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".epub") as temp_file:
+        temp_path = Path(temp_file.name)
+
+    try:
+        with zipfile.ZipFile(target, "r") as source, zipfile.ZipFile(temp_path, "w") as out:
+            for source_info in source.infolist():
+                normalized = zipfile.ZipInfo(source_info.filename, date_time=fixed_date_time)
+                normalized.compress_type = source_info.compress_type
+                normalized.external_attr = source_info.external_attr
+                normalized.comment = source_info.comment
+                normalized.extra = source_info.extra
+                normalized.create_system = source_info.create_system
+                normalized.create_version = source_info.create_version
+                normalized.extract_version = source_info.extract_version
+                normalized.flag_bits = source_info.flag_bits
+                out.writestr(normalized, source.read(source_info.filename))
+        temp_path.replace(target)
+    finally:
+        if temp_path.exists():
+            temp_path.unlink()
 
 
 def _build_chapter(

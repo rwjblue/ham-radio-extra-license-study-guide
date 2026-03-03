@@ -6,6 +6,7 @@ import io
 import json
 import re
 from pathlib import Path
+from typing import Any, cast
 
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import LETTER
@@ -510,7 +511,13 @@ def _write_pdf(
             palette["muted"],
             palette["page_bg"],
         ),
+        canvasmaker=cast(Any, _invariant_canvas),
     )
+
+
+def _invariant_canvas(filename: str, pagesize: tuple[float, float], **kwargs: Any) -> Canvas:
+    kwargs.pop("invariant", None)
+    return Canvas(filename, pagesize=pagesize, invariant=1, **kwargs)
 
 
 def _pdf_palette(theme: str) -> dict[str, colors.Color]:
