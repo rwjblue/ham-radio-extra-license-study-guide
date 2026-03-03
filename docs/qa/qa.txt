@@ -1,4 +1,4 @@
-## SUBELEMENT E1 - COMMISSION RULES
+## SUBELEMENT E1 - Commission Rules
 ### Group E1A - Frequency privileges; signal frequency range; automatic message forwarding; stations aboard ships or aircraft; power restriction on 630- and 2200-meter bands
 E1A01: Q: Why is it not legal to transmit a 3 kHz bandwidth USB signal with a carrier frequency of 14.348 MHz? A: The upper 1 kHz of the signal is outside the 20-meter band.
 E1A02: Q: When using a transceiver that displays the carrier frequency of phone signals, which of the following displayed frequencies represents the lowest frequency at which a properly adjusted LSB emission will be totally within the band? A: 3 kHz above the lower band edge.
@@ -80,7 +80,7 @@ E1F10: Q: Who may be the control operator of an auxiliary station? A: Only Techn
 E1F11: Q: Which of the following best describes one of the standards that must be met by an external RF power amplifier if it is to qualify for a grant of FCC certification? A: It must satisfy the FCC’s spurious emission standards when operated at the lesser of 1500 watts or its full output power.
 
 
-## SUBELEMENT E2 - OPERATING PROCEDURES
+## SUBELEMENT E2 - Operating Procedures
 ### Group E2A - Amateur radio in space: amateur satellites; orbital mechanics; frequencies and modes; satellite hardware; satellite operations
 E2A01: Q: What is the direction of an ascending pass for an amateur satellite? A: From south to north.
 E2A02: Q: Which of the following is characteristic of an inverting linear transponder? A: All these choices are correct.
@@ -151,7 +151,7 @@ E2E12: Q: How do ALE stations establish contact? A: ALE constantly scans a list 
 E2E13: Q: Which of these digital modes has the highest data throughput under clear communication conditions? A: PACTOR IV.
 
 
-## SUBELEMENT E3 - RADIO WAVE PROPAGATION
+## SUBELEMENT E3 - Radio Wave Propagation
 ### Group E3A - Electromagnetic Waves and Specialized Propagation: Earth-Moon-Earth (EME) communications; meteor scatter; microwave tropospheric and scatter propagation; auroral propagation; daily variation of ionospheric propagation; circular polarization
 E3A01: Q: What is the approximate maximum separation measured along the surface of the Earth between two stations communicating by EME? A: 12,000 miles, if the moon is “visible” by both stations.
 E3A02: Q: What characterizes libration fading of an EME signal? A: A fluttery, irregular fading.
@@ -198,7 +198,7 @@ E3C11: Q: What does VOACAP software model? A: HF propagation.
 E3C12: Q: Which of the following is indicated by a sudden rise in radio background noise across a large portion of the HF spectrum? A: A coronal mass ejection impact or a solar flare has occurred.
 
 
-## SUBELEMENT E4 - AMATEUR PRACTICES
+## SUBELEMENT E4 - Amateur Practices
 ### Group E4A - Test equipment: analog and digital instruments; spectrum analyzers; antenna analyzers; oscilloscopes; RF measurements
 E4A01: Q: Which of the following limits the highest frequency signal that can be accurately displayed on a digital oscilloscope? A: Sampling rate of the analog-to-digital converter.
 E4A02: Q: Which of the following parameters does a spectrum analyzer display on the vertical and horizontal axes? A: Signal amplitude and frequency.
@@ -271,7 +271,7 @@ E4E13: Q: Where should a station AC surge protector be installed? A: On the sing
 E4E14: Q: What is the purpose of a single point ground panel? A: Ensure all lightning protectors activate at the same time.
 
 
-## SUBELEMENT E5 - ELECTRICAL PRINCIPLES
+## SUBELEMENT E5 - Electrical Principles
 ### Group E5A - Resonance and Q: characteristics of resonant circuits; series and parallel resonance; definitions and effects of Q; half-power bandwidth
 E5A01: Q: What can cause the voltage across reactances in a series RLC circuit to be higher than the voltage applied to the entire circuit? A: Resonance.
 E5A02: Q: What is the resonant frequency of an RLC circuit if R is 22 ohms, L is 50 microhenries, and C is 40 picofarads? A: 3.56 MHz.
@@ -330,7 +330,7 @@ E5D11: Q: How much real power is consumed in a circuit consisting of a 100-ohm r
 E5D12: Q: What is reactive power? A: Wattless, nonproductive power.
 
 
-## SUBELEMENT E6 - CIRCUIT COMPONENTS
+## SUBELEMENT E6 - Circuit Components
 ### Group E6A - Semiconductor materials and devices: semiconductor materials; bipolar junction transistors; operation and types of field-effect transistors
 E6A01: Q: In what application is gallium arsenide used as a semiconductor material? A: In microwave circuits.
 E6A02: Q: Which of the following semiconductor materials contains excess free electrons? A: N-type.
@@ -411,7 +411,7 @@ E6F10: Q: What is the most common material used in power-generating photovoltaic
 E6F11: Q: What is the approximate open-circuit voltage produced by a fully illuminated silicon photovoltaic cell? A: 0.5 volts.
 
 
-## SUBELEMENT E7 - PRACTICAL CIRCUITS
+## SUBELEMENT E7 - Practical Circuits
 ### Group E7A - Digital circuits: digital circuit principles and logic circuits; classes of logic elements; positive and negative logic; frequency dividers; truth tables
 E7A01: Q: Which circuit is bistable? A: A flip-flop.
 E7A02: Q: What is the function of a decade counter? A: It produces one output pulse for every 10 input pulses.
@@ -527,7 +527,7 @@ E7H12: Q: Which of the following ensures that a crystal oscillator operates on t
 E7H13: Q: Which of the following is a technique for providing highly accurate and stable oscillators needed for microwave transmission and reception? A: All these choices are correct.
 
 
-## SUBELEMENT E8 - SIGNALS AND EMISSIONS
+## SUBELEMENT E8 - Signals And Emissions
 ### Group E8A - Fourier analysis; RMS measurements; average RF power and peak envelope power (PEP); analog/digital conversion
 E8A01: Q: What technique shows that a square wave is made up of a sine wave and its odd harmonics? A: Fourier analysis.
 E8A02: Q: Which of the following is a type of analog-to-digital conversion? A: Successive approximation.
@@ -585,7 +585,7 @@ E8D10: Q: What are some of the differences between the Baudot digital code and A
 E8D11: Q: What is one advantage of using ASCII code for data communications? A: It is possible to transmit both uppercase and lowercase text.
 
 
-## SUBELEMENT E9 - ANTENNAS AND TRANSMISSION LINES
+## SUBELEMENT E9 - Antennas And Transmission Lines
 ### Group E9A - Basic antenna parameters: radiation resistance, gain, beamwidth, efficiency; effective radiated power (ERP) and effective isotropic radiated power (EIRP)
 E9A01: Q: What is an isotropic radiator? A: A hypothetical, lossless antenna having equal radiation intensity in all directions used as a reference for antenna gain.
 E9A02: Q: What is the effective radiated power (ERP) of a repeater station with 150 watts transmitter power output, 2 dB feed line loss, 2.2 dB duplexer loss, and 7 dBd antenna gain? A: 286 watts.
@@ -695,7 +695,7 @@ E9H10: Q: How can the output voltage of a multiple-turn receiving loop antenna b
 E9H11: Q: What feature of a cardioid pattern antenna makes it useful for direction-finding antennas? A: A single null.
 
 
-## SUBELEMENT E0 - SAFETY
+## SUBELEMENT E0 - Safety
 ### Group E0A - Safety: RF radiation hazards; hazardous materials; grounding
 E0A01: Q: What is the primary function of an external earth connection or ground rod? A: Lightning charge dissipation.
 E0A02: Q: When evaluating RF exposure levels from your station at a neighbor’s home, what must you do? A: Ensure signals from your station are less than the uncontrolled maximum permissible exposure (MPE) limits.

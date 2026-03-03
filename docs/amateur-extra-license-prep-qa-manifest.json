@@ -1049,7 +1049,7 @@
       "text_path": "dist/audio/qa/chapters/chapter-03.txt",
       "audio_path": "dist/audio/qa/chapters/chapter-03.mp3",
       "duration_seconds": 352.163,
-      "start_seconds": 1356.249,
+      "start_seconds": 1356.248,
       "text_sha256": "4b88006caa3819319b584a46ddb5d744c0e878c39b8d5ad15af987101dce6981",
       "render_fingerprint": "elevenlabs:eleven_multilingual_v2:UgBBYS2sOqTuMpoF3BR0:1.0:mp3_44100_128:en",
       "units": [
@@ -2257,7 +2257,7 @@
       "text_path": "dist/audio/qa/chapters/chapter-06.txt",
       "audio_path": "dist/audio/qa/chapters/chapter-06.mp3",
       "duration_seconds": 595.513,
-      "start_seconds": 2835.783,
+      "start_seconds": 2835.784,
       "text_sha256": "7bd51de75b0ebdc1259c232ba7ed175e4f9c719a0023b4732c219937c928339a",
       "render_fingerprint": "elevenlabs:eleven_multilingual_v2:UgBBYS2sOqTuMpoF3BR0:1.0:mp3_44100_128:en",
       "units": [
@@ -4673,13 +4673,13 @@
     "provider": "elevenlabs",
     "output_format": "mp3",
     "merged_audio_path": "dist/audio/qa/book.mp3",
-    "total_duration_seconds": 5742.663,
+    "total_duration_seconds": 5742.664,
     "chapter_markers_embedded": true,
-    "chapters_rendered": 10,
-    "chapters_reused": 0,
+    "chapters_rendered": 0,
+    "chapters_reused": 10,
     "render_fingerprint": "elevenlabs:eleven_multilingual_v2:UgBBYS2sOqTuMpoF3BR0:1.0:mp3_44100_128:en",
     "jobs": 4,
     "unit_cache_dir": "/Users/rwjblue/src/github/rwjblue/ham-radio-extra-license-study-guide/.cache/audio-render/18353a1729f1a237",
-    "rendered_at": "2026-03-03T17:24:54.334827+00:00"
+    "rendered_at": "2026-03-03T17:28:22.912941+00:00"
   }
 }
