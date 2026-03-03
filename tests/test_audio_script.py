@@ -291,7 +291,9 @@ def test_write_audio_script_qa_mode_includes_question_and_answer(tmp_path: Path)
     )
 
     content = path.read_text(encoding="utf-8")
-    assert "Q: What is the maximum symbol rate? A: 1200 baud." in content
+    assert "What is the maximum symbol rate?\n[[SHORT_PAUSE]]\n1200 baud." in content
+    assert "Q:" not in content
+    assert "A:" not in content
 
 
 
@@ -310,9 +312,10 @@ def test_write_audio_script_inserts_pause_marker_between_questions(tmp_path: Pat
     )
 
     content = path.read_text(encoding="utf-8")
-    assert "Q: What is true? A: A." in content
-    assert "[[SHORT_PAUSE]]" in content
-    assert "Q: What is also true? A: B." in content
+    assert (
+        "What is true?\n[[SHORT_PAUSE]]\nA.\n[[SHORT_PAUSE]]\n\n"
+        "What is also true?\n[[SHORT_PAUSE]]\nB."
+    ) in content
 
 def test_build_audio_script_from_pool_json_qa_mode_uses_qa_filename(tmp_path: Path) -> None:
     from extra_facts.build import build_audio_script_from_pool_json

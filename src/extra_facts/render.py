@@ -194,8 +194,16 @@ def _build_audio_chapters(
             fact = fact_sentence(question, mode=mode, omit_id=omit_id)
             fact = _rewrite_first_abbreviation_use(fact, seen_abbreviations)
             fact = _expand_terms_for_tts(fact)
-            chapter_lines.append(_normalize_audio_paragraph(fact))
-            chapter_lines.append(AUDIO_SHORT_PAUSE_MARKER)
+            qa_parts = _split_qa_pair(fact) if mode == "qa" else None
+            if qa_parts is None:
+                chapter_lines.append(_normalize_audio_paragraph(fact))
+                chapter_lines.append(AUDIO_SHORT_PAUSE_MARKER)
+            else:
+                question_text, answer_text = qa_parts
+                chapter_lines.append(_normalize_audio_paragraph(question_text))
+                chapter_lines.append(AUDIO_SHORT_PAUSE_MARKER)
+                chapter_lines.append(_normalize_audio_paragraph(answer_text))
+                chapter_lines.append(AUDIO_SHORT_PAUSE_MARKER)
             chapter_lines.append("")
 
     if current_subelement:
