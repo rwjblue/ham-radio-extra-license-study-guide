@@ -15,6 +15,7 @@ from .intermediate import group_pool_questions
 from .models import PoolMetadata, PoolQuestion, QuestionImage
 
 QUESTION_ID_RE = re.compile(r"^([A-Z]\d[A-Z]\d{2}):\s*(.+)$")
+QA_PAIR_RE = re.compile(r"^Q:\s*(.+?)\s+A:\s*(.+)$")
 
 
 def write_epub(
@@ -117,27 +118,58 @@ def _build_chapter(
 
         for question in questions:
             text = fact_sentence(question, mode=mode, omit_id=omit_id)
-            formatted = _format_fact_html(text)
             image_tags = _question_image_html(
                 question, image_root_dir, book, image_registry
             )
             html_parts.append('<div class="question">')
             for tag in image_tags:
                 html_parts.append(tag)
-            html_parts.append(f"<p>{formatted}</p>")
+            html_parts.extend(_question_html_lines(text))
             html_parts.append("</div>")
 
     chapter.content = "\n".join(html_parts).encode("utf-8")
     return chapter
 
 
-def _format_fact_html(text: str) -> str:
-    escaped = _escape(text)
+def _question_html_lines(text: str) -> list[str]:
+    question_id, body = _split_question_id_and_body(text)
+    qa_parts = _split_qa_pair(body)
+    if qa_parts is None:
+        if question_id is None:
+            return [f"<p>{_escape(body)}</p>"]
+        return [f"<p><strong>{_escape(question_id)}:</strong> {_escape(body)}</p>"]
+
+    question_text, answer_text = qa_parts
+    lines: list[str] = []
+    if question_id is not None:
+        lines.append(f'<p class="question-id">{_escape(question_id)}</p>')
+    question_markup = (
+        '<p class="qa-line qa-question"><span class="qa-label">Q:</span> '
+        f"{_escape(question_text)}</p>"
+    )
+    answer_markup = (
+        '<p class="qa-line qa-answer"><span class="qa-label">A:</span> '
+        f"{_escape(answer_text)}</p>"
+    )
+    lines.append(question_markup)
+    lines.append(answer_markup)
+    return lines
+
+
+def _split_question_id_and_body(text: str) -> tuple[str | None, str]:
     match = QUESTION_ID_RE.match(text)
     if match is None:
-        return escaped
-    question_id, remainder = match.groups()
-    return f"<strong>{_escape(question_id)}:</strong> {_escape(remainder)}"
+        return None, text
+    return match.group(1), match.group(2)
+
+
+def _split_qa_pair(text: str) -> tuple[str, str] | None:
+    match = QA_PAIR_RE.match(text.strip())
+    if match is None:
+        return None
+    question_text = match.group(1).strip()
+    answer_text = match.group(2).strip()
+    return question_text, answer_text
 
 
 def _escape(text: str) -> str:
@@ -310,6 +342,20 @@ h2 {
 }
 .question p {
     margin: 0.3em 0;
+}
+.question-id {
+    font-size: 0.84em;
+    color: #6B7280;
+    margin-bottom: 0.05em;
+}
+.qa-line {
+    margin: 0.1em 0;
+}
+.qa-answer {
+    margin-left: 0;
+}
+.qa-label {
+    font-weight: 700;
 }
 .figure {
     text-align: center;

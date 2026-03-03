@@ -31,6 +31,7 @@ from .models import PoolMetadata, PoolQuestion, QuestionImage
 from .tts_pause import AUDIO_SHORT_PAUSE_MARKER
 
 QUESTION_ID_RE = re.compile(r"^([A-Z]\d[A-Z]\d{2}):\s*(.+)$")
+QA_PAIR_RE = re.compile(r"^Q:\s*(.+?)\s+A:\s*(.+)$")
 
 
 def write_outputs(
@@ -397,6 +398,17 @@ def _write_pdf(
         leftIndent=8,
         rightIndent=6,
     )
+    qa_question_style = ParagraphStyle(
+        "FactsQuestion",
+        parent=body,
+        fontName="Helvetica",
+        spaceAfter=3,
+    )
+    qa_answer_style = ParagraphStyle(
+        "FactsAnswer",
+        parent=body,
+        spaceAfter=8,
+    )
     note_style = ParagraphStyle(
         "FactsNote",
         parent=styles["BodyText"],
@@ -405,6 +417,17 @@ def _write_pdf(
         leading=13,
         textColor=palette["muted"],
         spaceAfter=10,
+    )
+    question_id_style = ParagraphStyle(
+        "FactsQuestionId",
+        parent=styles["BodyText"],
+        fontName="Helvetica",
+        fontSize=9.5,
+        leading=11.5,
+        textColor=palette["muted"],
+        leftIndent=8,
+        rightIndent=6,
+        spaceAfter=2,
     )
 
     story: list[Flowable] = []
@@ -443,7 +466,17 @@ def _write_pdf(
         for question in questions:
             text = fact_sentence(question, mode=mode, omit_id=omit_id)
             image_flowables = _question_image_flowables(question, image_root_dir)
-            story.append(_question_block(text, image_flowables, body, palette["line"]))
+            story.append(
+                _question_block(
+                    text,
+                    image_flowables,
+                    body,
+                    question_id_style,
+                    qa_question_style,
+                    qa_answer_style,
+                    palette["line"],
+                )
+            )
         story.append(Spacer(1, 0.07 * inch))
 
     doc = SimpleDocTemplate(
@@ -564,24 +597,57 @@ def _group_heading(
 def _question_block(
     text: str,
     image_flowables: list[Flowable],
-    style: ParagraphStyle,
+    body_style: ParagraphStyle,
+    id_style: ParagraphStyle,
+    question_style: ParagraphStyle,
+    answer_style: ParagraphStyle,
     line: colors.Color,
 ) -> KeepTogether:
-    formatted = _format_pdf_fact(text)
-    fact = Paragraph(formatted, style)
+    lines = _question_paragraphs(text, body_style, id_style, question_style, answer_style)
     bottom_rule = HRFlowable(width="100%", color=line, thickness=0.5, spaceBefore=1, spaceAfter=4)
     if not image_flowables:
-        return KeepTogether([fact, bottom_rule])
+        return KeepTogether([*lines, bottom_rule])
     top_rule = HRFlowable(width="100%", color=line, thickness=0.5, spaceBefore=1, spaceAfter=4)
-    return KeepTogether([top_rule, *image_flowables, fact, bottom_rule])
+    return KeepTogether([top_rule, *image_flowables, *lines, bottom_rule])
 
 
-def _format_pdf_fact(text: str) -> str:
+def _question_paragraphs(
+    text: str,
+    body_style: ParagraphStyle,
+    id_style: ParagraphStyle,
+    question_style: ParagraphStyle,
+    answer_style: ParagraphStyle,
+) -> list[Paragraph]:
+    question_id, body = _split_question_id_and_body(text)
+    qa_parts = _split_qa_pair(body)
+    if qa_parts is None:
+        if question_id is None:
+            return [Paragraph(body, body_style)]
+        return [Paragraph(f"<b>{question_id}:</b> {body}", body_style)]
+
+    question_text, answer_text = qa_parts
+    paragraphs: list[Paragraph] = []
+    if question_id is not None:
+        paragraphs.append(Paragraph(question_id, id_style))
+    paragraphs.append(Paragraph(f"<b>Q:</b> {question_text}", question_style))
+    paragraphs.append(Paragraph(f"<b>A:</b> {answer_text}", answer_style))
+    return paragraphs
+
+
+def _split_question_id_and_body(text: str) -> tuple[str | None, str]:
     match = QUESTION_ID_RE.match(text)
     if match is None:
-        return text
-    question_id, remainder = match.groups()
-    return f"<b>{question_id}:</b> {remainder}"
+        return None, text
+    return match.group(1), match.group(2)
+
+
+def _split_qa_pair(text: str) -> tuple[str, str] | None:
+    match = QA_PAIR_RE.match(text.strip())
+    if match is None:
+        return None
+    question_text = match.group(1).strip()
+    answer_text = match.group(2).strip()
+    return question_text, answer_text
 
 
 def _subelement_heading(subelement: str, metadata: PoolMetadata | None) -> str:
