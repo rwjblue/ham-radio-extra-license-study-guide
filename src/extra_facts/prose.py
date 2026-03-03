@@ -8,7 +8,6 @@ import threading
 from collections.abc import Callable, Iterable
 from concurrent.futures import Future, ThreadPoolExecutor, as_completed
 from dataclasses import dataclass, replace
-from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, Literal, Protocol, cast
 
@@ -18,6 +17,7 @@ from requests_cache import CachedSession
 
 from .facts import fact_sentence
 from .models import LlmProse, PoolMetadata, PoolQuestion, ProseMeta, ProseValidation, QuestionPool
+from .repro import deterministic_utc_datetime
 
 PROSE_SCHEMA_VERSION = 2
 NUM_RE = re.compile(r"\b\d+(?:\.\d+)?\b")
@@ -325,7 +325,7 @@ def enrich_pool_with_prose(
             provider=provider,
             model=model,
             prompt_version=prompt_version,
-            generated_at=datetime.now(UTC).isoformat(),
+            generated_at=deterministic_utc_datetime().isoformat(),
         ),
     )
     summary = ProseRunSummary(

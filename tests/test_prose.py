@@ -211,6 +211,29 @@ def test_enrich_pool_accepts_valid_output() -> None:
     assert enriched.questions[0].llm.last_candidate == "The maximum power on 2200 meters is 1 W."
 
 
+def test_enrich_pool_sets_deterministic_generated_at(monkeypatch: MonkeyPatch) -> None:
+    monkeypatch.setenv("SOURCE_DATE_EPOCH", "946684800")
+    question = PoolQuestion(
+        question_id="E1A07",
+        question_text="What is the maximum power on 2200 meters?",
+        choices=["1 W", "5 W", "10 W", "100 W"],
+        correct_choice_index=0,
+        group="E1A",
+        subelement="E1",
+    )
+
+    enriched, _ = enrich_pool_with_prose(
+        _pool(question),
+        client=_FakeClient("The maximum power on 2200 meters is 1 W."),
+        provider="test",
+        model="fake",
+        prompt_version="v1",
+    )
+
+    assert enriched.prose_meta is not None
+    assert enriched.prose_meta.generated_at == "2000-01-01T00:00:00+00:00"
+
+
 def test_enrich_pool_preserves_non_llm_fields() -> None:
     question = PoolQuestion(
         question_id="E5C10",
