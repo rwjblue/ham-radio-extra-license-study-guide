@@ -26,12 +26,12 @@ from reportlab.platypus import (
     TableStyle,
 )
 
-from .facts import fact_sentence
+from .facts import LLM_EXPLANATION_PREFIX, fact_sentence
 from .intermediate import group_pool_questions
 from .models import PoolMetadata, PoolQuestion, QuestionImage
 from .tts_pause import AUDIO_SHORT_PAUSE_MARKER
 
-QUESTION_ID_RE = re.compile(r"^([A-Z]\d[A-Z]\d{2}):\s*(.+)$")
+QUESTION_ID_RE = re.compile(r"^([A-Z]\d[A-Z]\d{2}):\s*(.+)$", flags=re.DOTALL)
 QA_PAIR_RE = re.compile(r"^Q:\s*(.+?)\s+A:\s*(.+)$")
 
 
@@ -103,6 +103,11 @@ def _write_text(
     metadata: PoolMetadata | None,
 ) -> None:
     lines: list[str] = []
+    intro = _augmented_intro_text(mode=mode, has_llm=_has_llm_questions(groups))
+    if intro:
+        lines.append("## About this edition")
+        lines.append(intro)
+        lines.append("")
     current_subelement = ""
 
     for group, questions in groups.items():
@@ -441,6 +446,9 @@ def _write_pdf(
 
     story: list[Flowable] = []
     story.extend(_cover_header(title_style, subtitle_style, mode, palette["line"]))
+    intro = _augmented_intro_text(mode=mode, has_llm=_has_llm_questions(groups))
+    if intro:
+        story.append(Paragraph(intro, note_style))
     story.append(
         Paragraph(
             "Workbook format: review each statement, speak it aloud, and mark weak items.",
@@ -550,6 +558,27 @@ def _mode_label(mode: str) -> str:
     return "Literal study guide"
 
 
+def _has_llm_questions(groups: dict[str, list[PoolQuestion]]) -> bool:
+    return any(question.llm is not None for questions in groups.values() for question in questions)
+
+
+def _augmented_intro_text(mode: str, has_llm: bool) -> str | None:
+    if not has_llm:
+        return None
+    if mode == "prose":
+        return (
+            "This augmented facts edition uses AI-generated study prose for each question. "
+            "The prose is validated against the canonical correct answer before inclusion. "
+            "Use the official question pool as the final authority."
+        )
+    if mode == "qa":
+        return (
+            "In this augmented Q&A edition, each question and answer line is verbatim from the "
+            "official question pool. The Notes line under each item is AI-generated study context."
+        )
+    return None
+
+
 def _cover_header(
     title_style: ParagraphStyle,
     subtitle_style: ParagraphStyle,
@@ -634,11 +663,17 @@ def _question_paragraphs(
     answer_style: ParagraphStyle,
 ) -> list[Paragraph]:
     question_id, body = _split_question_id_and_body(text)
-    qa_parts = _split_qa_pair(body)
+    main_body, explanation = _split_explanation(body)
+    qa_parts = _split_qa_pair(main_body)
     if qa_parts is None:
+        explanation_line = _explanation_paragraph(explanation, body_style)
         if question_id is None:
-            return [Paragraph(body, body_style)]
-        return [Paragraph(f"<b>{question_id}:</b> {body}", body_style)]
+            if explanation_line is None:
+                return [Paragraph(main_body, body_style)]
+            return [Paragraph(main_body, body_style), explanation_line]
+        if explanation_line is None:
+            return [Paragraph(f"<b>{question_id}:</b> {main_body}", body_style)]
+        return [Paragraph(f"<b>{question_id}:</b> {main_body}", body_style), explanation_line]
 
     question_text, answer_text = qa_parts
     paragraphs: list[Paragraph] = []
@@ -646,6 +681,9 @@ def _question_paragraphs(
         paragraphs.append(Paragraph(question_id, id_style))
     paragraphs.append(Paragraph(f"<b>Q:</b> {question_text}", question_style))
     paragraphs.append(Paragraph(f"<b>A:</b> {answer_text}", answer_style))
+    explanation_line = _explanation_paragraph(explanation, answer_style)
+    if explanation_line is not None:
+        paragraphs.append(explanation_line)
     return paragraphs
 
 
@@ -663,6 +701,26 @@ def _split_qa_pair(text: str) -> tuple[str, str] | None:
     question_text = match.group(1).strip()
     answer_text = match.group(2).strip()
     return question_text, answer_text
+
+
+def _split_explanation(text: str) -> tuple[str, str | None]:
+    marker = f"\n{LLM_EXPLANATION_PREFIX}"
+    if marker not in text:
+        return text, None
+    main_body, explanation = text.split(marker, 1)
+    normalized_explanation = explanation.strip()
+    if not normalized_explanation:
+        return main_body.strip(), None
+    return main_body.strip(), normalized_explanation
+
+
+def _explanation_paragraph(
+    explanation: str | None,
+    style: ParagraphStyle,
+) -> Paragraph | None:
+    if not explanation:
+        return None
+    return Paragraph(f"<b>{LLM_EXPLANATION_PREFIX}</b>{explanation}", style)
 
 
 def _subelement_heading(subelement: str, metadata: PoolMetadata | None) -> str:

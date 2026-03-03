@@ -6,7 +6,7 @@ from pathlib import Path
 
 from extra_facts.build import build_from_pool_json
 from extra_facts.intermediate import write_question_pool
-from extra_facts.models import PoolQuestion, QuestionImage, QuestionPool
+from extra_facts.models import LlmProse, PoolQuestion, ProseValidation, QuestionImage, QuestionPool
 
 PNG_1X1_BASE64 = (
     "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO5W6mQAAAAASUVORK5CYII="
@@ -194,3 +194,69 @@ def test_build_outputs_are_deterministic_across_runs(tmp_path: Path) -> None:
 
     for file_name in ("facts.txt", "facts.pdf", "facts-dark.pdf", "facts.epub"):
         assert (out_a / file_name).read_bytes() == (out_b / file_name).read_bytes()
+
+
+def test_augmented_prose_text_includes_about_section(tmp_path: Path) -> None:
+    pool_json = tmp_path / "pool.json"
+    write_question_pool(
+        QuestionPool(
+            schema_version=1,
+            excluded_count=0,
+            questions=[
+                PoolQuestion(
+                    question_id="E1A01",
+                    question_text="What is one purpose of the Amateur Radio Service?",
+                    choices=["Advance the art", "Entertainment", "Advertising", "None"],
+                    correct_choice_index=0,
+                    group="E1A",
+                    subelement="E1",
+                    llm=LlmProse(
+                        prose_fact="Cleaner prose sentence.",
+                        answer_explanation="Helpful context.",
+                        status="accepted",
+                        validation=ProseValidation(True, True, True),
+                        source_hash="sha256:test",
+                    ),
+                )
+            ],
+        ),
+        pool_json,
+    )
+
+    summary = build_from_pool_json(pool_json, out_dir=tmp_path, mode="prose", omit_id=False)
+    text = summary.text_path.read_text(encoding="utf-8")
+    assert "## About this edition" in text
+    assert "This augmented facts edition uses AI-generated study prose" in text
+
+
+def test_augmented_qa_text_includes_about_section(tmp_path: Path) -> None:
+    pool_json = tmp_path / "pool.json"
+    write_question_pool(
+        QuestionPool(
+            schema_version=1,
+            excluded_count=0,
+            questions=[
+                PoolQuestion(
+                    question_id="E1A01",
+                    question_text="What is one purpose of the Amateur Radio Service?",
+                    choices=["Advance the art", "Entertainment", "Advertising", "None"],
+                    correct_choice_index=0,
+                    group="E1A",
+                    subelement="E1",
+                    llm=LlmProse(
+                        prose_fact="Cleaner prose sentence.",
+                        answer_explanation="Helpful context.",
+                        status="accepted",
+                        validation=ProseValidation(True, True, True),
+                        source_hash="sha256:test",
+                    ),
+                )
+            ],
+        ),
+        pool_json,
+    )
+
+    summary = build_from_pool_json(pool_json, out_dir=tmp_path, mode="qa", omit_id=False)
+    text = summary.text_path.read_text(encoding="utf-8")
+    assert "## About this edition" in text
+    assert "each question and answer line is verbatim from the official question pool" in text

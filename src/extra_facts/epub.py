@@ -13,12 +13,12 @@ from typing import Any
 
 from ebooklib import epub  # type: ignore[import-untyped]
 
-from .facts import fact_sentence
+from .facts import LLM_EXPLANATION_PREFIX, fact_sentence
 from .intermediate import group_pool_questions
 from .models import PoolMetadata, PoolQuestion, QuestionImage
 from .repro import deterministic_utc_datetime
 
-QUESTION_ID_RE = re.compile(r"^([A-Z]\d[A-Z]\d{2}):\s*(.+)$")
+QUESTION_ID_RE = re.compile(r"^([A-Z]\d[A-Z]\d{2}):\s*(.+)$", flags=re.DOTALL)
 QA_PAIR_RE = re.compile(r"^Q:\s*(.+?)\s+A:\s*(.+)$")
 
 
@@ -46,6 +46,8 @@ def write_epub(
 
     groups = group_pool_questions(questions)
     image_registry: dict[str, str] = {}
+    intro_text = _augmented_intro_text(mode=mode, has_llm=any(question.llm is not None for question in questions))
+    intro_written = False
 
     chapters: list[epub.EpubHtml] = []
     current_subelement = ""
@@ -64,7 +66,9 @@ def write_epub(
                     image_root_dir,
                     book,
                     image_registry,
+                    intro_text if not intro_written else None,
                 )
+                intro_written = True
                 chapter.add_item(style)
                 book.add_item(chapter)
                 chapters.append(chapter)
@@ -82,7 +86,9 @@ def write_epub(
             image_root_dir,
             book,
             image_registry,
+            intro_text if not intro_written else None,
         )
+        intro_written = True
         chapter.add_item(style)
         book.add_item(chapter)
         chapters.append(chapter)
@@ -139,6 +145,7 @@ def _build_chapter(
     image_root_dir: Path | None,
     book: Any,
     image_registry: dict[str, str],
+    intro_text: str | None,
 ) -> epub.EpubHtml:
     title = _subelement_heading(subelement, metadata)
     chapter = epub.EpubHtml(
@@ -149,6 +156,11 @@ def _build_chapter(
 
     html_parts: list[str] = []
     html_parts.append(f"<h1>{_escape(title)}</h1>")
+    if intro_text:
+        html_parts.append('<div class="edition-note">')
+        html_parts.append("<h2>About this edition</h2>")
+        html_parts.append(f"<p>{_escape(intro_text)}</p>")
+        html_parts.append("</div>")
 
     for group, questions in groups.items():
         group_title = _group_heading_text(group, metadata)
@@ -171,11 +183,19 @@ def _build_chapter(
 
 def _question_html_lines(text: str) -> list[str]:
     question_id, body = _split_question_id_and_body(text)
-    qa_parts = _split_qa_pair(body)
+    main_body, explanation = _split_explanation(body)
+    qa_parts = _split_qa_pair(main_body)
     if qa_parts is None:
+        explanation_line = _explanation_html_line(explanation)
         if question_id is None:
-            return [f"<p>{_escape(body)}</p>"]
-        return [f"<p><strong>{_escape(question_id)}:</strong> {_escape(body)}</p>"]
+            lines = [f"<p>{_escape(main_body)}</p>"]
+            if explanation_line is not None:
+                lines.append(explanation_line)
+            return lines
+        lines = [f"<p><strong>{_escape(question_id)}:</strong> {_escape(main_body)}</p>"]
+        if explanation_line is not None:
+            lines.append(explanation_line)
+        return lines
 
     question_text, answer_text = qa_parts
     lines: list[str] = []
@@ -191,6 +211,9 @@ def _question_html_lines(text: str) -> list[str]:
     )
     lines.append(question_markup)
     lines.append(answer_markup)
+    explanation_line = _explanation_html_line(explanation)
+    if explanation_line is not None:
+        lines.append(explanation_line)
     return lines
 
 
@@ -208,6 +231,43 @@ def _split_qa_pair(text: str) -> tuple[str, str] | None:
     question_text = match.group(1).strip()
     answer_text = match.group(2).strip()
     return question_text, answer_text
+
+
+def _split_explanation(text: str) -> tuple[str, str | None]:
+    marker = f"\n{LLM_EXPLANATION_PREFIX}"
+    if marker not in text:
+        return text, None
+    main_body, explanation = text.split(marker, 1)
+    normalized_explanation = explanation.strip()
+    if not normalized_explanation:
+        return main_body.strip(), None
+    return main_body.strip(), normalized_explanation
+
+
+def _explanation_html_line(explanation: str | None) -> str | None:
+    if not explanation:
+        return None
+    return (
+        '<p class="llm-explanation"><span class="llm-label">'
+        f"{_escape(LLM_EXPLANATION_PREFIX)}</span>{_escape(explanation)}</p>"
+    )
+
+
+def _augmented_intro_text(mode: str, has_llm: bool) -> str | None:
+    if not has_llm:
+        return None
+    if mode == "prose":
+        return (
+            "This augmented facts edition uses AI-generated study prose for each question. "
+            "The prose is validated against the canonical correct answer before inclusion. "
+            "Use the official question pool as the final authority."
+        )
+    if mode == "qa":
+        return (
+            "In this augmented Q&A edition, each question and answer line is verbatim from the "
+            "official question pool. The Notes line under each item is AI-generated study context."
+        )
+    return None
 
 
 def _escape(text: str) -> str:
@@ -394,6 +454,22 @@ h2 {
 }
 .qa-label {
     font-weight: 700;
+}
+.llm-explanation {
+    margin-top: 0.2em;
+    color: #374151;
+}
+.llm-label {
+    font-weight: 700;
+}
+.edition-note {
+    margin: 0.8em 0 1.2em;
+    padding: 0.6em 0.8em;
+    border: 1px solid #E5E7EB;
+    background: #F8FAFC;
+}
+.edition-note h2 {
+    margin-top: 0;
 }
 .figure {
     text-align: center;

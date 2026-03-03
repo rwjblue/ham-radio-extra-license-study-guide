@@ -7,7 +7,14 @@ from pathlib import Path
 from extra_facts.build import build_from_pool_json
 from extra_facts.epub import _question_html_lines, write_epub
 from extra_facts.intermediate import write_question_pool
-from extra_facts.models import PoolMetadata, PoolQuestion, QuestionImage, QuestionPool
+from extra_facts.models import (
+    LlmProse,
+    PoolMetadata,
+    PoolQuestion,
+    ProseValidation,
+    QuestionImage,
+    QuestionPool,
+)
 
 PNG_1X1_BASE64 = (
     "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO5W6mQAAAAASUVORK5CYII="
@@ -175,6 +182,37 @@ def test_write_epub_multiple_subelements(tmp_path: Path) -> None:
         assert len(chapter_files) == 2
 
 
+def test_write_epub_augmented_qa_includes_about_section(tmp_path: Path) -> None:
+    questions = [
+        PoolQuestion(
+            question_id="E1A01",
+            question_text="What is one purpose?",
+            choices=["Advance the art", "B", "C", "D"],
+            correct_choice_index=0,
+            group="E1A",
+            subelement="E1",
+            llm=LlmProse(
+                prose_fact="Cleaner prose sentence.",
+                answer_explanation="Helpful context.",
+                status="accepted",
+                validation=ProseValidation(True, True, True),
+                source_hash="sha256:test",
+            ),
+        ),
+    ]
+    epub_path = write_epub(
+        questions,
+        tmp_path / "output.epub",
+        mode="qa",
+        omit_id=False,
+    )
+    with zipfile.ZipFile(epub_path, "r") as zf:
+        chapter_files = [n for n in zf.namelist() if n.endswith(".xhtml")]
+        content = zf.read(chapter_files[0]).decode("utf-8")
+        assert "About this edition" in content
+        assert "each question and answer line is verbatim from the official question pool" in content
+
+
 def test_build_from_pool_json_produces_epub(tmp_path: Path) -> None:
     pool_json = tmp_path / "pool.json"
     write_question_pool(_sample_pool(), pool_json)
@@ -203,3 +241,19 @@ def test_question_html_lines_keep_non_qa_content_single_line() -> None:
     lines = _question_html_lines("E1A01: This is a literal fact sentence.")
 
     assert lines == ["<p><strong>E1A01:</strong> This is a literal fact sentence.</p>"]
+
+
+def test_question_html_lines_include_llm_explanation_block() -> None:
+    lines = _question_html_lines(
+        "E1A01: Q: What is one purpose of the Amateur Radio Service? A: Advance the art.\n"
+        "Notes: This adds extra context."
+    )
+
+    assert lines == [
+        '<p class="question-id">E1A01</p>',
+        '<p class="qa-line qa-question"><span class="qa-label">Q:</span> '
+        "What is one purpose of the Amateur Radio Service?</p>",
+        '<p class="qa-line qa-answer"><span class="qa-label">A:</span> Advance the art.</p>',
+        '<p class="llm-explanation"><span class="llm-label">'
+        "Notes: </span>This adds extra context.</p>",
+    ]

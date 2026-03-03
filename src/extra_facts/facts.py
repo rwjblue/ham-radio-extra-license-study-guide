@@ -29,12 +29,16 @@ UNIT_PATTERNS = {
     r"\b([0-9]+(?:\.[0-9]+)?)\s*A\b": r"\1 amperes",
 }
 
+LLM_EXPLANATION_PREFIX = "Notes: "
+
 
 def fact_sentence(question: PoolQuestion, mode: str, omit_id: bool = False) -> str:
     if mode == "qa":
         sentence = _to_qa(question.question_text, question.correct_answer)
+        sentence = _append_augmented_context(sentence, question)
     elif mode == "prose" and question.llm is not None:
         sentence = _normalize_sentence(question.llm.prose_fact)
+        sentence = _append_augmented_context(sentence, question)
     else:
         answer = question.correct_answer
         question_text = question.question_text.strip()
@@ -48,6 +52,15 @@ def fact_sentence(question: PoolQuestion, mode: str, omit_id: bool = False) -> s
     if omit_id:
         return sentence
     return f"{question.question_id}: {sentence}"
+
+
+def _append_augmented_context(sentence: str, question: PoolQuestion) -> str:
+    if question.llm is None:
+        return sentence
+    explanation = _normalize_sentence(question.llm.answer_explanation)
+    if not explanation:
+        return sentence
+    return f"{sentence}\n{LLM_EXPLANATION_PREFIX}{explanation}"
 
 
 def _to_qa(question_text: str, answer: str) -> str:
@@ -124,6 +137,8 @@ def _capitalize_first(text: str) -> str:
 
 def _normalize_sentence(text: str) -> str:
     text = re.sub(r"\s+", " ", text).strip()
+    if not text:
+        return ""
     text = re.sub(r"\s+:", ":", text)
     if not text.endswith("."):
         text += "."

@@ -82,13 +82,39 @@ def test_prose_mode_uses_llm_fact() -> None:
             confidence=0.9,
         ),
     )
-    assert fact_sentence(q, mode="prose") == "E2A02: This is cleaner prose."
+    assert fact_sentence(q, mode="prose") == (
+        "E2A02: This is cleaner prose.\nNotes: Short reason."
+    )
 
 
 def test_qa_mode_uses_question_and_answer_text() -> None:
     q = _question("E3A01", "What is the purpose of this test?", "To verify Q and A mode")
     assert fact_sentence(q, mode="qa") == (
         "E3A01: Q: What is the purpose of this test? A: To verify Q and A mode."
+    )
+
+
+def test_qa_mode_appends_llm_explanation_when_present() -> None:
+    q = _question("E3A02", "What is the purpose of this test?", "To verify Q and A mode")
+    q = PoolQuestion(
+        question_id=q.question_id,
+        question_text=q.question_text,
+        choices=q.choices,
+        correct_choice_index=q.correct_choice_index,
+        group=q.group,
+        subelement=q.subelement,
+        llm=LlmProse(
+            prose_fact="Cleaner prose sentence.",
+            answer_explanation="Because this mode now carries augmented context.",
+            status="accepted",
+            validation=ProseValidation(True, True, True),
+            source_hash="sha256:test-qa",
+            confidence=0.9,
+        ),
+    )
+    assert fact_sentence(q, mode="qa") == (
+        "E3A02: Q: What is the purpose of this test? A: To verify Q and A mode.\n"
+        "Notes: Because this mode now carries augmented context."
     )
 
 
