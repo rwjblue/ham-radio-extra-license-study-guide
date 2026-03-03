@@ -5,7 +5,7 @@
     {
       "number": 1,
       "code": "E1",
-      "title": "COMMISSION RULES",
+      "title": "Commission Rules",
       "groups": [
         "E1A",
         "E1B",
@@ -16,16 +16,16 @@
       ],
       "text_path": "dist/audio/qa/chapters/chapter-01.txt",
       "audio_path": "dist/audio/qa/chapters/chapter-01.mp3",
-      "duration_seconds": 835.733,
+      "duration_seconds": 835.863,
       "start_seconds": 0.0,
-      "text_sha256": "13f695f51463864514cf18b4fbaf7e0e02f76fbcea36c3fff224f8c727cece3b",
+      "text_sha256": "d318c79bfe64fcbcffff2130f0d32aaef4d73c27873c3f9d3053a2e155f133f5",
       "render_fingerprint": "elevenlabs:eleven_multilingual_v2:UgBBYS2sOqTuMpoF3BR0:1.0:mp3_44100_128:en",
       "units": [
         {
           "index": 1,
           "text_path": "/Users/rwjblue/src/github/rwjblue/ham-radio-extra-license-study-guide/.cache/audio-render/18353a1729f1a237/units/chapter-01/unit-0001.txt",
           "audio_path": "/Users/rwjblue/src/github/rwjblue/ham-radio-extra-license-study-guide/.cache/audio-render/18353a1729f1a237/units/chapter-01/unit-0001.mp3",
-          "text_sha256": "cb40f2ef935c43e2f985d48b34cd7a26f4d92ee1143d63d1eece53894932f48b",
+          "text_sha256": "98f3a24003ad53d3ca4a708a56ba78de6a4c9360c949dd5b4908ba8d214f25bb",
           "render_fingerprint": "elevenlabs:eleven_multilingual_v2:UgBBYS2sOqTuMpoF3BR0:1.0:mp3_44100_128:en"
         },
         {
@@ -558,7 +558,7 @@
     {
       "number": 2,
       "code": "E2",
-      "title": "OPERATING PROCEDURES",
+      "title": "Operating Procedures",
       "groups": [
         "E2A",
         "E2B",
@@ -568,16 +568,16 @@
       ],
       "text_path": "dist/audio/qa/chapters/chapter-02.txt",
       "audio_path": "dist/audio/qa/chapters/chapter-02.mp3",
-      "duration_seconds": 520.255,
-      "start_seconds": 835.733,
-      "text_sha256": "2fa3fd030cf50cec5bacd7fe5e7cd2c72e12108c26959a14f1f5b52c3335732c",
+      "duration_seconds": 520.385,
+      "start_seconds": 835.863,
+      "text_sha256": "3bed16a4792f54db3a57549ce3cf7789bfc5e3f15374d67edf28c0a7d85b66a5",
       "render_fingerprint": "elevenlabs:eleven_multilingual_v2:UgBBYS2sOqTuMpoF3BR0:1.0:mp3_44100_128:en",
       "units": [
         {
           "index": 1,
           "text_path": "/Users/rwjblue/src/github/rwjblue/ham-radio-extra-license-study-guide/.cache/audio-render/18353a1729f1a237/units/chapter-02/unit-0001.txt",
           "audio_path": "/Users/rwjblue/src/github/rwjblue/ham-radio-extra-license-study-guide/.cache/audio-render/18353a1729f1a237/units/chapter-02/unit-0001.mp3",
-          "text_sha256": "a69c1416c9f6d97ba8d29068fe9df9fe0f5babe868e6a4ed6af6ff9c9d105f15",
+          "text_sha256": "b07eb56d9f512919072b3859914f8fcbf7d579e9aa7c44e0123be909b2a1dbba",
           "render_fingerprint": "elevenlabs:eleven_multilingual_v2:UgBBYS2sOqTuMpoF3BR0:1.0:mp3_44100_128:en"
         },
         {
@@ -1040,7 +1040,7 @@
     {
       "number": 3,
       "code": "E3",
-      "title": "RADIO WAVE PROPAGATION",
+      "title": "Radio Wave Propagation",
       "groups": [
         "E3A",
         "E3B",
@@ -1048,16 +1048,16 @@
       ],
       "text_path": "dist/audio/qa/chapters/chapter-03.txt",
       "audio_path": "dist/audio/qa/chapters/chapter-03.mp3",
-      "duration_seconds": 351.849,
-      "start_seconds": 1355.988,
-      "text_sha256": "b9ce3a302d8073375d1897899243dd78db46895622d5f4c28e0132ac591bba81",
+      "duration_seconds": 352.163,
+      "start_seconds": 1356.249,
+      "text_sha256": "4b88006caa3819319b584a46ddb5d744c0e878c39b8d5ad15af987101dce6981",
       "render_fingerprint": "elevenlabs:eleven_multilingual_v2:UgBBYS2sOqTuMpoF3BR0:1.0:mp3_44100_128:en",
       "units": [
         {
           "index": 1,
           "text_path": "/Users/rwjblue/src/github/rwjblue/ham-radio-extra-license-study-guide/.cache/audio-render/18353a1729f1a237/units/chapter-03/unit-0001.txt",
           "audio_path": "/Users/rwjblue/src/github/rwjblue/ham-radio-extra-license-study-guide/.cache/audio-render/18353a1729f1a237/units/chapter-03/unit-0001.mp3",
-          "text_sha256": "685b5bc13cac6327b0543a4a830b6bf18679a507045a7bd0ca84cdee930b2e01",
+          "text_sha256": "4d396172c24c9ec0a99f07589403205a61c3e7b7e6c96447624e0141422ebb8c",
           "render_fingerprint": "elevenlabs:eleven_multilingual_v2:UgBBYS2sOqTuMpoF3BR0:1.0:mp3_44100_128:en"
         },
         {
@@ -1366,7 +1366,7 @@
     {
       "number": 4,
       "code": "E4",
-      "title": "AMATEUR PRACTICES",
+      "title": "Amateur Practices",
       "groups": [
         "E4A",
         "E4B",
@@ -1376,16 +1376,16 @@
       ],
       "text_path": "dist/audio/qa/chapters/chapter-04.txt",
       "audio_path": "dist/audio/qa/chapters/chapter-04.mp3",
-      "duration_seconds": 662.732,
-      "start_seconds": 1707.837,
-      "text_sha256": "481bb8630ef7af87cf71c4c53ab9d47e972f0697590bf06c526cbb9905ba14d1",
+      "duration_seconds": 662.367,
+      "start_seconds": 1708.411,
+      "text_sha256": "afb3520a97dd61924d39bea8e6e056025429d4c2a15fcb36a53751cac00a6459",
       "render_fingerprint": "elevenlabs:eleven_multilingual_v2:UgBBYS2sOqTuMpoF3BR0:1.0:mp3_44100_128:en",
       "units": [
         {
           "index": 1,
           "text_path": "/Users/rwjblue/src/github/rwjblue/ham-radio-extra-license-study-guide/.cache/audio-render/18353a1729f1a237/units/chapter-04/unit-0001.txt",
           "audio_path": "/Users/rwjblue/src/github/rwjblue/ham-radio-extra-license-study-guide/.cache/audio-render/18353a1729f1a237/units/chapter-04/unit-0001.mp3",
-          "text_sha256": "aaca9fd90349e3a1a5e424e23958f647f85f18f8eafdd5a84f8a7a440ab8dafd",
+          "text_sha256": "77605d429d44c3592d51f220cc4667315976aecf26b11bb5dc669dc406cfd2ab",
           "render_fingerprint": "elevenlabs:eleven_multilingual_v2:UgBBYS2sOqTuMpoF3BR0:1.0:mp3_44100_128:en"
         },
         {
@@ -1862,7 +1862,7 @@
     {
       "number": 5,
       "code": "E5",
-      "title": "ELECTRICAL PRINCIPLES",
+      "title": "Electrical Principles",
       "groups": [
         "E5A",
         "E5B",
@@ -1871,16 +1871,16 @@
       ],
       "text_path": "dist/audio/qa/chapters/chapter-05.txt",
       "audio_path": "dist/audio/qa/chapters/chapter-05.mp3",
-      "duration_seconds": 465.162,
-      "start_seconds": 2370.569,
-      "text_sha256": "c0d35cf08d1d81a591eeceb2d15f66909e99cd41cf6b99c6af07d002610560dd",
+      "duration_seconds": 465.006,
+      "start_seconds": 2370.778,
+      "text_sha256": "add91c17faff48578aad29d879f0c8db79afd5412aced4950c1da84a0c218aff",
       "render_fingerprint": "elevenlabs:eleven_multilingual_v2:UgBBYS2sOqTuMpoF3BR0:1.0:mp3_44100_128:en",
       "units": [
         {
           "index": 1,
           "text_path": "/Users/rwjblue/src/github/rwjblue/ham-radio-extra-license-study-guide/.cache/audio-render/18353a1729f1a237/units/chapter-05/unit-0001.txt",
           "audio_path": "/Users/rwjblue/src/github/rwjblue/ham-radio-extra-license-study-guide/.cache/audio-render/18353a1729f1a237/units/chapter-05/unit-0001.mp3",
-          "text_sha256": "942defdd7f59b57f11c2ba673f7dac29e755e2315cf8dda42ca1d1930129c2af",
+          "text_sha256": "7886425fb227843cd6047782589dbd97774bc0c8e542ebf16ed71e1c4c39c95f",
           "render_fingerprint": "elevenlabs:eleven_multilingual_v2:UgBBYS2sOqTuMpoF3BR0:1.0:mp3_44100_128:en"
         },
         {
@@ -2245,7 +2245,7 @@
     {
       "number": 6,
       "code": "E6",
-      "title": "CIRCUIT COMPONENTS",
+      "title": "Circuit Components",
       "groups": [
         "E6A",
         "E6B",
@@ -2256,16 +2256,16 @@
       ],
       "text_path": "dist/audio/qa/chapters/chapter-06.txt",
       "audio_path": "dist/audio/qa/chapters/chapter-06.mp3",
-      "duration_seconds": 595.54,
-      "start_seconds": 2835.731,
-      "text_sha256": "55c8d9524df074f1d73c4458a68157eeb9c2c27ea1a72b77a28b7e9788b8bad3",
+      "duration_seconds": 595.513,
+      "start_seconds": 2835.783,
+      "text_sha256": "7bd51de75b0ebdc1259c232ba7ed175e4f9c719a0023b4732c219937c928339a",
       "render_fingerprint": "elevenlabs:eleven_multilingual_v2:UgBBYS2sOqTuMpoF3BR0:1.0:mp3_44100_128:en",
       "units": [
         {
           "index": 1,
           "text_path": "/Users/rwjblue/src/github/rwjblue/ham-radio-extra-license-study-guide/.cache/audio-render/18353a1729f1a237/units/chapter-06/unit-0001.txt",
           "audio_path": "/Users/rwjblue/src/github/rwjblue/ham-radio-extra-license-study-guide/.cache/audio-render/18353a1729f1a237/units/chapter-06/unit-0001.mp3",
-          "text_sha256": "c2aad078da2a60445d3767042d0be6db1821a4a105082a518f3081aaf6446b78",
+          "text_sha256": "cd2d7bfd15778578e604b9f8c2ade8a6a8fb3cc88d2a38609c44d9f510998467",
           "render_fingerprint": "elevenlabs:eleven_multilingual_v2:UgBBYS2sOqTuMpoF3BR0:1.0:mp3_44100_128:en"
         },
         {
@@ -2749,7 +2749,7 @@
     {
       "number": 7,
       "code": "E7",
-      "title": "PRACTICAL CIRCUITS",
+      "title": "Practical Circuits",
       "groups": [
         "E7A",
         "E7B",
@@ -2763,15 +2763,15 @@
       "text_path": "dist/audio/qa/chapters/chapter-07.txt",
       "audio_path": "dist/audio/qa/chapters/chapter-07.mp3",
       "duration_seconds": 833.744,
-      "start_seconds": 3431.271,
-      "text_sha256": "37601b4374404591b9d8960be8a890de41d74f1819b24ab971c48151723bfdef",
+      "start_seconds": 3431.297,
+      "text_sha256": "3ed0cd90ccfbf7b7634b7adb7551bcbd9966f56cc0df65b119971966e0d76f91",
       "render_fingerprint": "elevenlabs:eleven_multilingual_v2:UgBBYS2sOqTuMpoF3BR0:1.0:mp3_44100_128:en",
       "units": [
         {
           "index": 1,
           "text_path": "/Users/rwjblue/src/github/rwjblue/ham-radio-extra-license-study-guide/.cache/audio-render/18353a1729f1a237/units/chapter-07/unit-0001.txt",
           "audio_path": "/Users/rwjblue/src/github/rwjblue/ham-radio-extra-license-study-guide/.cache/audio-render/18353a1729f1a237/units/chapter-07/unit-0001.mp3",
-          "text_sha256": "8a71120ffa74494b5f6ad51264745e69f9687bd8c7d3f34273fa3e65de66c1a6",
+          "text_sha256": "b029dee003593f3f79a5169182f9e5d73000b1a7502902555f1058d1858e7811",
           "render_fingerprint": "elevenlabs:eleven_multilingual_v2:UgBBYS2sOqTuMpoF3BR0:1.0:mp3_44100_128:en"
         },
         {
@@ -3465,7 +3465,7 @@
     {
       "number": 8,
       "code": "E8",
-      "title": "SIGNALS AND EMISSIONS",
+      "title": "Signals And Emissions",
       "groups": [
         "E8A",
         "E8B",
@@ -3474,16 +3474,16 @@
       ],
       "text_path": "dist/audio/qa/chapters/chapter-08.txt",
       "audio_path": "dist/audio/qa/chapters/chapter-08.mp3",
-      "duration_seconds": 472.541,
-      "start_seconds": 4265.015,
-      "text_sha256": "ad6459296eb2976bd034598d7de647ed472d111b5768145d88fc2a475f7c19a6",
+      "duration_seconds": 472.175,
+      "start_seconds": 4265.041,
+      "text_sha256": "287757478aab489c6f2b2a2870d1364dd22fb02f037580d1b615642fac92bdd7",
       "render_fingerprint": "elevenlabs:eleven_multilingual_v2:UgBBYS2sOqTuMpoF3BR0:1.0:mp3_44100_128:en",
       "units": [
         {
           "index": 1,
           "text_path": "/Users/rwjblue/src/github/rwjblue/ham-radio-extra-license-study-guide/.cache/audio-render/18353a1729f1a237/units/chapter-08/unit-0001.txt",
           "audio_path": "/Users/rwjblue/src/github/rwjblue/ham-radio-extra-license-study-guide/.cache/audio-render/18353a1729f1a237/units/chapter-08/unit-0001.mp3",
-          "text_sha256": "70fba20828d3ebda774e112d7aa4b269de45c72d7b24540817bcf2a7073dea01",
+          "text_sha256": "626e58fda54ca4ccab6046b765e5acc05261f1ce3911afa38ba88b9571c5c226",
           "render_fingerprint": "elevenlabs:eleven_multilingual_v2:UgBBYS2sOqTuMpoF3BR0:1.0:mp3_44100_128:en"
         },
         {
@@ -3862,7 +3862,7 @@
     {
       "number": 9,
       "code": "E9",
-      "title": "ANTENNAS AND TRANSMISSION LINES",
+      "title": "Antennas And Transmission Lines",
       "groups": [
         "E9A",
         "E9B",
@@ -3875,16 +3875,16 @@
       ],
       "text_path": "dist/audio/qa/chapters/chapter-09.txt",
       "audio_path": "dist/audio/qa/chapters/chapter-09.mp3",
-      "duration_seconds": 884.915,
-      "start_seconds": 4737.556,
-      "text_sha256": "56c6b2fb30ce644abe8378f308bdcbc051247c5064aff7650005547aa5ced051",
+      "duration_seconds": 884.524,
+      "start_seconds": 4737.216,
+      "text_sha256": "c91a605701a9d6943a6b0dcbd1e46072d764434a42d926d693ecdfb05c3d07f7",
       "render_fingerprint": "elevenlabs:eleven_multilingual_v2:UgBBYS2sOqTuMpoF3BR0:1.0:mp3_44100_128:en",
       "units": [
         {
           "index": 1,
           "text_path": "/Users/rwjblue/src/github/rwjblue/ham-radio-extra-license-study-guide/.cache/audio-render/18353a1729f1a237/units/chapter-09/unit-0001.txt",
           "audio_path": "/Users/rwjblue/src/github/rwjblue/ham-radio-extra-license-study-guide/.cache/audio-render/18353a1729f1a237/units/chapter-09/unit-0001.mp3",
-          "text_sha256": "6a2a5ec7e4997f5e73edaf5aebf37682ca2df49fb5545cf6fa0510a1b13d96fb",
+          "text_sha256": "b950e9b4ce665c53174c7aa5660505b12b9cde5fd843186a788bc1f1588b156b",
           "render_fingerprint": "elevenlabs:eleven_multilingual_v2:UgBBYS2sOqTuMpoF3BR0:1.0:mp3_44100_128:en"
         },
         {
@@ -4550,22 +4550,22 @@
     {
       "number": 10,
       "code": "E0",
-      "title": "SAFETY",
+      "title": "Safety",
       "groups": [
         "E0A"
       ],
       "text_path": "dist/audio/qa/chapters/chapter-10.txt",
       "audio_path": "dist/audio/qa/chapters/chapter-10.mp3",
-      "duration_seconds": 121.028,
-      "start_seconds": 5622.471,
-      "text_sha256": "7512955be0506680a3007541527c3c3756e3ba70d4342e44ba30132e018d40d1",
+      "duration_seconds": 120.924,
+      "start_seconds": 5621.74,
+      "text_sha256": "b63a2556e3497ecb6a20a63b62db7fe847964d0d17628eb814ae30a5d9ab43bb",
       "render_fingerprint": "elevenlabs:eleven_multilingual_v2:UgBBYS2sOqTuMpoF3BR0:1.0:mp3_44100_128:en",
       "units": [
         {
           "index": 1,
           "text_path": "/Users/rwjblue/src/github/rwjblue/ham-radio-extra-license-study-guide/.cache/audio-render/18353a1729f1a237/units/chapter-10/unit-0001.txt",
           "audio_path": "/Users/rwjblue/src/github/rwjblue/ham-radio-extra-license-study-guide/.cache/audio-render/18353a1729f1a237/units/chapter-10/unit-0001.mp3",
-          "text_sha256": "6e14e9f3662fa427bedf26af6f6b865cbb98108e4bdeda55230c12f2cf620164",
+          "text_sha256": "0fc5901901a98442d1e1a7bfba509ac81f69fdf05aba40edcdd60ee09ca39fbb",
           "render_fingerprint": "elevenlabs:eleven_multilingual_v2:UgBBYS2sOqTuMpoF3BR0:1.0:mp3_44100_128:en"
         },
         {
@@ -4673,13 +4673,13 @@
     "provider": "elevenlabs",
     "output_format": "mp3",
     "merged_audio_path": "dist/audio/qa/book.mp3",
-    "total_duration_seconds": 5743.499,
+    "total_duration_seconds": 5742.663,
     "chapter_markers_embedded": true,
-    "chapters_rendered": 0,
-    "chapters_reused": 10,
+    "chapters_rendered": 10,
+    "chapters_reused": 0,
     "render_fingerprint": "elevenlabs:eleven_multilingual_v2:UgBBYS2sOqTuMpoF3BR0:1.0:mp3_44100_128:en",
     "jobs": 4,
     "unit_cache_dir": "/Users/rwjblue/src/github/rwjblue/ham-radio-extra-license-study-guide/.cache/audio-render/18353a1729f1a237",
-    "rendered_at": "2026-03-03T17:14:33.055985+00:00"
+    "rendered_at": "2026-03-03T17:24:54.334827+00:00"
   }
 }

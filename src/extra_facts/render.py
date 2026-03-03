@@ -677,8 +677,8 @@ def _subelement_title_for_display(subelement: str, metadata: PoolMetadata | None
         return ""
     friendly = metadata.subelement_friendly_titles.get(subelement, "").strip()
     if friendly:
-        return friendly
-    return metadata.subelement_titles.get(subelement, "").strip()
+        return _normalize_shouty_title(friendly)
+    return _normalize_shouty_title(metadata.subelement_titles.get(subelement, "").strip())
 
 
 def _group_title_for_display(group: str, metadata: PoolMetadata | None) -> str:
@@ -686,8 +686,16 @@ def _group_title_for_display(group: str, metadata: PoolMetadata | None) -> str:
         return ""
     friendly = metadata.group_friendly_titles.get(group, "").strip()
     if friendly:
-        return friendly
-    return metadata.group_titles.get(group, "").strip()
+        return _normalize_shouty_title(friendly)
+    return _normalize_shouty_title(metadata.group_titles.get(group, "").strip())
+
+
+def _normalize_shouty_title(title: str) -> str:
+    letters_only = re.sub(r"[^A-Za-z]+", "", title)
+    if not letters_only or not letters_only.isupper():
+        return title
+    normalized = title.lower().title()
+    return re.sub(r"'S\b", "'s", normalized)
 
 
 def _draw_footer(

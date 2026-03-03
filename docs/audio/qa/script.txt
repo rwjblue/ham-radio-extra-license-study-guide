@@ -1,4 +1,4 @@
-Chapter E1: COMMISSION RULES.
+Chapter E1: Commission Rules.
 [[SHORT_PAUSE]]
 
 Section E1A.
@@ -355,7 +355,7 @@ It must satisfy the FCC’s spurious emission standards when operated at the les
 
 That wraps up chapter E1.
 
-Chapter E2: OPERATING PROCEDURES.
+Chapter E2: Operating Procedures.
 [[SHORT_PAUSE]]
 
 Section E2A.
@@ -665,7 +665,7 @@ PACTOR IV.
 
 That wraps up chapter E2.
 
-Chapter E3: RADIO WAVE PROPAGATION.
+Chapter E3: Radio Wave Propagation.
 [[SHORT_PAUSE]]
 
 Section E3A.
@@ -871,7 +871,7 @@ A coronal mass ejection impact or a solar flare has occurred.
 
 That wraps up chapter E3.
 
-Chapter E4: AMATEUR PRACTICES.
+Chapter E4: Amateur Practices.
 [[SHORT_PAUSE]]
 
 Section E4A.
@@ -1191,7 +1191,7 @@ Ensure all lightning protectors activate at the same time.
 
 That wraps up chapter E4.
 
-Chapter E5: ELECTRICAL PRINCIPLES.
+Chapter E5: Electrical Principles.
 [[SHORT_PAUSE]]
 
 Section E5A.
@@ -1434,7 +1434,7 @@ Wattless, nonproductive power.
 
 That wraps up chapter E5.
 
-Chapter E6: CIRCUIT COMPONENTS.
+Chapter E6: Circuit Components.
 [[SHORT_PAUSE]]
 
 Section E6A. 2 questions that require figures were removed from this section.
@@ -1756,7 +1756,7 @@ What is the approximate open-circuit voltage produced by a fully illuminated sil
 
 That wraps up chapter E6.
 
-Chapter E7: PRACTICAL CIRCUITS.
+Chapter E7: Practical Circuits.
 [[SHORT_PAUSE]]
 
 Section E7A.
@@ -2222,7 +2222,7 @@ All these choices are correct.
 
 That wraps up chapter E7.
 
-Chapter E8: SIGNALS AND EMISSIONS.
+Chapter E8: Signals And Emissions.
 [[SHORT_PAUSE]]
 
 Section E8A.
@@ -2475,7 +2475,7 @@ It is possible to transmit both uppercase and lowercase text.
 
 That wraps up chapter E8.
 
-Chapter E9: ANTENNAS AND TRANSMISSION LINES.
+Chapter E9: Antennas And Transmission Lines.
 [[SHORT_PAUSE]]
 
 Section E9A.
@@ -2921,7 +2921,7 @@ A single null.
 
 That wraps up chapter E9.
 
-Chapter E0: SAFETY.
+Chapter E0: Safety.
 [[SHORT_PAUSE]]
 
 Section E0A.

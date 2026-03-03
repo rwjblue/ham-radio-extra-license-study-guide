@@ -254,6 +254,28 @@ def test_write_audio_script_emits_chapter_files_in_order(tmp_path: Path) -> None
     assert [chapter["code"] for chapter in manifest["chapters"]] == ["E1", "E2"]
 
 
+def test_write_audio_script_normalizes_all_caps_chapter_titles(tmp_path: Path) -> None:
+    questions = [_question("E1A01", "What is true?", "A")]
+    metadata = PoolMetadata(
+        subelement_titles={"E1": "COMMISSION RULES"},
+        group_titles={"E1A": "BAND PRIVILEGES"},
+    )
+
+    path, _chapters_dir, manifest_path = write_audio_script(
+        questions,
+        out_dir=tmp_path,
+        mode="literal",
+        omit_id=True,
+        metadata=metadata,
+    )
+
+    content = path.read_text(encoding="utf-8")
+    assert "Chapter E1: Commission Rules." in content
+
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    assert manifest["chapters"][0]["title"] == "Commission Rules"
+
+
 def test_write_audio_script_removes_figure_questions_and_reports_count(tmp_path: Path) -> None:
     questions = [
         _question("E1A01", "What is true?", "A", image_paths=["media/image1.png"]),
