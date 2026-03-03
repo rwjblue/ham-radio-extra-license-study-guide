@@ -153,6 +153,25 @@ def test_write_audio_script_adjusts_articles_for_usb_and_ssb(tmp_path: Path) -> 
     assert "a upper side band" not in content
     assert "an single side band" not in content
 
+
+def test_write_audio_script_adjusts_capitalized_articles_for_usb_and_ssb(tmp_path: Path) -> None:
+    questions = [
+        _question("E1A01", "Which mode is selected?", "A USB signal"),
+        _question("E1A02", "What type of emission is generated?", "An SSB emission"),
+    ]
+
+    path, _chapters_dir, _manifest_path = write_audio_script(
+        questions,
+        out_dir=tmp_path,
+        mode="prose",
+        omit_id=True,
+    )
+
+    content = path.read_text(encoding="utf-8")
+    assert "An upper side band signal" in content
+    assert "A single side band emission" in content
+    assert "An single side band" not in content
+
 def test_write_audio_script_does_not_force_newline_within_fact_paragraph(tmp_path: Path) -> None:
     questions = [
         _question(
