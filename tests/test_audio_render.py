@@ -47,6 +47,81 @@ class _CapturingTtsClient:
         return b"audio-bytes"
 
 
+
+
+def test_render_audio_from_manifest_rewrites_pause_markers_for_openai(tmp_path: Path) -> None:
+    chapter_path = tmp_path / "audio" / "chapters" / "chapter-01.txt"
+    chapter_path.parent.mkdir(parents=True)
+    chapter_path.write_text("Question one.\n[[SHORT_PAUSE]]\nQuestion two.", encoding="utf-8")
+
+    manifest_path = tmp_path / "audio" / "audio_chapters_manifest.json"
+    manifest = {
+        "schema_version": 1,
+        "chapter_count": 1,
+        "chapters": [
+            {
+                "number": 1,
+                "code": "E1",
+                "title": "One",
+                "groups": ["E1A"],
+                "text_path": str(chapter_path),
+            }
+        ],
+    }
+    manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+
+    client = _CapturingTtsClient()
+
+    result = render_audio_from_manifest(
+        manifest_path=manifest_path,
+        out_dir=tmp_path / "audio",
+        client=client,
+        merge_output=False,
+        probe_duration=lambda _path: 5.0,
+        render_fingerprint="test-fingerprint",
+        provider="openai",
+    )
+
+    assert result.chapter_count == 1
+    assert client.inputs == ["Question one.\n...\nQuestion two."]
+
+
+def test_render_audio_from_manifest_rewrites_pause_markers_for_elevenlabs(tmp_path: Path) -> None:
+    chapter_path = tmp_path / "audio" / "chapters" / "chapter-01.txt"
+    chapter_path.parent.mkdir(parents=True)
+    chapter_path.write_text("Question one.\n[[SHORT_PAUSE]]\nQuestion two.", encoding="utf-8")
+
+    manifest_path = tmp_path / "audio" / "audio_chapters_manifest.json"
+    manifest = {
+        "schema_version": 1,
+        "chapter_count": 1,
+        "chapters": [
+            {
+                "number": 1,
+                "code": "E1",
+                "title": "One",
+                "groups": ["E1A"],
+                "text_path": str(chapter_path),
+            }
+        ],
+    }
+    manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+
+    client = _CapturingTtsClient()
+
+    result = render_audio_from_manifest(
+        manifest_path=manifest_path,
+        out_dir=tmp_path / "audio",
+        client=client,
+        merge_output=False,
+        probe_duration=lambda _path: 5.0,
+        render_fingerprint="test-fingerprint",
+        provider="elevenlabs",
+    )
+
+    assert result.chapter_count == 1
+    assert client.inputs == ["Question one.\n... ...\nQuestion two."]
+
 def test_render_audio_from_manifest_enriches_manifest_and_merges(tmp_path: Path) -> None:
     chapters_dir = tmp_path / "audio" / "chapters"
     chapters_dir.mkdir(parents=True)

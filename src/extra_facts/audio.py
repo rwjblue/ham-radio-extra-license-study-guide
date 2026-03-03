@@ -16,6 +16,8 @@ import requests
 from requests.adapters import HTTPAdapter
 from requests_cache import CachedSession
 
+from .tts_pause import apply_provider_pause_markers
+
 
 class TtsClient(Protocol):
     def synthesize(self, text: str) -> bytes:
@@ -357,6 +359,7 @@ def render_audio_from_manifest(
                 output_format=output_format,
                 chapters_audio_dir=chapters_audio_dir,
                 client=client,
+                provider=provider,
             )
             if len(segment_paths) == 1:
                 audio_path.write_bytes(segment_paths[0].read_bytes())
@@ -551,8 +554,10 @@ def _render_tts_segments(
     output_format: str,
     chapters_audio_dir: Path,
     client: TtsClient,
+    provider: str,
 ) -> list[Path]:
-    chunks = _split_text_for_tts(text, max_chars=TTS_MAX_CHARS)
+    prepared_text = apply_provider_pause_markers(text, provider=provider)
+    chunks = _split_text_for_tts(prepared_text, max_chars=TTS_MAX_CHARS)
     segment_paths: list[Path] = []
     for segment_index, chunk in enumerate(chunks, start=1):
         segment_name = (
@@ -562,6 +567,8 @@ def _render_tts_segments(
         segment_path.write_bytes(client.synthesize(chunk))
         segment_paths.append(segment_path)
     return segment_paths
+
+
 
 
 def _split_text_for_tts(text: str, max_chars: int) -> list[str]:
