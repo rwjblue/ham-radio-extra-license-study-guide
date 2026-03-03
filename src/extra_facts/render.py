@@ -19,6 +19,7 @@ from reportlab.platypus import (
     HRFlowable,
     Image,
     KeepTogether,
+    PageBreak,
     Paragraph,
     SimpleDocTemplate,
     Spacer,
@@ -456,8 +457,13 @@ def _write_pdf(
         )
     )
     seen_subelement = ""
+    saw_group = False
 
     for group, questions in groups.items():
+        if saw_group:
+            story.append(PageBreak())
+        saw_group = True
+
         subelement = group[:2]
         if subelement != seen_subelement:
             story.append(Spacer(1, 0.08 * inch))
