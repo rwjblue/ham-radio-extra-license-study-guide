@@ -4,8 +4,10 @@ Generate a clean study guide from the public NCVEC Element 4 (Amateur Extra) poo
 
 This project produces:
 - static facts (`dist/static/static-extra_facts.txt`, `dist/static/static-extra_facts.pdf`, and `dist/static/static-extra_facts-dark.pdf`)
+- Q & A facts (`dist/qa/qa-extra_facts.txt`, `dist/qa/qa-extra_facts.pdf`, and `dist/qa/qa-extra_facts-dark.pdf`)
 - optional LLM prose facts (`dist/prose/prose-extra_facts.txt`, `dist/prose/prose-extra_facts.pdf`, and `dist/prose/prose-extra_facts-dark.pdf`)
 - optional listenable script (`dist/audio/extra_facts_audio.txt`)
+- Q & A audio script (`dist/audio-qa/qa-extra_facts_audio.txt`)
 - per-chapter audio script files (`dist/audio/chapters/chapter-01.txt`, ...)
 - audio chapter manifest (`dist/audio/audio_chapters_manifest.json`)
 - optional rendered chapter audio (`dist/audio/chapters/chapter-01.mp3`, ...)
@@ -47,6 +49,13 @@ when the configured TTS provider key is set (`ELEVENLABS_API_KEY` by default,
 or `OPENAI_API_KEY` when `TTS_PROVIDER=openai`) it renders and verifies
 chapter/merged MP3 outputs.
 
+
+Build the Q & A pathway (includes both the full question text and the correct answer text):
+
+```bash
+mise run full-qa-build
+```
+
 If you want to regenerate only the audio script from the static pool:
 
 ```bash
@@ -83,6 +92,7 @@ mise run compare
   `dist/prose/prose-extra_facts-dark.pdf`
 - Audio script output:
   `dist/audio/extra_facts_audio.txt`
+  `dist/audio-qa/qa-extra_facts_audio.txt`
   `dist/audio/chapters/chapter-01.txt` ... `chapter-10.txt`
   `dist/audio/audio_chapters_manifest.json`
   `dist/audio/chapters/chapter-01.mp3` ... `chapter-10.mp3`
@@ -120,8 +130,8 @@ The repository workflow `.github/workflows/pages.yml` deploys `docs/` to GitHub 
 extra-facts extract --source-url <docx-url> --out-json dist/pool/extra_pool.json [--cache .cache]
 extra-facts extract --docx <local.docx> --out-json dist/pool/extra_pool.json
 extra-facts prose --pool-json dist/pool/extra_pool.json --out-json dist/pool/extra_pool_prose.json [--model gpt-5-mini] [--prompt-version v1] [--workers 6] [--max-attempts 3] [--max-questions N] [--resume]
-extra-facts build --pool-json dist/pool/extra_pool.json --out-dir dist --mode literal|tts|prose [--omit-id]
-extra-facts audio-script --pool-json dist/pool/extra_pool_prose.json --out-dir dist/audio --mode prose [--include-id]
+extra-facts build --pool-json dist/pool/extra_pool.json --out-dir dist --mode literal|tts|prose|qa [--omit-id]
+extra-facts audio-script --pool-json dist/pool/extra_pool_prose.json --out-dir dist/audio --mode prose|qa [--include-id]
 extra-facts audio-render --manifest dist/audio/audio_chapters_manifest.json --out-dir dist/audio [--provider elevenlabs|openai] [--model <provider-model>] [--voice <provider-voice>] [--elevenlabs-output-format mp3_44100_128] [--elevenlabs-language-code en] [--speed 1.0] [--instructions "Custom style override"] [--no-merge] [--no-chapter-markers]
 extra-facts audio-verify --manifest dist/audio/audio_chapters_manifest.json [--allow-missing-merged] [--skip-chapter-marker-check]
 ```

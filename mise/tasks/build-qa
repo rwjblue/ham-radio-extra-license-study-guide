@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+#MISE description="Build Q & A facts outputs"
+#MISE depends=["extract"]
+#MISE sources=["dist/pool/extra_pool.json", "src/**/*.py", "pyproject.toml"]
+#MISE outputs=["dist/qa/qa-extra_facts.txt", "dist/qa/qa-extra_facts.pdf", "dist/qa/qa-extra_facts.epub"]
+set -euo pipefail
+
+uv run extra-facts build \
+  --pool-json "${POOL_JSON:-dist/pool/extra_pool.json}" \
+  --out-dir "${QA_OUT_DIR:-dist/qa}" \
+  --mode qa

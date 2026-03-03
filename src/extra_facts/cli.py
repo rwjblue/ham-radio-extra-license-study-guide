@@ -181,7 +181,7 @@ def create_parser() -> argparse.ArgumentParser:
     build = sub.add_parser("build", help="Build facts outputs from intermediate JSON")
     build.add_argument("--pool-json", help="Path to prebuilt intermediate question pool JSON")
     build.add_argument("--out-dir", default="dist", help="Output directory")
-    build.add_argument("--mode", choices=["literal", "tts", "prose"], default="literal")
+    build.add_argument("--mode", choices=["literal", "tts", "prose", "qa"], default="literal")
     build.add_argument("--omit-id", action="store_true", help="Omit question IDs in output lines")
     build.set_defaults(func=build_command)
 
@@ -191,7 +191,7 @@ def create_parser() -> argparse.ArgumentParser:
     )
     audio.add_argument("--pool-json", help="Path to prebuilt intermediate question pool JSON")
     audio.add_argument("--out-dir", default="dist/audio", help="Output directory")
-    audio.add_argument("--mode", choices=["literal", "tts", "prose"], default="prose")
+    audio.add_argument("--mode", choices=["literal", "tts", "prose", "qa"], default="prose")
     audio.add_argument(
         "--omit-id",
         action="store_true",

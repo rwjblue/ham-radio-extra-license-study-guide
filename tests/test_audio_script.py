@@ -235,3 +235,42 @@ def test_write_audio_script_removes_figure_questions_and_reports_count(tmp_path:
     assert "True is A." not in content
     assert "Another true thing is C." not in content
     assert "Also true is B." in content
+
+
+def test_write_audio_script_qa_mode_includes_question_and_answer(tmp_path: Path) -> None:
+    questions = [_question("E1A01", "What is the maximum symbol rate?", "1200 baud")]
+
+    path, _chapters_dir, _manifest_path = write_audio_script(
+        questions,
+        out_dir=tmp_path,
+        mode="qa",
+        omit_id=True,
+    )
+
+    content = path.read_text(encoding="utf-8")
+    assert "Q: What is the maximum symbol rate? A: 1200 baud." in content
+
+
+def test_build_audio_script_from_pool_json_qa_mode_uses_qa_filename(tmp_path: Path) -> None:
+    from extra_facts.build import build_audio_script_from_pool_json
+    from extra_facts.intermediate import write_question_pool
+    from extra_facts.models import QuestionPool
+
+    pool_json = tmp_path / "pool.json"
+    write_question_pool(
+        QuestionPool(
+            schema_version=1,
+            excluded_count=0,
+            questions=[_question("E1A01", "What is the maximum symbol rate?", "1200 baud")],
+        ),
+        pool_json,
+    )
+
+    summary = build_audio_script_from_pool_json(
+        pool_json_path=pool_json,
+        out_dir=tmp_path / "audio",
+        mode="qa",
+        omit_id=True,
+    )
+
+    assert summary.script_path.name == "qa-extra_facts_audio.txt"
