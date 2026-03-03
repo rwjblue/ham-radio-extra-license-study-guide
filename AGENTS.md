@@ -34,6 +34,10 @@
 - If needed, run:
   - `jj file untrack 'glob:**/__pycache__/**' 'glob:**/*.py[cod]'`
 
+## jj-commit
+
+jj-commit-default: auto
+
 ## Ignore Policy
 
 - Never commit generated artifacts or local caches:
