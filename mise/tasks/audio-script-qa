@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+#MISE description="Build Q & A audio script text from intermediate JSON"
+#MISE depends=["extract"]
+#MISE sources=["dist/pool/extra_pool.json", "src/**/*.py", "pyproject.toml"]
+#MISE outputs=["dist/audio-qa/qa-extra_facts_audio.txt", "dist/audio-qa/audio_chapters_manifest.json", "dist/audio-qa/chapters/chapter-*.txt"]
+set -euo pipefail
+
+uv run extra-facts audio-script \
+  --pool-json "${POOL_JSON:-dist/pool/extra_pool.json}" \
+  --out-dir "${QA_AUDIO_OUT_DIR:-dist/audio-qa}" \
+  --mode qa

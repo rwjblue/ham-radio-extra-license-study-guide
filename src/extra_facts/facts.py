@@ -31,7 +31,9 @@ UNIT_PATTERNS = {
 
 
 def fact_sentence(question: PoolQuestion, mode: str, omit_id: bool = False) -> str:
-    if mode == "prose" and question.llm is not None:
+    if mode == "qa":
+        sentence = _to_qa(question.question_text, question.correct_answer)
+    elif mode == "prose" and question.llm is not None:
         sentence = _normalize_sentence(question.llm.prose_fact)
     else:
         answer = question.correct_answer
@@ -46,6 +48,14 @@ def fact_sentence(question: PoolQuestion, mode: str, omit_id: bool = False) -> s
     if omit_id:
         return sentence
     return f"{question.question_id}: {sentence}"
+
+
+def _to_qa(question_text: str, answer: str) -> str:
+    cleaned_question = question_text.strip()
+    cleaned_answer = answer.strip()
+    if not cleaned_question.endswith("?"):
+        cleaned_question = f"{cleaned_question}?"
+    return f"Q: {cleaned_question} A: {cleaned_answer}."
 
 
 def _to_declarative(question_text: str, answer: str) -> str:

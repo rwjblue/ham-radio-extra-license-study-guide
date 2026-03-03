@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+#MISE description="Extract and build Q & A outputs (PDF/EPUB/text + audio script)"
+#MISE depends=["build-qa", "audio-script-qa"]
+#MISE outputs={auto=true}
+set -euo pipefail
+
+echo "full-qa-build complete"

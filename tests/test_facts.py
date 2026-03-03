@@ -82,3 +82,10 @@ def test_prose_mode_uses_llm_fact() -> None:
         ),
     )
     assert fact_sentence(q, mode="prose") == "E2A02: This is cleaner prose."
+
+
+def test_qa_mode_uses_question_and_answer_text() -> None:
+    q = _question("E3A01", "What is the purpose of this test?", "To verify Q and A mode")
+    assert fact_sentence(q, mode="qa") == (
+        "E3A01: Q: What is the purpose of this test? A: To verify Q and A mode."
+    )
