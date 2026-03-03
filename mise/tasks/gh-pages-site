@@ -1,12 +1,13 @@
 #!/usr/bin/env bash
 #MISE description="Build GitHub Pages site payload from existing dist artifacts"
 #MISE depends=["deps-dev"]
-#MISE sources=["dist/pool/extra_pool.json", "dist/pool/extra_pool_prose.json", "dist/pool/assets/**", "dist/static/facts.txt", "dist/static/facts.pdf", "dist/static/facts-dark.pdf", "dist/static/facts.epub", "dist/qa/qa.txt", "dist/qa/qa.pdf", "dist/qa/qa-dark.pdf", "dist/qa/qa.epub", "dist/augmented/facts.txt", "dist/augmented/facts.pdf", "dist/augmented/facts-dark.pdf", "dist/augmented/facts.epub", "dist/augmented/qa.txt", "dist/augmented/qa.pdf", "dist/augmented/qa-dark.pdf", "dist/augmented/qa.epub", "dist/audio/fact/script.txt", "dist/audio/fact/manifest.json", "dist/audio/qa/script.txt", "dist/audio/qa/manifest.json", "dist/audio/fact/book.mp3", "dist/audio/qa/book.mp3"]
+#MISE sources=["mise/templates/gh-pages-index.html", "dist/pool/extra_pool.json", "dist/pool/extra_pool_prose.json", "dist/pool/assets/**", "dist/static/facts.txt", "dist/static/facts.pdf", "dist/static/facts-dark.pdf", "dist/static/facts.epub", "dist/qa/qa.txt", "dist/qa/qa.pdf", "dist/qa/qa-dark.pdf", "dist/qa/qa.epub", "dist/augmented/facts.txt", "dist/augmented/facts.pdf", "dist/augmented/facts-dark.pdf", "dist/augmented/facts.epub", "dist/augmented/qa.txt", "dist/augmented/qa.pdf", "dist/augmented/qa-dark.pdf", "dist/augmented/qa.epub", "dist/audio/fact/script.txt", "dist/audio/fact/manifest.json", "dist/audio/qa/script.txt", "dist/audio/qa/manifest.json", "dist/audio/fact/book.mp3", "dist/audio/qa/book.mp3"]
 # Audio book files (mp3) and augmented artifacts are optional; placeholders are created as needed.
 #MISE outputs={auto=true}
 set -euo pipefail
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+template_dir="${repo_root}/mise/templates"
 dist_dir="${DIST_DIR:-${repo_root}/dist}"
 out_dir="${PAGES_DIR:-${repo_root}/docs}"
 
@@ -155,226 +156,240 @@ if [ "${has_augmented}" = true ]; then
   augmented_note="Augmented artifacts include AI-generated prose in addition to the canonical answer."
 fi
 
-cat > "${out_dir}/index.html" <<HTML
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Ham Radio Extra Study Guide Assets</title>
-    <style>
-      :root {
-        --bg: #f6f9ff;
-        --fg: #10243a;
-        --muted: #4a5c71;
-        --card: #ffffff;
-        --border: #d7e1ef;
-        --link: #0057b8;
+pool_prose_item=""
+if [ -f "${dist_dir}/pool/extra_pool_prose.json" ]; then
+  pool_prose_item=',
+      {
+        "href": "./pool/extra_pool_prose.json",
+        "download": "amateur-extra-license-prep-pool-prose.json",
+        "label": "pool/extra_pool_prose.json",
+        "description": "Optional prose-augmented pool JSON (if generated)."
+      }'
+fi
+
+augmented_items="[]"
+if [ "${has_augmented}" = true ]; then
+  augmented_items='[
+      {
+        "href": "./amateur-extra-license-prep-augmented-facts.pdf",
+        "label": "augmented/facts.pdf",
+        "description": "Augmented static facts PDF."
+      },
+      {
+        "href": "./amateur-extra-license-prep-augmented-qa.pdf",
+        "label": "augmented/qa.pdf",
+        "description": "Augmented Q&A PDF."
+      },
+      {
+        "href": "./amateur-extra-license-prep-augmented-facts.epub",
+        "label": "augmented/facts.epub",
+        "description": "Augmented static facts EPUB."
+      },
+      {
+        "href": "./amateur-extra-license-prep-augmented-qa.epub",
+        "label": "augmented/qa.epub",
+        "description": "Augmented Q&A EPUB."
       }
-      body {
-        margin: 0;
-        font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Palatino, serif;
-        background: radial-gradient(circle at top right, #e7f0ff 0%, var(--bg) 55%);
-        color: var(--fg);
-      }
-      main {
-        max-width: 720px;
-        margin: 40px auto;
-        padding: 0 20px;
-      }
-      .card {
-        background: var(--card);
-        border: 1px solid var(--border);
-        border-radius: 12px;
-        padding: 20px;
-      }
-      h1 {
-        margin: 0 0 12px 0;
-        font-size: clamp(1.6rem, 3vw, 2rem);
-      }
-      p {
-        margin: 0 0 18px 0;
-        color: var(--muted);
-      }
-      p:last-of-type {
-        margin-top: 16px;
-        margin-bottom: 0;
-      }
-      .pipeline {
-        margin-top: 18px;
-      }
-      .assets {
-        display: grid;
-        gap: 10px;
-        margin: 16px 0 0 0;
-      }
-      .section {
-        margin-top: 22px;
-      }
-      .section h2 {
-        font-size: 1.05rem;
-        margin: 0;
-      }
-      .section p {
-        margin: 8px 0 0 0;
-      }
-      .asset {
-        display: block;
-        text-decoration: none;
-        border: 1px solid var(--border);
-        border-radius: 10px;
-        background: #fdfefe;
-        padding: 12px 14px;
-      }
-      .asset strong {
-        display: block;
-        font-size: 1rem;
-        line-height: 1.3;
-      }
-      .asset span {
-        display: block;
-        margin-top: 4px;
-        color: var(--muted);
-        font-size: 0.94rem;
-      }
-      .asset:hover {
-        background: #f4f8ff;
-        border-color: #c2d6f3;
-      }
-      a {
-        color: var(--link);
-      }
-      code {
-        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      }
-    </style>
-  </head>
-  <body>
-    <main>
-      <section class="card">
-        <h1>Ham Radio Extra Study Guide Assets</h1>
-        <p class="pipeline">
-          New here? Start with the
-          <a href="https://ncvec.org/">official NCVEC question pool</a>. This site publishes generated artifacts directly using the current <code>dist/</code> layout.
-        </p>
-        <section class="section">
-          <h2>Static Facts</h2>
-          <div class="assets">
-            <a class="asset" href="./amateur-extra-license-prep-facts.pdf">
-              <strong>facts.pdf</strong>
-              <span>Printable static facts workbook.</span>
-            </a>
-            <a class="asset" href="./amateur-extra-license-prep-facts-dark.pdf">
-              <strong>facts-dark.pdf</strong>
-              <span>Dark-theme static facts workbook.</span>
-            </a>
-            <a class="asset" href="./amateur-extra-license-prep-facts.epub">
-              <strong>facts.epub</strong>
-              <span>E-reader version of static facts.</span>
-            </a>
-            <a class="asset" href="./amateur-extra-license-prep-facts.txt">
-              <strong>facts.txt</strong>
-              <span>Plain-text static facts output.</span>
-            </a>
-          </div>
-        </section>
-        <section class="section">
-          <h2>Q&A Facts</h2>
-          <div class="assets">
-            <a class="asset" href="./amateur-extra-license-prep-qa.pdf">
-              <strong>qa.pdf</strong>
-              <span>Printable Q&A workbook.</span>
-            </a>
-            <a class="asset" href="./amateur-extra-license-prep-qa-dark.pdf">
-              <strong>qa-dark.pdf</strong>
-              <span>Dark-theme Q&A workbook.</span>
-            </a>
-            <a class="asset" href="./amateur-extra-license-prep-qa.epub">
-              <strong>qa.epub</strong>
-              <span>E-reader version of Q&A output.</span>
-            </a>
-            <a class="asset" href="./amateur-extra-license-prep-qa.txt">
-              <strong>qa.txt</strong>
-              <span>Plain-text Q&A output.</span>
-            </a>
-          </div>
-        </section>
-        <section class="section">
-          <h2>Augmented (Optional)</h2>
-          <p>${augmented_note}</p>
-          <div class="assets">
-            <a class="asset" href="./amateur-extra-license-prep-augmented-facts.pdf">
-              <strong>augmented/facts.pdf</strong>
-              <span>Augmented static facts PDF.</span>
-            </a>
-            <a class="asset" href="./amateur-extra-license-prep-augmented-qa.pdf">
-              <strong>augmented/qa.pdf</strong>
-              <span>Augmented Q&A PDF.</span>
-            </a>
-            <a class="asset" href="./amateur-extra-license-prep-augmented-facts.epub">
-              <strong>augmented/facts.epub</strong>
-              <span>Augmented static facts EPUB.</span>
-            </a>
-            <a class="asset" href="./amateur-extra-license-prep-augmented-qa.epub">
-              <strong>augmented/qa.epub</strong>
-              <span>Augmented Q&A EPUB.</span>
-            </a>
-          </div>
-        </section>
-        <section class="section">
-          <h2>Audio Artifacts</h2>
-          <div class="assets">
-            <a class="asset" href="${fact_audio_href}">
-              <strong>audio/fact/book.mp3</strong>
-              <span>${fact_audio_desc}</span>
-            </a>
-            <a class="asset" href="./amateur-extra-license-prep-fact-script.txt">
-              <strong>audio/fact/script.txt</strong>
-              <span>Fact narration script.</span>
-            </a>
-            <a class="asset" href="./amateur-extra-license-prep-fact-manifest.json">
-              <strong>audio/fact/manifest.json</strong>
-              <span>Fact chapter manifest for rendering/verification.</span>
-            </a>
-            <a class="asset" href="${qa_audio_href}">
-              <strong>audio/qa/book.mp3</strong>
-              <span>${qa_audio_desc}</span>
-            </a>
-            <a class="asset" href="./amateur-extra-license-prep-qa-script.txt">
-              <strong>audio/qa/script.txt</strong>
-              <span>Q&A narration script.</span>
-            </a>
-            <a class="asset" href="./amateur-extra-license-prep-qa-manifest.json">
-              <strong>audio/qa/manifest.json</strong>
-              <span>Q&A chapter manifest for rendering/verification.</span>
-            </a>
-          </div>
-        </section>
-        <section class="section">
-          <h2>Pool Data</h2>
-          <div class="assets">
-            <a class="asset" href="./pool/extra_pool.json" download="amateur-extra-license-prep-pool.json">
-              <strong>pool/extra_pool.json</strong>
-              <span>Canonical extracted pool JSON. Figure files are in <code>pool/assets/</code>.</span>
-            </a>
-            <a class="asset" href="./pool/extra_pool_prose.json" download="amateur-extra-license-prep-pool-prose.json">
-              <strong>pool/extra_pool_prose.json</strong>
-              <span>Optional prose-augmented pool JSON (if generated).</span>
-            </a>
-            <a class="asset" href="https://github.com/rwjblue/ham-radio-extra-license-study-guide/releases/latest">
-              <strong>Release Bundles</strong>
-              <span>Download complete JSON + image bundles from the latest GitHub release.</span>
-            </a>
-          </div>
-        </section>
-        <p>
-          Created by N1RWJ. Source repository:
-          <a href="https://github.com/rwjblue/ham-radio-extra-license-study-guide">github.com/rwjblue/ham-radio-extra-license-study-guide</a>.
-        </p>
-      </section>
-    </main>
-  </body>
-</html>
-HTML
+    ]'
+fi
+
+augmented_style_choice=""
+if [ "${has_augmented}" = true ]; then
+  augmented_style_choice=',
+    {
+      "id": "augmented",
+      "title": "I want extra context (experimental)",
+      "note": "Adds AI-generated prose context on top of canonical answers. Depending on the source pool and build inputs, this may sometimes look close to the non-augmented versions.",
+      "items": [
+        {
+          "href": "./amateur-extra-license-prep-augmented-facts.pdf",
+          "label": "Augmented Facts PDF",
+          "description": "Facts plus extra explanation context."
+        },
+        {
+          "href": "./amateur-extra-license-prep-augmented-qa.pdf",
+          "label": "Augmented Q&A PDF",
+          "description": "Q&A plus extra explanation context."
+        },
+        {
+          "href": "./amateur-extra-license-prep-augmented-facts.epub",
+          "label": "Augmented Facts EPUB",
+          "description": "E-reader facts plus extra context."
+        },
+        {
+          "href": "./amateur-extra-license-prep-augmented-qa.epub",
+          "label": "Augmented Q&A EPUB",
+          "description": "E-reader Q&A plus extra context."
+        }
+      ]
+    }'
+fi
+
+cat > "${out_dir}/artifacts.json" <<JSON
+{
+  "default_style": "qa",
+  "style_choices": [
+    {
+      "id": "qa",
+      "title": "I want direct exam practice",
+      "note": "Best for drilling exam-style prompts and answers. Recommended starting point.",
+      "items": [
+        {
+          "href": "./amateur-extra-license-prep-qa.pdf",
+          "label": "Q&A PDF",
+          "description": "Printable exam-style workbook."
+        },
+        {
+          "href": "./amateur-extra-license-prep-qa.epub",
+          "label": "Q&A EPUB",
+          "description": "E-reader exam-style workbook."
+        },
+        {
+          "href": "${qa_audio_href}",
+          "label": "Q&A Audio Book",
+          "description": "${qa_audio_desc}"
+        }
+      ]
+    },
+    {
+      "id": "facts",
+      "title": "I want concise memorization",
+      "note": "Best for quickly memorizing correct answers in statement form.",
+      "items": [
+        {
+          "href": "./amateur-extra-license-prep-facts.pdf",
+          "label": "Facts PDF",
+          "description": "Printable statement-style workbook."
+        },
+        {
+          "href": "./amateur-extra-license-prep-facts.epub",
+          "label": "Facts EPUB",
+          "description": "E-reader statement-style workbook."
+        },
+        {
+          "href": "${fact_audio_href}",
+          "label": "Facts Audio Book",
+          "description": "${fact_audio_desc}"
+        }
+      ]
+    }${augmented_style_choice}
+  ],
+  "sections": [
+    {
+      "title": "Static Facts",
+      "items": [
+        {
+          "href": "./amateur-extra-license-prep-facts.pdf",
+          "label": "facts.pdf",
+          "description": "Printable static facts workbook."
+        },
+        {
+          "href": "./amateur-extra-license-prep-facts-dark.pdf",
+          "label": "facts-dark.pdf",
+          "description": "Dark-theme static facts workbook."
+        },
+        {
+          "href": "./amateur-extra-license-prep-facts.epub",
+          "label": "facts.epub",
+          "description": "E-reader version of static facts."
+        },
+        {
+          "href": "./amateur-extra-license-prep-facts.txt",
+          "label": "facts.txt",
+          "description": "Plain-text static facts output."
+        }
+      ]
+    },
+    {
+      "title": "Q&A Facts",
+      "items": [
+        {
+          "href": "./amateur-extra-license-prep-qa.pdf",
+          "label": "qa.pdf",
+          "description": "Printable Q&A workbook."
+        },
+        {
+          "href": "./amateur-extra-license-prep-qa-dark.pdf",
+          "label": "qa-dark.pdf",
+          "description": "Dark-theme Q&A workbook."
+        },
+        {
+          "href": "./amateur-extra-license-prep-qa.epub",
+          "label": "qa.epub",
+          "description": "E-reader version of Q&A output."
+        },
+        {
+          "href": "./amateur-extra-license-prep-qa.txt",
+          "label": "qa.txt",
+          "description": "Plain-text Q&A output."
+        }
+      ]
+    },
+    {
+      "title": "Augmented (Optional)",
+      "note": "${augmented_note}",
+      "items": ${augmented_items}
+    },
+    {
+      "title": "Audio Artifacts",
+      "items": [
+        {
+          "href": "${fact_audio_href}",
+          "label": "audio/fact/book.mp3",
+          "description": "${fact_audio_desc}"
+        },
+        {
+          "href": "./amateur-extra-license-prep-fact-script.txt",
+          "label": "audio/fact/script.txt",
+          "description": "Fact narration script."
+        },
+        {
+          "href": "./amateur-extra-license-prep-fact-manifest.json",
+          "label": "audio/fact/manifest.json",
+          "description": "Fact chapter manifest for rendering/verification."
+        },
+        {
+          "href": "${qa_audio_href}",
+          "label": "audio/qa/book.mp3",
+          "description": "${qa_audio_desc}"
+        },
+        {
+          "href": "./amateur-extra-license-prep-qa-script.txt",
+          "label": "audio/qa/script.txt",
+          "description": "Q&A narration script."
+        },
+        {
+          "href": "./amateur-extra-license-prep-qa-manifest.json",
+          "label": "audio/qa/manifest.json",
+          "description": "Q&A chapter manifest for rendering/verification."
+        }
+      ]
+    },
+    {
+      "title": "Pool Data",
+      "items": [
+        {
+          "href": "./pool/extra_pool.json",
+          "download": "amateur-extra-license-prep-pool.json",
+          "label": "pool/extra_pool.json",
+          "description": "Canonical extracted pool JSON. Figure files are in pool/assets/."
+        }${pool_prose_item},
+        {
+          "href": "https://github.com/rwjblue/ham-radio-extra-license-study-guide/releases/latest",
+          "label": "Release Bundles",
+          "description": "Download complete JSON + image bundles from the latest GitHub release."
+        }
+      ]
+    }
+  ]
+}
+JSON
+
+cp "${template_dir}/gh-pages-index.html" "${out_dir}/index.html"
+{
+  printf 'window.HAM_EXTRA_ARTIFACTS = '
+  cat "${out_dir}/artifacts.json"
+  printf ';\n'
+} > "${out_dir}/artifacts.js"
 
 echo "GitHub Pages site generated at ${out_dir}"

@@ -134,6 +134,8 @@ This creates `docs/` with:
 - `docs/audio/qa/{script.txt,manifest.json,book.mp3}`
 - placeholder files `docs/audio/{fact,qa}/book.mp3.placeholder.txt` when merged MP3s have not been rendered yet
 - root-level alias downloads using `amateur-extra-license-prep-*` filenames for cleaner saved file names in browsers
+- `docs/artifacts.json` (manifest consumed by `docs/index.html`)
+- `docs/artifacts.js` (inline manifest for local `file://` browsing without fetch/CORS issues)
 - `docs/index.html`
 
 For downloadable JSON+assets bundles, use GitHub Releases.
