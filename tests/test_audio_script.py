@@ -47,6 +47,7 @@ def test_write_audio_script_adds_spoken_headers_and_omits_ids(tmp_path: Path) ->
 
     content = path.read_text(encoding="utf-8")
     assert "Chapter E1: Operating Rules." in content
+    assert "Chapter E1: Operating Rules.\n[[SHORT_PAUSE]]\n\n" in content
     assert "Section E1A." in content
     assert "Section E1B." in content
     assert "Focus on the core ideas and practical limits in this chapter." not in content
@@ -201,7 +202,8 @@ def test_write_audio_script_does_not_force_newline_within_fact_paragraph(tmp_pat
         "\n\nWhen using a transceiver that displays the carrier frequency of phone signals, "
         "what is the lowest frequency at which a properly adjusted lower side "
         "band emission will be "
-        "totally within the band: 3 kilohertz above the lower band edge.\n\n"
+        "totally within the band: 3 kilohertz above the lower band edge.\n"
+        "[[SHORT_PAUSE]]\n\n"
     ) in content
 
 
@@ -219,10 +221,11 @@ def test_write_audio_script_uses_blank_lines_between_sections_and_facts(tmp_path
     )
 
     content = path.read_text(encoding="utf-8")
-    assert "Section E1A.\n\nThe maximum symbol rate is 1200 baud.\n\n" in content
+    assert "Chapter E1.\n[[SHORT_PAUSE]]\n\nSection E1A.\n\n" in content
+    assert "Section E1A.\n\nThe maximum symbol rate is 1200 baud.\n[[SHORT_PAUSE]]\n\n" in content
     assert (
-        "The maximum symbol rate is 1200 baud.\n\n"
-        "Which of the following is true: Option A.\n\n"
+        "The maximum symbol rate is 1200 baud.\n[[SHORT_PAUSE]]\n\n"
+        "Which of the following is true: Option A.\n[[SHORT_PAUSE]]\n\n"
     ) in content
 
 
@@ -290,6 +293,26 @@ def test_write_audio_script_qa_mode_includes_question_and_answer(tmp_path: Path)
     content = path.read_text(encoding="utf-8")
     assert "Q: What is the maximum symbol rate? A: 1200 baud." in content
 
+
+
+
+def test_write_audio_script_inserts_pause_marker_between_questions(tmp_path: Path) -> None:
+    questions = [
+        _question("E1A01", "What is true?", "A"),
+        _question("E1A02", "What is also true?", "B"),
+    ]
+
+    path, _chapters_dir, _manifest_path = write_audio_script(
+        questions,
+        out_dir=tmp_path,
+        mode="qa",
+        omit_id=True,
+    )
+
+    content = path.read_text(encoding="utf-8")
+    assert "Q: What is true? A: A." in content
+    assert "[[SHORT_PAUSE]]" in content
+    assert "Q: What is also true? A: B." in content
 
 def test_build_audio_script_from_pool_json_qa_mode_uses_qa_filename(tmp_path: Path) -> None:
     from extra_facts.build import build_audio_script_from_pool_json

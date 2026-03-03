@@ -28,6 +28,7 @@ from reportlab.platypus import (
 from .facts import fact_sentence
 from .intermediate import group_pool_questions
 from .models import PoolMetadata, PoolQuestion, QuestionImage
+from .tts_pause import AUDIO_SHORT_PAUSE_MARKER
 
 QUESTION_ID_RE = re.compile(r"^([A-Z]\d[A-Z]\d{2}):\s*(.+)$")
 
@@ -193,6 +194,7 @@ def _build_audio_chapters(
             fact = _rewrite_first_abbreviation_use(fact, seen_abbreviations)
             fact = _expand_terms_for_tts(fact)
             chapter_lines.append(_normalize_audio_paragraph(fact))
+            chapter_lines.append(AUDIO_SHORT_PAUSE_MARKER)
             chapter_lines.append("")
 
     if current_subelement:
@@ -258,8 +260,8 @@ def _chapter_txt_name(number: int) -> str:
 def _audio_chapter_intro(subelement: str, metadata: PoolMetadata | None) -> list[str]:
     title = _subelement_title_for_display(subelement, metadata)
     if title:
-        return [f"Chapter {subelement}: {title}.", ""]
-    return [f"Chapter {subelement}.", ""]
+        return [f"Chapter {subelement}: {title}.", AUDIO_SHORT_PAUSE_MARKER, ""]
+    return [f"Chapter {subelement}.", AUDIO_SHORT_PAUSE_MARKER, ""]
 
 
 def _audio_group_intro(

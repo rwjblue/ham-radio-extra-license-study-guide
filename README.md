@@ -148,6 +148,7 @@ extra-facts audio-verify --manifest dist/audio/audio_chapters_manifest.json [--a
 - ElevenLabs requests include `language_code` (default `en`; override with `ELEVENLABS_LANGUAGE_CODE` or `--elevenlabs-language-code`).
 - ElevenLabs audio-render calls use on-disk HTTP caching at `.cache/elevenlabs-http` (override via `ELEVENLABS_HTTP_CACHE_DIR`, disable with `ELEVENLABS_HTTP_CACHE=0`).
 - OpenAI audio-render calls use the same HTTP cache controls as prose.
+- Audio scripts insert a neutral `[[SHORT_PAUSE]]` marker after chapter titles and each spoken item; during `audio-render` this is converted per provider (`...` for OpenAI, `... ...` for ElevenLabs) so transitions sound distinct without depending on SSML support.
 - Audio render instructions are currently applied to OpenAI only; set `INSTRUCTIONS` (for `mise run audio-render`) or `--instructions` (CLI) to override OpenAI delivery style.
 - `audio-render` uses `ffprobe` (duration extraction) and `ffmpeg` (MP3 merge + chapter markers).
 - `audio-render` reuses existing chapter MP3 files when chapter text and render settings are unchanged.
