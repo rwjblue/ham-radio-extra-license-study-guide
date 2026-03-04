@@ -173,11 +173,24 @@
       const stylesRoot = document.getElementById("styles");
       const sectionsRoot = document.getElementById("sections");
 
+      function resolveThemeAwarePdfHref(href) {
+        if (
+          !window.matchMedia("(prefers-color-scheme: dark)").matches ||
+          typeof href !== "string" ||
+          !href.endsWith(".pdf") ||
+          href.endsWith("-dark.pdf")
+        ) {
+          return href;
+        }
+
+        return href.replace(/\.pdf$/, "-dark.pdf");
+      }
+
       function renderItems(root, items) {
         for (const item of items) {
           const link = document.createElement("a");
           link.className = "asset";
-          link.href = item.href;
+          link.href = resolveThemeAwarePdfHref(item.href);
           if (item.download) {
             link.download = item.download;
           }
