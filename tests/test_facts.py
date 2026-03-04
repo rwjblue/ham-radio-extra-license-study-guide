@@ -94,6 +94,28 @@ def test_qa_mode_uses_question_and_answer_text() -> None:
     )
 
 
+def test_qa_mode_expands_all_choices_correct_answer() -> None:
+    q = PoolQuestion(
+        question_id="E3A03",
+        question_text="Which statements are true?",
+        choices=[
+            "Statement one is true",
+            "Statement two is true",
+            "Statement three is true",
+            "All of these are correct",
+        ],
+        correct_choice_index=3,
+        group="E3A",
+        subelement="E3",
+    )
+    assert fact_sentence(q, mode="qa") == (
+        "E3A03: Q: Which statements are true? A: All of these are correct:\n\n"
+        "  - Statement one is true\n"
+        "  - Statement two is true\n"
+        "  - Statement three is true"
+    )
+
+
 def test_qa_mode_appends_llm_explanation_when_present() -> None:
     q = _question("E3A02", "What is the purpose of this test?", "To verify Q and A mode")
     q = PoolQuestion(

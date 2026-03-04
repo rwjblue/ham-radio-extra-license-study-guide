@@ -33,7 +33,7 @@ from .models import PoolMetadata, PoolQuestion, QuestionImage
 from .tts_pause import AUDIO_SHORT_PAUSE_MARKER
 
 QUESTION_ID_RE = re.compile(r"^([A-Z]\d[A-Z]\d{2}):\s*(.+)$", flags=re.DOTALL)
-QA_PAIR_RE = re.compile(r"^Q:\s*(.+?)\s+A:\s*(.+)$")
+QA_PAIR_RE = re.compile(r"^Q:\s*(.+?)\s+A:\s*(.+)$", flags=re.DOTALL)
 
 
 def write_outputs(
@@ -209,8 +209,9 @@ def _build_audio_chapters(
                 question_text, answer_text = qa_parts
                 chapter_lines.append(_normalize_audio_paragraph(question_text))
                 chapter_lines.append(AUDIO_SHORT_PAUSE_MARKER)
-                chapter_lines.append(_normalize_audio_paragraph(answer_text))
-                chapter_lines.append(AUDIO_SHORT_PAUSE_MARKER)
+                for answer_line in _qa_answer_lines_for_audio(answer_text):
+                    chapter_lines.append(_normalize_audio_paragraph(answer_line))
+                    chapter_lines.append(AUDIO_SHORT_PAUSE_MARKER)
             chapter_lines.append("")
 
     if current_subelement:
@@ -337,6 +338,19 @@ def _expand_terms_for_tts(text: str) -> str:
 
 def _normalize_audio_paragraph(text: str) -> str:
     return re.sub(r"\s+", " ", text).strip()
+
+
+def _qa_answer_lines_for_audio(answer_text: str) -> list[str]:
+    lines = [line.strip() for line in answer_text.splitlines() if line.strip()]
+    if not lines:
+        return []
+    normalized: list[str] = []
+    for line in lines:
+        if line.startswith("- "):
+            normalized.append(line[2:].strip())
+        else:
+            normalized.append(line)
+    return normalized
 
 
 def _requires_figure(question: PoolQuestion) -> bool:
@@ -686,7 +700,7 @@ def _question_paragraphs(
     if question_id is not None:
         paragraphs.append(Paragraph(question_id, id_style))
     paragraphs.append(Paragraph(f"<b>Q:</b> {question_text}", question_style))
-    paragraphs.append(Paragraph(f"<b>A:</b> {answer_text}", answer_style))
+    paragraphs.append(Paragraph(f"<b>A:</b> {_qa_answer_for_pdf(answer_text)}", answer_style))
     explanation_line = _explanation_paragraph(explanation, answer_style)
     if explanation_line is not None:
         paragraphs.append(explanation_line)
@@ -707,6 +721,26 @@ def _split_qa_pair(text: str) -> tuple[str, str] | None:
     question_text = match.group(1).strip()
     answer_text = match.group(2).strip()
     return question_text, answer_text
+
+
+def _qa_answer_for_pdf(answer_text: str) -> str:
+    lines = [line.rstrip() for line in answer_text.splitlines()]
+    if len(lines) <= 1:
+        return answer_text
+
+    formatted: list[str] = []
+    for index, line in enumerate(lines):
+        stripped = line.strip()
+        if not stripped:
+            continue
+        if index == 0:
+            formatted.append(stripped)
+            continue
+        if stripped.startswith("- "):
+            formatted.append(f"&nbsp;&nbsp;&bull; {stripped[2:].strip()}")
+            continue
+        formatted.append(stripped)
+    return "<br/>".join(formatted)
 
 
 def _split_explanation(text: str) -> tuple[str, str | None]:

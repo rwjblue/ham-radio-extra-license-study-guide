@@ -320,6 +320,46 @@ def test_write_audio_script_qa_mode_includes_question_and_answer(tmp_path: Path)
 
 
 
+def test_write_audio_script_qa_mode_expands_all_choices_correct_answer(tmp_path: Path) -> None:
+    questions = [
+        PoolQuestion(
+            question_id="E1A01",
+            question_text="Which statements are true?",
+            choices=[
+                "Statement one is true",
+                "Statement two is true",
+                "Statement three is true",
+                "All these choices are correct",
+            ],
+            correct_choice_index=3,
+            group="E1A",
+            subelement="E1",
+        )
+    ]
+
+    path, _chapters_dir, _manifest_path = write_audio_script(
+        questions,
+        out_dir=tmp_path,
+        mode="qa",
+        omit_id=True,
+    )
+
+    content = path.read_text(encoding="utf-8")
+    assert (
+        "Which statements are true?\n"
+        "[[SHORT_PAUSE]]\n"
+        "All these choices are correct:\n"
+        "[[SHORT_PAUSE]]\n"
+        "Statement one is true\n"
+        "[[SHORT_PAUSE]]\n"
+        "Statement two is true\n"
+        "[[SHORT_PAUSE]]\n"
+        "Statement three is true\n"
+        "[[SHORT_PAUSE]]"
+    ) in content
+    assert "\n- Statement one is true" not in content
+
+
 def test_write_audio_script_inserts_pause_marker_between_questions(tmp_path: Path) -> None:
     questions = [
         _question("E1A01", "What is true?", "A"),

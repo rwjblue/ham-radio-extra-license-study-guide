@@ -44,7 +44,11 @@ E1D01: Q: What is the definition of telemetry? A: One-way transmission of measur
 E1D02: Q: Which of the following may transmit encrypted messages? A: Telecommand signals from a space telecommand station.
 E1D03: Q: What is a space telecommand station? A: An amateur station that transmits communications to initiate, modify, or terminate functions of a space station.
 E1D04: Q: Which of the following is required in the identification transmissions from a balloon-borne telemetry station? A: Call sign.
-E1D05: Q: What must be posted at the location of a station being operated by telecommand on or within 50 kilometers of the Earth’s surface? A: All these choices are correct.
+E1D05: Q: What must be posted at the location of a station being operated by telecommand on or within 50 kilometers of the Earth’s surface? A: All these choices are correct:
+
+  - A photocopy of the station license
+  - A label with the name, address, and telephone number of the station licensee
+  - A label with the name, address, and telephone number of the control operator
 E1D06: Q: What is the maximum permitted transmitter output power when operating a model craft by telecommand? A: 1 watt.
 E1D07: Q: Which of the following HF amateur bands include allocations for space stations? A: 40 meters, 20 meters, 15 meters, and 10 meters.
 E1D08: Q: Which VHF amateur bands have frequencies authorized for space stations? A: 2 meters.
@@ -83,12 +87,20 @@ E1F11: Q: Which of the following best describes one of the standards that must b
 ## SUBELEMENT E2 - Operating Procedures
 ### Group E2A - Amateur radio in space: amateur satellites; orbital mechanics; frequencies and modes; satellite hardware; satellite operations
 E2A01: Q: What is the direction of an ascending pass for an amateur satellite? A: From south to north.
-E2A02: Q: Which of the following is characteristic of an inverting linear transponder? A: All these choices are correct.
+E2A02: Q: Which of the following is characteristic of an inverting linear transponder? A: All these choices are correct:
+
+  - Doppler shift is reduced because the uplink and downlink shifts are in opposite directions
+  - Signal position in the band is reversed
+  - Upper sideband on the uplink becomes lower sideband on the downlink, and vice versa
 E2A03: Q: How is an upload signal processed by an inverting linear transponder? A: The signal is mixed with a local oscillator signal and the difference product is transmitted.
 E2A04: Q: What is meant by the “mode” of an amateur radio satellite? A: The satellite’s uplink and downlink frequency bands.
 E2A05: Q: What do the letters in a satellite’s mode designator specify? A: The uplink and downlink frequency ranges.
 E2A06: Q: What are Keplerian elements? A: Parameters that define the orbit of a satellite.
-E2A07: Q: Which of the following types of signals can be relayed through a linear transponder? A: All these choices are correct.
+E2A07: Q: Which of the following types of signals can be relayed through a linear transponder? A: All these choices are correct:
+
+  - FM and CW
+  - SSB and SSTV
+  - PSK and packet
 E2A08: Q: Why should effective radiated power (ERP) be limited to a satellite that uses a linear transponder? A: To avoid reducing the downlink power to all other users.
 E2A09: Q: What do the terms “L band” and “S band” specify? A: The 23- and 13-centimeter bands.
 E2A10: Q: What type of satellite appears to stay in one position in the sky? A: Geostationary.
@@ -116,9 +128,17 @@ E2C04: Q: Which of the following frequencies can be used for amateur radio mesh 
 E2C05: Q: What is the function of a DX QSL Manager? A: Handle the receiving and sending of confirmations for a DX station.
 E2C06: Q: During a VHF/UHF contest, in which band segment would you expect to find the highest level of SSB or CW activity? A: In the weak signal segment of the band, with most of the activity near the calling frequency.
 E2C07: Q: What is the Cabrillo format? A: A standard for submission of electronic contest logs.
-E2C08: Q: Which of the following contacts may be confirmed through the Logbook of The World (LoTW)? A: All these choices are correct.
+E2C08: Q: Which of the following contacts may be confirmed through the Logbook of The World (LoTW)? A: All these choices are correct:
+
+  - Special event contacts between stations in the US
+  - Contacts between a US station and a non-US station
+  - Contacts for Worked All States credit
 E2C09: Q: What type of equipment is commonly used to implement an amateur radio mesh network? A: A wireless router running custom firmware.
-E2C10: Q: Why do DX stations often transmit and receive on different frequencies? A: All these choices are correct.
+E2C10: Q: Why do DX stations often transmit and receive on different frequencies? A: All these choices are correct:
+
+  - Because the DX station may be transmitting on a frequency that is prohibited to some responding stations
+  - To separate the calling stations from the DX station
+  - To improve operating efficiency by reducing interference
 E2C11: Q: How should you generally identify your station when attempting to contact a DX station during a contest or in a pileup? A: Send your full call sign once or twice.
 E2C12: Q: What indicates the delay between a control operator action and the corresponding change in the transmitted signal? A: Latency.
 
@@ -139,7 +159,11 @@ E2D11: Q: How do APRS stations relay data? A: By packet digipeaters.
 E2E01: Q: Which of the following types of modulation is used for data emissions below 30 MHz? A: FSK.
 E2E02: Q: Which of the following synchronizes WSJT-X digital mode transmit/receive timing? A: Synchronization of computer clocks.
 E2E03: Q: To what does the "4" in FT4 refer? A: Four-tone continuous-phase frequency shift keying.
-E2E04: Q: Which of the following is characteristic of the FST4 mode? A: All these choices are correct.
+E2E04: Q: Which of the following is characteristic of the FST4 mode? A: All these choices are correct:
+
+  - Four-tone Gaussian frequency shift keying
+  - Variable transmit/receive periods
+  - Seven different tone spacings
 E2E05: Q: Which of these digital modes does not support keyboard-to-keyboard operation? A: WSPR.
 E2E06: Q: What is the length of an FT8 transmission cycle? A: 15 seconds.
 E2E07: Q: How does Q65 differ from JT65? A: Multiple receive cycles are averaged.
@@ -207,10 +231,18 @@ E4A04: Q: How is compensation of an oscilloscope probe performed? A: A square wa
 E4A05: Q: What is the purpose of using a prescaler with a frequency counter? A: Reduce the signal frequency to within the counter's operating range.
 E4A06: Q: What is the effect of aliasing on a digital oscilloscope when displaying a waveform? A: A false, jittery low-frequency version of the waveform is displayed.
 E4A07: Q: Which of the following is an advantage of using an antenna analyzer compared to an SWR bridge? A: Antenna analyzers compute SWR and impedance automatically.
-E4A08: Q: Which of the following is used to measure SWR? A: All these choices are correct.
+E4A08: Q: Which of the following is used to measure SWR? A: All these choices are correct:
+
+  - Directional wattmeter
+  - Vector network analyzer
+  - Antenna analyzer
 E4A09: Q: Which of the following is good practice when using an oscilloscope probe? A: Minimize the length of the probe's ground connection.
 E4A10: Q: Which trigger mode is most effective when using an oscilloscope to measure a linear power supply’s output ripple? A: Line.
-E4A11: Q: Which of the following can be measured with an antenna analyzer? A: All these choices are correct.
+E4A11: Q: Which of the following can be measured with an antenna analyzer? A: All these choices are correct:
+
+  - Velocity factor
+  - Cable length
+  - Resonant frequency of a tuned circuit
 
 ### Group E4B - Measurement technique and limitations: instrument accuracy and performance limitations; probes; techniques to minimize errors; measurement of Q; instrument calibration; S parameters; vector network analyzers; RF signals
 E4B01: Q: Which of the following factors most affects the accuracy of a frequency counter? A: Time base accuracy.
@@ -223,7 +255,11 @@ E4B07: Q: What do the subscripts of S parameters represent? A: The port or ports
 E4B08: Q: Which of the following can be used to determine the Q of a series-tuned circuit? A: The bandwidth of the circuit's frequency response.
 E4B09: Q: Which of the following can be measured by a two-port vector network analyzer? A: Filter frequency response.
 E4B10: Q: Which of the following methods measures intermodulation distortion in an SSB transmitter? A: Modulate the transmitter using two AF signals having non-harmonically related frequencies and observe the RF output with a spectrum analyzer.
-E4B11: Q: Which of the following can be measured with a vector network analyzer? A: All these choices are correct.
+E4B11: Q: Which of the following can be measured with a vector network analyzer? A: All these choices are correct:
+
+  - Input impedance
+  - Output impedance
+  - Reflection coefficient
 
 ### Group E4C - Receiver performance: phase noise, noise floor, image rejection, minimum detectable signal (MDS), increasing signal-to-noise ratio and dynamic range, noise figure, reciprocal mixing; selectivity; SDR non-linearity; use of attenuators at low frequencies
 E4C01: Q: What is an effect of excessive phase noise in an SDR receiver’s master clock oscillator? A: It can combine with strong signals on nearby frequencies to generate interference.
@@ -257,14 +293,22 @@ E4D14: Q: What power level does a receiver minimum discernible signal of -100 dB
 
 ### Group E4E - Noise and interference: external RF interference; electrical and computer noise; line noise; DSP filtering and noise reduction; common-mode current; surge protectors; single point ground panel
 E4E01: Q: What problem can occur when using an automatic notch filter (ANF) to remove interfering carriers while receiving CW signals? A: Removal of the CW signal as well as the interfering carrier.
-E4E02: Q: Which of the following types of noise can often be reduced by a digital noise reduction? A: All these choices are correct.
+E4E02: Q: Which of the following types of noise can often be reduced by a digital noise reduction? A: All these choices are correct:
+
+  - Broadband white noise
+  - Ignition noise
+  - Power line noise
 E4E04: Q: How can conducted noise from an automobile battery charging system be suppressed? A: By installing ferrite chokes on the charging system leads.
 E4E05: Q: What is used to suppress radio frequency interference from a line-driven AC motor? A: A brute-force AC-line filter in series with the motor’s power leads.
 E4E06: Q: What type of electrical interference can be caused by computer network equipment? A: The appearance of unstable modulated or unmodulated signals at specific frequencies.
 E4E07: Q: Which of the following can cause shielded cables to radiate or receive interference? A: Common-mode currents on the shield and conductors.
 E4E08: Q: What current flows equally on all conductors of an unshielded multiconductor cable? A: Common-mode current.
 E4E09: Q: What undesirable effect can occur when using a noise blanker? A: Strong signals may be distorted and appear to cause spurious emissions.
-E4E10: Q: Which of the following can create intermittent loud roaring or buzzing AC line interference? A: All these choices are correct.
+E4E10: Q: Which of the following can create intermittent loud roaring or buzzing AC line interference? A: All these choices are correct:
+
+  - Arcing contacts in a thermostatically controlled device
+  - A defective doorbell or doorbell transformer inside a nearby residence
+  - A malfunctioning illuminated advertising display
 E4E11: Q: What could be the cause of local AM broadcast band signals combining to generate spurious signals on the MF or HF bands? A: Nearby corroded metal connections are mixing and reradiating the broadcast signals.
 E4E12: Q: What causes interference received as a series of carriers at regular intervals across a wide frequency range? A: Switch-mode power supplies.
 E4E13: Q: Where should a station AC surge protector be installed? A: On the single point ground panel.
@@ -393,7 +437,11 @@ E6E06: Q: What characteristics of MMICs make them a popular choice for VHF throu
 E6E07: Q: What type of transmission line is often used for connections to MMICs? A: Microstrip.
 E6E08: Q: How is power supplied to the most common type of MMIC? A: Through a resistor and/or RF choke connected to the amplifier output lead.
 E6E09: Q: Which of the following component package types have the least parasitic effects at frequencies above the HF range? A: Surface mount.
-E6E10: Q: What advantage does surface-mount technology offer at RF compared to using through-hole components? A: All these choices are correct.
+E6E10: Q: What advantage does surface-mount technology offer at RF compared to using through-hole components? A: All these choices are correct:
+
+  - Smaller circuit area
+  - Shorter circuit board traces
+  - Components have less parasitic inductance and capacitance
 E6E11: Q: What is a characteristic of DIP packaging used for integrated circuits? A: Two rows of connecting pins on opposite sides of package (dual in-line package).
 E6E12: Q: Why are DIP through-hole package ICs not typically used at UHF and higher frequencies? A: Excessive lead length.
 
@@ -524,7 +572,11 @@ E7H09: Q: What type of frequency synthesizer circuit uses a phase accumulator, l
 E7H10: Q: What information is contained in the lookup table of a direct digital synthesizer (DDS)? A: Amplitude values that represent the desired waveform.
 E7H11: Q: What are the major spectral impurity components of direct digital synthesizers? A: Spurious signals at discrete frequencies.
 E7H12: Q: Which of the following ensures that a crystal oscillator operates on the frequency specified by the crystal manufacturer? A: Provide the crystal with a specified parallel capacitance.
-E7H13: Q: Which of the following is a technique for providing highly accurate and stable oscillators needed for microwave transmission and reception? A: All these choices are correct.
+E7H13: Q: Which of the following is a technique for providing highly accurate and stable oscillators needed for microwave transmission and reception? A: All these choices are correct:
+
+  - Use a GPS signal reference
+  - Use a rubidium stabilized reference oscillator
+  - Use a temperature-controlled high Q dielectric resonator
 
 
 ## SUBELEMENT E8 - Signals And Emissions
@@ -662,7 +714,11 @@ E9F04: Q: What impedance does a 1/2-wavelength transmission line present to an R
 E9F05: Q: What is microstrip? A: Precision printed circuit conductors above a ground plane that provide constant impedance interconnects at microwave frequencies.
 E9F06: Q: What is the approximate physical length of an air-insulated, parallel conductor transmission line that is electrically 1/2 wavelength long at 14.10 MHz? A: 10.6 meters.
 E9F07: Q: How does parallel conductor transmission line compare to coaxial cable with a plastic dielectric? A: Lower loss.
-E9F08: Q: Which of the following is a significant difference between foam dielectric coaxial cable and solid dielectric coaxial cable, assuming all other parameters are the same? A: All these choices are correct.
+E9F08: Q: Which of the following is a significant difference between foam dielectric coaxial cable and solid dielectric coaxial cable, assuming all other parameters are the same? A: All these choices are correct:
+
+  - Foam dielectric coaxial cable has lower safe maximum operating voltage
+  - Foam dielectric coaxial cable has lower loss per unit of length
+  - Foam dielectric coaxial cable has higher velocity factor
 E9F09: Q: What impedance does a 1/4-wavelength transmission line present to an RF generator when the line is shorted at the far end? A: Very high impedance.
 E9F10: Q: What impedance does a 1/8-wavelength transmission line present to an RF generator when the line is shorted at the far end? A: An inductive reactance.
 E9F11: Q: What impedance does a 1/8-wavelength transmission line present to an RF generator when the line is open at the far end? A: A capacitive reactance.
@@ -702,7 +758,11 @@ E0A02: Q: When evaluating RF exposure levels from your station at a neighbor’s
 E0A03: Q: Over what range of frequencies are the FCC human body RF exposure limits most restrictive? A: 30 - 300 MHz.
 E0A04: Q: When evaluating a site with multiple transmitters operating at the same time, the operators and licensees of which transmitters are responsible for mitigating over-exposure situations? A: Each transmitter that produces 5 percent or more of its MPE limit in areas where the total MPE limit is exceeded.
 E0A05: Q: What hazard is created by operating at microwave frequencies? A: The high gain antennas commonly used can result in high exposure levels.
-E0A06: Q: Why are there separate electric (E) and magnetic (H) MPE limits at frequencies below 300 MHz? A: All these choices are correct.
+E0A06: Q: Why are there separate electric (E) and magnetic (H) MPE limits at frequencies below 300 MHz? A: All these choices are correct:
+
+  - The body reacts to electromagnetic radiation from both the E and H fields
+  - Ground reflections and scattering cause the field strength to vary with location
+  - E field and H field radiation intensity peaks can occur at different locations
 E0A07: Q: What is meant by “100% tie-off” regarding tower safety? A: At least one lanyard attached to the tower at all times.
 E0A08: Q: What does SAR measure? A: The rate at which RF energy is absorbed by the body.
 E0A09: Q: Which of the following types of equipment are exempt from RF exposure evaluations? A: Hand-held transceivers sold before May 3, 2021.

@@ -240,6 +240,28 @@ def test_question_html_lines_split_qa_content() -> None:
     ]
 
 
+def test_question_html_lines_split_multiline_qa_answer_into_list() -> None:
+    lines = _question_html_lines(
+        "E1A01: Q: Which statements are true? A: All of these are correct:\n\n"
+        "  - Statement one is true\n"
+        "  - Statement two is true\n"
+        "  - Statement three is true"
+    )
+
+    assert lines == [
+        '<p class="question-id">E1A01</p>',
+        '<p class="qa-line qa-question"><span class="qa-label">Q:</span> '
+        "Which statements are true?</p>",
+        '<p class="qa-line qa-answer"><span class="qa-label">A:</span> '
+        "All of these are correct:</p>",
+        '<ul class="qa-answer-list">',
+        "<li>Statement one is true</li>",
+        "<li>Statement two is true</li>",
+        "<li>Statement three is true</li>",
+        "</ul>",
+    ]
+
+
 def test_question_html_lines_keep_non_qa_content_single_line() -> None:
     lines = _question_html_lines("E1A01: This is a literal fact sentence.")
 

@@ -19,7 +19,7 @@ from .models import PoolMetadata, PoolQuestion, QuestionImage
 from .repro import deterministic_utc_datetime
 
 QUESTION_ID_RE = re.compile(r"^([A-Z]\d[A-Z]\d{2}):\s*(.+)$", flags=re.DOTALL)
-QA_PAIR_RE = re.compile(r"^Q:\s*(.+?)\s+A:\s*(.+)$")
+QA_PAIR_RE = re.compile(r"^Q:\s*(.+?)\s+A:\s*(.+)$", flags=re.DOTALL)
 
 
 def write_epub(
@@ -206,12 +206,9 @@ def _question_html_lines(text: str) -> list[str]:
         '<p class="qa-line qa-question"><span class="qa-label">Q:</span> '
         f"{_escape(question_text)}</p>"
     )
-    answer_markup = (
-        '<p class="qa-line qa-answer"><span class="qa-label">A:</span> '
-        f"{_escape(answer_text)}</p>"
-    )
+    answer_markup = _qa_answer_html(answer_text)
     lines.append(question_markup)
-    lines.append(answer_markup)
+    lines.extend(answer_markup)
     explanation_line = _explanation_html_line(explanation)
     if explanation_line is not None:
         lines.append(explanation_line)
@@ -232,6 +229,40 @@ def _split_qa_pair(text: str) -> tuple[str, str] | None:
     question_text = match.group(1).strip()
     answer_text = match.group(2).strip()
     return question_text, answer_text
+
+
+def _qa_answer_html(answer_text: str) -> list[str]:
+    lines = [line.rstrip() for line in answer_text.splitlines()]
+    if len(lines) <= 1:
+        return [
+            '<p class="qa-line qa-answer"><span class="qa-label">A:</span> '
+            f"{_escape(answer_text)}</p>"
+        ]
+
+    first = ""
+    bullets: list[str] = []
+    for index, line in enumerate(lines):
+        stripped = line.strip()
+        if not stripped:
+            continue
+        if index == 0:
+            first = stripped
+            continue
+        if stripped.startswith("- "):
+            bullets.append(stripped[2:].strip())
+        else:
+            bullets.append(stripped)
+
+    markup = [
+        '<p class="qa-line qa-answer"><span class="qa-label">A:</span> '
+        f"{_escape(first)}</p>"
+    ]
+    if bullets:
+        markup.append('<ul class="qa-answer-list">')
+        for bullet in bullets:
+            markup.append(f"<li>{_escape(bullet)}</li>")
+        markup.append("</ul>")
+    return markup
 
 
 def _split_explanation(text: str) -> tuple[str, str | None]:
@@ -452,6 +483,12 @@ h2 {
 }
 .qa-answer {
     margin-left: 0;
+}
+.qa-answer-list {
+    margin: -0.2em 0 0.65em 1.3em;
+}
+.qa-answer-list li {
+    margin: 0.15em 0;
 }
 .qa-label {
     font-weight: 700;

@@ -164,7 +164,7 @@ What is the highest modulation index permitted at the highest modulation frequen
 
 What is the maximum mean power level for a spurious emission below 30 megahertz with respect to the fundamental emission?
 [[SHORT_PAUSE]]
-- 43 dB.
+43 dB.
 [[SHORT_PAUSE]]
 
 Which of the following operating arrangements allows an FCC-licensed US citizen to operate in many European countries, and amateurs from many European countries to operate in the US?
@@ -201,7 +201,13 @@ Call sign.
 
 What must be posted at the location of a station being operated by telecommand on or within 50 kilometers of the Earth’s surface?
 [[SHORT_PAUSE]]
-All these choices are correct.
+All these choices are correct:
+[[SHORT_PAUSE]]
+A photocopy of the station license
+[[SHORT_PAUSE]]
+A label with the name, address, and telephone number of the station licensee
+[[SHORT_PAUSE]]
+A label with the name, address, and telephone number of the control operator
 [[SHORT_PAUSE]]
 
 What is the maximum permitted transmitter output power when operating a model craft by telecommand?
@@ -367,7 +373,13 @@ From south to north.
 
 Which of the following is characteristic of an inverting linear transponder?
 [[SHORT_PAUSE]]
-All these choices are correct.
+All these choices are correct:
+[[SHORT_PAUSE]]
+Doppler shift is reduced because the uplink and downlink shifts are in opposite directions
+[[SHORT_PAUSE]]
+Signal position in the band is reversed
+[[SHORT_PAUSE]]
+Upper sideband on the uplink becomes lower sideband on the downlink, and vice versa
 [[SHORT_PAUSE]]
 
 How is an upload signal processed by an inverting linear transponder?
@@ -392,7 +404,13 @@ Parameters that define the orbit of a satellite.
 
 Which of the following types of signals can be relayed through a linear transponder?
 [[SHORT_PAUSE]]
-All these choices are correct.
+All these choices are correct:
+[[SHORT_PAUSE]]
+FM and CW
+[[SHORT_PAUSE]]
+single side band and SSTV
+[[SHORT_PAUSE]]
+PSK and packet
 [[SHORT_PAUSE]]
 
 Why should effective radiated power (ERP) be limited to a satellite that uses a linear transponder?
@@ -516,7 +534,13 @@ A standard for submission of electronic contest logs.
 
 Which of the following contacts may be confirmed through the Logbook of The World (LoTW)?
 [[SHORT_PAUSE]]
-All these choices are correct.
+All these choices are correct:
+[[SHORT_PAUSE]]
+Special event contacts between stations in the US
+[[SHORT_PAUSE]]
+Contacts between a US station and a non-US station
+[[SHORT_PAUSE]]
+Contacts for Worked All States credit
 [[SHORT_PAUSE]]
 
 What type of equipment is commonly used to implement an amateur radio mesh network?
@@ -526,7 +550,13 @@ A wireless router running custom firmware.
 
 Why do DX stations often transmit and receive on different frequencies?
 [[SHORT_PAUSE]]
-All these choices are correct.
+All these choices are correct:
+[[SHORT_PAUSE]]
+Because the DX station may be transmitting on a frequency that is prohibited to some responding stations
+[[SHORT_PAUSE]]
+To separate the calling stations from the DX station
+[[SHORT_PAUSE]]
+To improve operating efficiency by reducing interference
 [[SHORT_PAUSE]]
 
 How should you generally identify your station when attempting to contact a DX station during a contest or in a pileup?
@@ -615,7 +645,13 @@ Four-tone continuous-phase frequency shift keying.
 
 Which of the following is characteristic of the FST4 mode?
 [[SHORT_PAUSE]]
-All these choices are correct.
+All these choices are correct:
+[[SHORT_PAUSE]]
+Four-tone Gaussian frequency shift keying
+[[SHORT_PAUSE]]
+Variable transmit/receive periods
+[[SHORT_PAUSE]]
+Seven different tone spacings
 [[SHORT_PAUSE]]
 
 Which of these digital modes does not support keyboard-to-keyboard operation?
@@ -913,7 +949,13 @@ Antenna analyzers compute SWR and impedance automatically.
 
 Which of the following is used to measure SWR?
 [[SHORT_PAUSE]]
-All these choices are correct.
+All these choices are correct:
+[[SHORT_PAUSE]]
+Directional wattmeter
+[[SHORT_PAUSE]]
+Vector network analyzer
+[[SHORT_PAUSE]]
+Antenna analyzer
 [[SHORT_PAUSE]]
 
 Which of the following is good practice when using an oscilloscope probe?
@@ -928,7 +970,13 @@ Line.
 
 Which of the following can be measured with an antenna analyzer?
 [[SHORT_PAUSE]]
-All these choices are correct.
+All these choices are correct:
+[[SHORT_PAUSE]]
+Velocity factor
+[[SHORT_PAUSE]]
+Cable length
+[[SHORT_PAUSE]]
+Resonant frequency of a tuned circuit
 [[SHORT_PAUSE]]
 
 Section E4B.
@@ -985,7 +1033,13 @@ Modulate the transmitter using two AF signals having non-harmonically related fr
 
 Which of the following can be measured with a vector network analyzer?
 [[SHORT_PAUSE]]
-All these choices are correct.
+All these choices are correct:
+[[SHORT_PAUSE]]
+Input impedance
+[[SHORT_PAUSE]]
+Output impedance
+[[SHORT_PAUSE]]
+Reflection coefficient
 [[SHORT_PAUSE]]
 
 Section E4C.
@@ -1131,7 +1185,13 @@ Removal of the CW signal as well as the interfering carrier.
 
 Which of the following types of noise can often be reduced by a digital noise reduction?
 [[SHORT_PAUSE]]
-All these choices are correct.
+All these choices are correct:
+[[SHORT_PAUSE]]
+Broadband white noise
+[[SHORT_PAUSE]]
+Ignition noise
+[[SHORT_PAUSE]]
+Power line noise
 [[SHORT_PAUSE]]
 
 How can conducted noise from an automobile battery charging system be suppressed?
@@ -1166,7 +1226,13 @@ Strong signals may be distorted and appear to cause spurious emissions.
 
 Which of the following can create intermittent loud roaring or buzzing AC line interference?
 [[SHORT_PAUSE]]
-All these choices are correct.
+All these choices are correct:
+[[SHORT_PAUSE]]
+Arcing contacts in a thermostatically controlled device
+[[SHORT_PAUSE]]
+A defective doorbell or doorbell transformer inside a nearby residence
+[[SHORT_PAUSE]]
+A malfunctioning illuminated advertising display
 [[SHORT_PAUSE]]
 
 What could be the cause of local AM broadcast band signals combining to generate spurious signals on the MF or HF bands?
@@ -1684,7 +1750,13 @@ Surface mount.
 
 What advantage does surface-mount technology offer at RF compared to using through-hole components?
 [[SHORT_PAUSE]]
-All these choices are correct.
+All these choices are correct:
+[[SHORT_PAUSE]]
+Smaller circuit area
+[[SHORT_PAUSE]]
+Shorter circuit board traces
+[[SHORT_PAUSE]]
+Components have less parasitic inductance and capacitance
 [[SHORT_PAUSE]]
 
 What is a characteristic of DIP packaging used for integrated circuits?
@@ -2217,7 +2289,13 @@ Provide the crystal with a specified parallel capacitance.
 
 Which of the following is a technique for providing highly accurate and stable oscillators needed for microwave transmission and reception?
 [[SHORT_PAUSE]]
-All these choices are correct.
+All these choices are correct:
+[[SHORT_PAUSE]]
+Use a GPS signal reference
+[[SHORT_PAUSE]]
+Use a rubidium stabilized reference oscillator
+[[SHORT_PAUSE]]
+Use a temperature-controlled high Q dielectric resonator
 [[SHORT_PAUSE]]
 
 That wraps up chapter E7.
@@ -2792,7 +2870,13 @@ Lower loss.
 
 Which of the following is a significant difference between foam dielectric coaxial cable and solid dielectric coaxial cable, assuming all other parameters are the same?
 [[SHORT_PAUSE]]
-All these choices are correct.
+All these choices are correct:
+[[SHORT_PAUSE]]
+Foam dielectric coaxial cable has lower safe maximum operating voltage
+[[SHORT_PAUSE]]
+Foam dielectric coaxial cable has lower loss per unit of length
+[[SHORT_PAUSE]]
+Foam dielectric coaxial cable has higher velocity factor
 [[SHORT_PAUSE]]
 
 What impedance does a 1/4-wavelength transmission line present to an RF generator when the line is shorted at the far end?
@@ -2953,7 +3037,13 @@ The high gain antennas commonly used can result in high exposure levels.
 
 Why are there separate electric (E) and magnetic (H) MPE limits at frequencies below 300 megahertz?
 [[SHORT_PAUSE]]
-All these choices are correct.
+All these choices are correct:
+[[SHORT_PAUSE]]
+The body reacts to electromagnetic radiation from both the E and H fields
+[[SHORT_PAUSE]]
+Ground reflections and scattering cause the field strength to vary with location
+[[SHORT_PAUSE]]
+E field and H field radiation intensity peaks can occur at different locations
 [[SHORT_PAUSE]]
 
 What is meant by “100% tie-off” regarding tower safety?

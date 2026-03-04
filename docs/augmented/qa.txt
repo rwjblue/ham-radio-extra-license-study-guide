@@ -86,7 +86,11 @@ E1D03: Q: What is a space telecommand station? A: An amateur station that transm
 Notes: In the Amateur Extra exam context, a space telecommand station specifically controls the operation of an amateur space station by sending signals that start, change, or stop its functions. This definition aligns with FCC rules governing amateur operation of satellites and other space-based stations.
 E1D04: Q: Which of the following is required in the identification transmissions from a balloon-borne telemetry station? A: Call sign.
 Notes: The FCC requires all amateur stations, including balloon-borne telemetry stations, to identify with their call sign so the transmitting station can be clearly and uniquely identified. Including the call sign in the telemetry identification satisfies this regulatory requirement for proper station identification on the Amateur Extra exam.
-E1D05: Q: What must be posted at the location of a station being operated by telecommand on or within 50 kilometers of the Earth’s surface? A: All these choices are correct.
+E1D05: Q: What must be posted at the location of a station being operated by telecommand on or within 50 kilometers of the Earth’s surface? A: All these choices are correct:
+
+  - A photocopy of the station license
+  - A label with the name, address, and telephone number of the station licensee
+  - A label with the name, address, and telephone number of the control operator
 Notes: For telecommanded stations near the Earth's surface, the rules require clear identification of the licensee and how to reach the control point. Listing the name, call sign, and contact information ensures accountability and the ability to promptly control or shut down the station if necessary.
 E1D06: Q: What is the maximum permitted transmitter output power when operating a model craft by telecommand? A: 1 watt.
 Notes: FCC rules limit telecommand of model craft to a maximum transmitter output power of 1 watt to minimize interference and ensure safe shared use of the spectrum. Amateur Extra operators must observe this specific power cap when controlling model craft by radio.
@@ -156,7 +160,11 @@ Notes: FCC certification requires that external RF power amplifiers limit unwant
 ### Group E2A - Amateur satellites, orbits, and space operation
 E2A01: Q: What is the direction of an ascending pass for an amateur satellite? A: From south to north.
 Notes: An ascending pass is defined as the portion of the satellite’s orbit where it moves from the Southern Hemisphere toward the Northern Hemisphere as seen from Earth. For an observer, this corresponds to the satellite traveling generally from south to north across the sky.
-E2A02: Q: Which of the following is characteristic of an inverting linear transponder? A: All these choices are correct.
+E2A02: Q: Which of the following is characteristic of an inverting linear transponder? A: All these choices are correct:
+
+  - Doppler shift is reduced because the uplink and downlink shifts are in opposite directions
+  - Signal position in the band is reversed
+  - Upper sideband on the uplink becomes lower sideband on the downlink, and vice versa
 Notes: Each listed behavior describes how an inverting linear transponder processes signals in amateur satellite operation. Because it inverts both sideband sense and passband frequency while maintaining linearity, all of the provided statements are simultaneously true.
 E2A03: Q: How is an upload signal processed by an inverting linear transponder? A: The signal is mixed with a local oscillator signal and the difference product is transmitted.
 Notes: An inverting linear transponder uses frequency mixing so that the uplink signal is converted to a different frequency by subtracting it from a local oscillator signal. This difference product is then amplified and retransmitted, preserving the modulation while shifting the frequency and inverting the spectrum as used in satellite and similar amateur applications.
@@ -166,7 +174,11 @@ E2A05: Q: What do the letters in a satellite’s mode designator specify? A: The
 Notes: Each letter in the satellite mode (such as Mode U/V or L/S) corresponds to a specific amateur band used for the uplink and the downlink. This lets operators know which frequency ranges to use when communicating through that satellite.
 E2A06: Q: What are Keplerian elements? A: Parameters that define the orbit of a satellite.
 Notes: In amateur satellite operation, Keplerian elements mathematically describe a satellite's orbit so tracking software can predict its position over time. These orbital parameters are essential for knowing when and where to point antennas and when communication windows will occur.
-E2A07: Q: Which of the following types of signals can be relayed through a linear transponder? A: All these choices are correct.
+E2A07: Q: Which of the following types of signals can be relayed through a linear transponder? A: All these choices are correct:
+
+  - FM and CW
+  - SSB and SSTV
+  - PSK and packet
 Notes: A linear transponder simply translates a range of input frequencies to a different output range, so any mode that occupies bandwidth within that passband can be relayed. This allows multiple analog and digital signal types to be used simultaneously on the same satellite transponder.
 E2A08: Q: Why should effective radiated power (ERP) be limited to a satellite that uses a linear transponder? A: To avoid reducing the downlink power to all other users.
 Notes: A linear transponder has a fixed total output power, so if one station transmits with excessive ERP, it forces the transponder to reduce power available to other signals. Limiting ERP helps ensure fair and reliable downlink signals for all users sharing the satellite transponder.
@@ -218,11 +230,19 @@ E2C06: Q: During a VHF/UHF contest, in which band segment would you expect to fi
 Notes: VHF/UHF weak signal segments and their calling frequencies are the standard gathering points for SSB and CW operators, especially during contests. Concentrating activity near the calling frequency makes it easier for stations to find each other and make contacts efficiently under contest conditions.
 E2C07: Q: What is the Cabrillo format? A: A standard for submission of electronic contest logs.
 Notes: In amateur radio contesting, Cabrillo defines a uniform text-file structure so that logging software and contest sponsors can reliably process and score electronic log submissions. Using this standard format ensures accurate and efficient handling of contest entries by log-checking systems.
-E2C08: Q: Which of the following contacts may be confirmed through the Logbook of The World (LoTW)? A: All these choices are correct.
+E2C08: Q: Which of the following contacts may be confirmed through the Logbook of The World (LoTW)? A: All these choices are correct:
+
+  - Special event contacts between stations in the US
+  - Contacts between a US station and a non-US station
+  - Contacts for Worked All States credit
 Notes: LoTW is the ARRL’s official online contact confirmation and awards system and is designed to confirm a wide range of amateur radio QSOs. In the exam context, this means that every contact type listed in the question can be confirmed through LoTW.
 E2C09: Q: What type of equipment is commonly used to implement an amateur radio mesh network? A: A wireless router running custom firmware.
 Notes: Custom firmware on a wireless router allows control of frequencies, power levels, and networking features suitable for amateur radio mesh networks. This enables flexible, IP-based communication links that comply with Amateur Extra operating practices.
-E2C10: Q: Why do DX stations often transmit and receive on different frequencies? A: All these choices are correct.
+E2C10: Q: Why do DX stations often transmit and receive on different frequencies? A: All these choices are correct:
+
+  - Because the DX station may be transmitting on a frequency that is prohibited to some responding stations
+  - To separate the calling stations from the DX station
+  - To improve operating efficiency by reducing interference
 Notes: Splitting transmit and receive frequencies (split operation) helps DX stations manage heavy calling, avoid interference on their transmit frequency, and maintain clearer communication. In the Amateur Extra exam context, all listed reasons together explain why DX stations commonly use split frequency operation.
 E2C11: Q: How should you generally identify your station when attempting to contact a DX station during a contest or in a pileup? A: Send your full call sign once or twice.
 Notes: Sending your full call sign once or twice provides clear, complete identification without causing unnecessary congestion in a crowded operating situation. This practice improves efficiency and helps the DX station quickly log and respond to your call, which is especially important under contest and pileup conditions.
@@ -260,7 +280,11 @@ E2E02: Q: Which of the following synchronizes WSJT-X digital mode transmit/recei
 Notes: WSJT-X depends on very accurate time alignment between stations, so each station’s computer clock must be synchronized. This clock synchronization ensures the software starts and stops transmitting and receiving at precisely coordinated times for successful decoding.
 E2E03: Q: To what does the "4" in FT4 refer? A: Four-tone continuous-phase frequency shift keying.
 Notes: FT4 is a digital communication mode that encodes data by shifting among four discrete frequency tones in a continuous-phase FSK scheme, which is what the numeral "4" designates. This modulation approach is chosen to provide reliable, machine-decoded communication under typical HF propagation conditions for weak signals.
-E2E04: Q: Which of the following is characteristic of the FST4 mode? A: All these choices are correct.
+E2E04: Q: Which of the following is characteristic of the FST4 mode? A: All these choices are correct:
+
+  - Four-tone Gaussian frequency shift keying
+  - Variable transmit/receive periods
+  - Seven different tone spacings
 Notes: FST4 is engineered as a weak-signal digital mode that combines narrow bandwidth, selectable time periods, and strong error correction to reliably decode signals near the noise floor. These design characteristics make it well suited for difficult paths such as LF/MF, EME, and other low signal-to-noise conditions encountered in Amateur Extra-level operation.
 E2E05: Q: Which of these digital modes does not support keyboard-to-keyboard operation? A: WSPR.
 Notes: WSPR is specifically designed for low-power propagation reporting, not for interactive text communication. In the Amateur Extra exam context, it is identified as a beacon-style mode rather than a conversational keyboard-to-keyboard mode.
@@ -384,13 +408,21 @@ E4A06: Q: What is the effect of aliasing on a digital oscilloscope when displayi
 Notes: When the sampling rate of a digital oscilloscope is too low relative to the signal frequency, higher-frequency components fold back into lower frequencies, creating a misleading low-frequency display. This effect is seen as a jittery, incorrect representation of the actual waveform, which is important to recognize in precise Amateur Extra-class measurements.
 E4A07: Q: Which of the following is an advantage of using an antenna analyzer compared to an SWR bridge? A: Antenna analyzers compute SWR and impedance automatically.
 Notes: An antenna analyzer measures and then directly displays both SWR and complex impedance, simplifying antenna tuning. This automatic computation saves time and reduces calculation errors during station setup and adjustment for the Amateur Extra exam context.
-E4A08: Q: Which of the following is used to measure SWR? A: All these choices are correct.
+E4A08: Q: Which of the following is used to measure SWR? A: All these choices are correct:
+
+  - Directional wattmeter
+  - Vector network analyzer
+  - Antenna analyzer
 Notes: These instruments are all designed to evaluate how efficiently RF power is transferred from a transmitter to a load by indicating the SWR on a transmission line. In the Amateur Extra exam context, recognizing that multiple common station instruments can measure SWR is essential for proper station setup and troubleshooting.
 E4A09: Q: Which of the following is good practice when using an oscilloscope probe? A: Minimize the length of the probe's ground connection.
 Notes: A short ground lead reduces inductance and loop area, which minimizes signal distortion and noise pickup. This is especially important in RF and high-frequency measurements for accurate waveform observation on the oscilloscope.
 E4A10: Q: Which trigger mode is most effective when using an oscilloscope to measure a linear power supply’s output ripple? A: Line.
 Notes: Line trigger mode locks the oscilloscope’s trigger to the AC mains frequency that drives the linear power supply, stabilizing the display of ripple that is synchronized to that line frequency. This makes the ripple waveform easier to view and measure accurately on the screen.
-E4A11: Q: Which of the following can be measured with an antenna analyzer? A: All these choices are correct.
+E4A11: Q: Which of the following can be measured with an antenna analyzer? A: All these choices are correct:
+
+  - Velocity factor
+  - Cable length
+  - Resonant frequency of a tuned circuit
 Notes: Modern antenna analyzers are designed to display several key parameters of an antenna system, including SWR, impedance, and resonance. Because it provides all of these related measurements, all of the listed functions are correctly performed by an antenna analyzer in Amateur Extra exam context.
 
 ### Group E4B - Measurement techniques, accuracy, and calibration
@@ -414,7 +446,11 @@ E4B09: Q: Which of the following can be measured by a two-port vector network an
 Notes: A two-port vector network analyzer measures how signals of different frequencies are transmitted and reflected through a device, which directly characterizes a filter’s frequency response. This allows amateurs to evaluate how well a filter passes desired frequencies and attenuates unwanted ones for proper station performance.
 E4B10: Q: Which of the following methods measures intermodulation distortion in an SSB transmitter? A: Modulate the transmitter using two AF signals having non-harmonically related frequencies and observe the RF output with a spectrum analyzer.
 Notes: Using two non-harmonically related audio tones causes intermodulation products to appear at predictable spacings in the RF output spectrum. A spectrum analyzer makes these products visible so their levels can be measured relative to the desired signals for SSB transmitter performance evaluation.
-E4B11: Q: Which of the following can be measured with a vector network analyzer? A: All these choices are correct.
+E4B11: Q: Which of the following can be measured with a vector network analyzer? A: All these choices are correct:
+
+  - Input impedance
+  - Output impedance
+  - Reflection coefficient
 Notes: A vector network analyzer characterizes RF components by measuring how signals are transmitted and reflected, including both magnitude and phase. This allows accurate determination of impedance and loss-related parameters needed for Amateur Extra-level design and troubleshooting.
 
 ### Group E4C - Receiver noise, sensitivity, and dynamic range
@@ -476,7 +512,11 @@ Notes: In RF engineering, dBm is a logarithmic measure of power referenced to 1 
 ### Group E4E - Noise sources, interference, and station grounding
 E4E01: Q: What problem can occur when using an automatic notch filter (ANF) to remove interfering carriers while receiving CW signals? A: Removal of the CW signal as well as the interfering carrier.
 Notes: An automatic notch filter analyzes and suppresses steady tones, so it can mistakenly identify a CW signal as interference. This causes the desired CW signal to be notched out along with the unwanted carrier, degrading or eliminating reception of the intended transmission.
-E4E02: Q: Which of the following types of noise can often be reduced by a digital noise reduction? A: All these choices are correct.
+E4E02: Q: Which of the following types of noise can often be reduced by a digital noise reduction? A: All these choices are correct:
+
+  - Broadband white noise
+  - Ignition noise
+  - Power line noise
 Notes: In the Amateur Extra exam context, digital noise reduction (DNR) in modern receivers is designed to analyze and suppress a wide range of repetitive or structured noise sources, including locally generated noise, ignition noise, and power line noise. This makes digital noise reduction broadly effective for improving intelligibility in the presence of these common noise types.
 E4E04: Q: How can conducted noise from an automobile battery charging system be suppressed? A: By installing ferrite chokes on the charging system leads.
 Notes: Ferrite chokes increase the impedance to high-frequency noise currents on the charging leads while allowing DC charging current to pass normally. This reduces conducted interference from the vehicle’s electrical system from reaching amateur radio equipment.
@@ -490,7 +530,11 @@ E4E08: Q: What current flows equally on all conductors of an unshielded multicon
 Notes: In amateur radio systems, common-mode current appears when all conductors in a cable carry the same RF current in the same direction with respect to some reference, such as ground. Recognizing common-mode current is important because it can cause unwanted RF radiation, interference, and coupling issues in station wiring and feedlines.
 E4E09: Q: What undesirable effect can occur when using a noise blanker? A: Strong signals may be distorted and appear to cause spurious emissions.
 Notes: A noise blanker works by momentarily blanking or muting the receiver to remove impulsive noise, which can also clip or distort strong desired signals. This distortion can make those strong signals look like they are generating spurious emissions on nearby frequencies in the receiver.
-E4E10: Q: Which of the following can create intermittent loud roaring or buzzing AC line interference? A: All these choices are correct.
+E4E10: Q: Which of the following can create intermittent loud roaring or buzzing AC line interference? A: All these choices are correct:
+
+  - Arcing contacts in a thermostatically controlled device
+  - A defective doorbell or doorbell transformer inside a nearby residence
+  - A malfunctioning illuminated advertising display
 Notes: Multiple common AC-powered sources, such as faulty power line hardware, bad connections, and malfunctioning appliances, can each produce intermittent loud roaring or buzzing interference. Because all listed items are realistic AC line noise sources in amateur radio practice, all these choices are correct.
 E4E11: Q: What could be the cause of local AM broadcast band signals combining to generate spurious signals on the MF or HF bands? A: Nearby corroded metal connections are mixing and reradiating the broadcast signals.
 Notes: Corroded metal junctions can behave like unintended nonlinear devices, mixing strong AM broadcast signals and creating new, unwanted frequencies. These mixed products are then reradiated and can appear as spurious signals on MF or HF amateur bands, affecting reception and causing interference issues relevant to the Amateur Extra exam.
@@ -726,7 +770,11 @@ E6E08: Q: How is power supplied to the most common type of MMIC? A: Through a re
 Notes: Many MMIC designs use the output lead as the DC bias point, feeding power through a resistor or RF choke so RF is passed while DC is supplied. This configuration simplifies biasing and decouples the DC supply from the RF path for stable amplifier operation in amateur radio circuits.
 E6E09: Q: Which of the following component package types have the least parasitic effects at frequencies above the HF range? A: Surface mount.
 Notes: Surface mount packages minimize lead length and physical size, which reduces unwanted inductance and capacitance that degrade circuit performance at VHF, UHF, and higher frequencies. This makes them preferred for high-frequency amateur radio designs beyond the HF range.
-E6E10: Q: What advantage does surface-mount technology offer at RF compared to using through-hole components? A: All these choices are correct.
+E6E10: Q: What advantage does surface-mount technology offer at RF compared to using through-hole components? A: All these choices are correct:
+
+  - Smaller circuit area
+  - Shorter circuit board traces
+  - Components have less parasitic inductance and capacitance
 Notes: The correct answer is that all the listed benefits apply, because surface-mount components minimize unwanted inductance and capacitance while allowing more compact, better-controlled RF circuit layouts. These combined effects improve performance and stability at radio frequencies, which is why surface-mount technology is preferred for RF designs on the Amateur Extra exam.
 E6E11: Q: What is a characteristic of DIP packaging used for integrated circuits? A: Two rows of connecting pins on opposite sides of package (dual in-line package).
 Notes: DIP, or dual in-line package, is specifically defined by its two parallel rows of pins that plug into sockets or through-hole circuit board pads. This pin arrangement makes it easy to mount and replace integrated circuits in traditional through-hole designs.
@@ -968,7 +1016,11 @@ E7H11: Q: What are the major spectral impurity components of direct digital synt
 Notes: Direct digital synthesizers generate unwanted spurious outputs at specific, discrete frequencies due to quantization and non-idealities in the digital and conversion processes. These discrete spurs are the primary spectral impurity of DDS signals in amateur radio applications.
 E7H12: Q: Which of the following ensures that a crystal oscillator operates on the frequency specified by the crystal manufacturer? A: Provide the crystal with a specified parallel capacitance.
 Notes: Crystal manufacturers specify a load, or parallel, capacitance at which the crystal will oscillate at its marked frequency. Matching this specified parallel capacitance in the oscillator circuit keeps the operating frequency at the intended value for accurate amateur radio operation.
-E7H13: Q: Which of the following is a technique for providing highly accurate and stable oscillators needed for microwave transmission and reception? A: All these choices are correct.
+E7H13: Q: Which of the following is a technique for providing highly accurate and stable oscillators needed for microwave transmission and reception? A: All these choices are correct:
+
+  - Use a GPS signal reference
+  - Use a rubidium stabilized reference oscillator
+  - Use a temperature-controlled high Q dielectric resonator
 Notes: Each listed method is an established way to obtain the frequency precision and stability required at microwave frequencies. Together, they represent common design techniques used in Amateur Extra-level microwave equipment and systems.
 
 
@@ -1220,7 +1272,11 @@ E9F06: Q: What is the approximate physical length of an air-insulated, parallel 
 Notes: For an air-insulated parallel conductor transmission line, the physical length is very close to the free-space half-wavelength at the operating frequency. At 14.10 MHz, this corresponds to approximately 10.6 meters for a 1/2-wavelength line section.
 E9F07: Q: How does parallel conductor transmission line compare to coaxial cable with a plastic dielectric? A: Lower loss.
 Notes: Parallel conductor line operates with lower dielectric and conductor losses than typical plastic-dielectric coaxial cable, resulting in reduced signal attenuation. This makes it more efficient for carrying RF signals over a given distance, especially at higher frequencies or longer runs.
-E9F08: Q: Which of the following is a significant difference between foam dielectric coaxial cable and solid dielectric coaxial cable, assuming all other parameters are the same? A: All these choices are correct.
+E9F08: Q: Which of the following is a significant difference between foam dielectric coaxial cable and solid dielectric coaxial cable, assuming all other parameters are the same? A: All these choices are correct:
+
+  - Foam dielectric coaxial cable has lower safe maximum operating voltage
+  - Foam dielectric coaxial cable has lower loss per unit of length
+  - Foam dielectric coaxial cable has higher velocity factor
 Notes: Foam dielectric construction changes how RF energy propagates in the cable, affecting velocity factor, attenuation, and power-handling. On the Amateur Extra exam, this means all stated differences between foam and solid dielectric coaxial cable apply simultaneously.
 E9F09: Q: What impedance does a 1/4-wavelength transmission line present to an RF generator when the line is shorted at the far end? A: Very high impedance.
 Notes: A quarter-wavelength transmission line transforms a short circuit at its load end into a very high impedance at its input. This impedance-transforming property is used in RF design for impedance matching and creating resonant stubs.
@@ -1292,7 +1348,11 @@ E0A04: Q: When evaluating a site with multiple transmitters operating at the sam
 Notes: FCC RF safety rules require that any station contributing 5 percent or more of its maximum permissible exposure (MPE) in an area where the total exposure exceeds the MPE limit must take steps to reduce exposure. This ensures that all significant contributors share responsibility for correcting unsafe RF exposure conditions at a multi-transmitter site.
 E0A05: Q: What hazard is created by operating at microwave frequencies? A: The high gain antennas commonly used can result in high exposure levels.
 Notes: Microwave operation often uses high-gain directional antennas that concentrate RF energy into narrow beams, increasing field strength in those areas. In the amateur radio Extra exam context, this concentrated energy can create potentially hazardous RF exposure levels for people near the antenna.
-E0A06: Q: Why are there separate electric (E) and magnetic (H) MPE limits at frequencies below 300 MHz? A: All these choices are correct.
+E0A06: Q: Why are there separate electric (E) and magnetic (H) MPE limits at frequencies below 300 MHz? A: All these choices are correct:
+
+  - The body reacts to electromagnetic radiation from both the E and H fields
+  - Ground reflections and scattering cause the field strength to vary with location
+  - E field and H field radiation intensity peaks can occur at different locations
 Notes: Below 300 MHz, the electric and magnetic components of RF fields can interact with the human body in different ways, so each must be limited separately. The FCC therefore specifies distinct maximum permissible exposure limits for both E and H fields in this frequency range to ensure safety in amateur radio operations.
 E0A07: Q: What is meant by “100% tie-off” regarding tower safety? A: At least one lanyard attached to the tower at all times.
 Notes: 100% tie-off ensures a climber is continuously secured so a slip or loss of footing does not result in a fall. This continuous attachment is a fundamental safety requirement when working on towers in amateur radio and related services.

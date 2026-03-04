@@ -30,11 +30,15 @@ UNIT_PATTERNS = {
 }
 
 LLM_EXPLANATION_PREFIX = "Notes: "
+ALL_CHOICES_CORRECT_RE = re.compile(
+    r"^all(?:\s+of)?\s+these(?:\s+choices)?\s+are\s+correct\.?$",
+    flags=re.IGNORECASE,
+)
 
 
 def fact_sentence(question: PoolQuestion, mode: str, omit_id: bool = False) -> str:
     if mode == "qa":
-        sentence = _to_qa(question.question_text, question.correct_answer)
+        sentence = _to_qa(question)
         sentence = _append_augmented_context(sentence, question)
     elif mode == "prose" and question.llm is not None:
         sentence = _normalize_sentence(question.llm.prose_fact)
@@ -63,12 +67,36 @@ def _append_augmented_context(sentence: str, question: PoolQuestion) -> str:
     return f"{sentence}\n{LLM_EXPLANATION_PREFIX}{explanation}"
 
 
-def _to_qa(question_text: str, answer: str) -> str:
-    cleaned_question = question_text.strip()
-    cleaned_answer = answer.strip()
+def _to_qa(question: PoolQuestion) -> str:
+    cleaned_question = question.question_text.strip()
+    cleaned_answer = _qa_answer_text(question)
     if not cleaned_question.endswith("?"):
         cleaned_question = f"{cleaned_question}?"
-    return f"Q: {cleaned_question} A: {cleaned_answer}."
+    return f"Q: {cleaned_question} A: {cleaned_answer}"
+
+
+def _qa_answer_text(question: PoolQuestion) -> str:
+    answer = question.correct_answer.strip()
+    if not ALL_CHOICES_CORRECT_RE.match(answer):
+        return _qa_terminal_punctuation(answer)
+
+    expanded_answers = [
+        choice.strip()
+        for index, choice in enumerate(question.choices)
+        if index != question.correct_choice_index and choice.strip()
+    ]
+    if not expanded_answers:
+        return _qa_terminal_punctuation(answer)
+
+    key_answer = answer.rstrip(" .:")
+    bullets = "\n".join(f"  - {choice}" for choice in expanded_answers)
+    return f"{key_answer}:\n\n{bullets}"
+
+
+def _qa_terminal_punctuation(answer: str) -> str:
+    if answer.endswith((".", "!", "?")):
+        return answer
+    return f"{answer}."
 
 
 def _to_declarative(question_text: str, answer: str) -> str:
