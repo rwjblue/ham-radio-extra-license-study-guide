@@ -150,7 +150,7 @@ extra-facts extract --docx <local.docx> --out-json dist/pool/extra_pool.json
 extra-facts prose --pool-json dist/pool/extra_pool.json --out-json dist/pool/extra_pool_prose.json [--model gpt-5] [--prompt-version v1] [--workers 6] [--max-attempts 3] [--max-questions N] [--resume]
 extra-facts build --pool-json dist/pool/extra_pool.json --out-dir dist --mode literal|tts|prose|qa [--omit-id]
 extra-facts audio-script --pool-json dist/pool/extra_pool_prose.json --out-dir dist/audio/fact --mode prose|qa [--include-id]
-extra-facts audio-render --manifest dist/audio/fact/manifest.json --out-dir dist/audio/fact [--provider elevenlabs|openai] [--model <provider-model>] [--voice <provider-voice>] [--elevenlabs-output-format mp3_44100_128] [--elevenlabs-language-code en] [--speed 1.0] [--instructions "Custom style override"] [--no-merge] [--no-chapter-markers]
+extra-facts audio-render --manifest dist/audio/fact/manifest.json --out-dir dist/audio/fact [--provider elevenlabs|openai] [--model <provider-model>] [--voice <provider-voice>] [--elevenlabs-output-format mp3_44100_128] [--elevenlabs-language-code en] [--speed 1.0] [--instructions "Custom style override"] [--no-qc-openai-transcribe] [--qc-openai-model gpt-4o-mini-transcribe] [--qc-expected-language en] [--qc-max-wer 0.35] [--qc-max-extra-tokens 2] [--qc-max-attempts 3] [--qc-llm-judge] [--qc-llm-model gpt-4.1-mini] [--no-merge] [--no-chapter-markers]
 extra-facts audio-verify --manifest dist/audio/fact/manifest.json [--allow-missing-merged] [--skip-chapter-marker-check]
 ```
 
@@ -168,6 +168,8 @@ extra-facts audio-verify --manifest dist/audio/fact/manifest.json [--allow-missi
 - OpenAI audio-render calls use the same HTTP cache controls as prose.
 - Audio scripts insert a neutral `[[SHORT_PAUSE]]` marker after chapter titles and each spoken item; during `audio-render` this is converted per provider (`...` for OpenAI, `... ...` for ElevenLabs) so transitions sound distinct without depending on SSML support.
 - Audio render instructions are currently applied to OpenAI only; set `INSTRUCTIONS` (for `mise run audio-render`) or `--instructions` (CLI) to override OpenAI delivery style.
+- OpenAI transcription QC is enabled by default for `audio-render` and auto-retries unit renders when transcript mismatch/language drift thresholds are exceeded. Disable with `--no-qc-openai-transcribe` (or `QC_OPENAI_TRANSCRIBE=0` with `mise run audio-render`).
+- Optional semantic judge: add `--qc-llm-judge` (or `QC_LLM_JUDGE=1`) to run a fast OpenAI text model against expected script vs ASR transcript for additional gibberish/artifact filtering.
 - `audio-render` uses `ffprobe` (duration extraction) and `ffmpeg` (MP3 merge + chapter markers).
 - `audio-render` reuses existing chapter MP3 files when chapter text and render settings are unchanged.
 

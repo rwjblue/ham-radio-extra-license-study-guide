@@ -7,10 +7,16 @@ from typing import cast
 
 from .audio import (
     DEFAULT_ELEVENLABS_OUTPUT_FORMAT,
+    DEFAULT_OPENAI_TRANSCRIPTION_MODEL,
     DEFAULT_TTS_INSTRUCTIONS,
+    AudioQualityConfig,
+    AudioQualityValidator,
     AudioRenderProgressUpdate,
     ElevenLabsTtsClient,
+    OpenAITranscriptionClient,
+    OpenAITranscriptJudgeClient,
     OpenAITtsClient,
+    TranscriptMatchQualityValidator,
     TtsClient,
     render_audio_from_manifest,
 )
@@ -222,6 +228,14 @@ def render_audio_from_chapter_manifest(
     out_manifest_path: Path | None = None,
     jobs: int = 1,
     unit_cache_dir: Path | None = None,
+    qc_openai_transcribe: bool = True,
+    qc_openai_model: str = DEFAULT_OPENAI_TRANSCRIPTION_MODEL,
+    qc_expected_language: str = "en",
+    qc_max_wer: float = 0.35,
+    qc_max_extra_tokens: int = 2,
+    qc_max_attempts: int = 3,
+    qc_llm_judge: bool = False,
+    qc_llm_model: str = "gpt-4.1-mini",
     progress_callback: Callable[[AudioRenderProgressUpdate], None] | None = None,
 ) -> AudioRenderSummary:
     normalized_provider = provider.strip().lower()
@@ -287,6 +301,46 @@ def render_audio_from_chapter_manifest(
     else:
         raise RuntimeError(f"Unsupported audio provider: {provider}")
 
+    quality_validator: AudioQualityValidator | None = None
+    quality_validator_factory: Callable[[], AudioQualityValidator] | None = None
+    if qc_openai_transcribe:
+        qc_config = AudioQualityConfig(
+            max_wer=qc_max_wer,
+            max_extra_tokens=qc_max_extra_tokens,
+            expected_language=qc_expected_language,
+        )
+        quality_validator = TranscriptMatchQualityValidator(
+            transcription_client=OpenAITranscriptionClient(
+                model=qc_openai_model,
+                language=qc_expected_language,
+            ),
+            config=qc_config,
+            transcript_judge=(
+                OpenAITranscriptJudgeClient(model=qc_llm_model) if qc_llm_judge else None
+            ),
+        )
+
+        def _quality_validator_factory() -> AudioQualityValidator:
+            return TranscriptMatchQualityValidator(
+                transcription_client=OpenAITranscriptionClient(
+                    model=qc_openai_model,
+                    language=qc_expected_language,
+                ),
+                config=qc_config,
+                transcript_judge=(
+                    OpenAITranscriptJudgeClient(model=qc_llm_model) if qc_llm_judge else None
+                ),
+            )
+
+        quality_validator_factory = _quality_validator_factory
+        qc_llm_flag = "1" if qc_llm_judge else "0"
+        qc_llm_model_value = qc_llm_model if qc_llm_judge else "none"
+        render_fingerprint = (
+            f"{render_fingerprint}:qc:"
+            f"{qc_openai_model}:{qc_expected_language}:{qc_max_wer:.3f}:"
+            f"{qc_max_extra_tokens}:{qc_max_attempts}:{qc_llm_flag}:{qc_llm_model_value}"
+        )
+
     result = render_audio_from_manifest(
         manifest_path=manifest_path,
         out_dir=out_dir,
@@ -299,6 +353,9 @@ def render_audio_from_chapter_manifest(
         provider=normalized_provider,
         jobs=jobs,
         client_factory=client_factory,
+        quality_validator=quality_validator,
+        quality_validator_factory=quality_validator_factory,
+        quality_max_attempts=qc_max_attempts,
         unit_cache_dir=unit_cache_dir,
         progress_callback=progress_callback,
     )

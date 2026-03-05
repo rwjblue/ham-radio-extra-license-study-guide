@@ -35,5 +35,35 @@ fi
 if [[ -n "${NO_CHAPTER_MARKERS:-}" ]]; then
   cmd+=(--no-chapter-markers)
 fi
+if [[ -n "${QC_OPENAI_TRANSCRIBE:-}" ]]; then
+  qc_enabled="$(echo "${QC_OPENAI_TRANSCRIBE}" | tr '[:upper:]' '[:lower:]')"
+  if [[ "${qc_enabled}" == "0" || "${qc_enabled}" == "false" || "${qc_enabled}" == "no" || "${qc_enabled}" == "off" ]]; then
+    cmd+=(--no-qc-openai-transcribe)
+  fi
+fi
+if [[ -n "${QC_OPENAI_MODEL:-}" ]]; then
+  cmd+=(--qc-openai-model "${QC_OPENAI_MODEL}")
+fi
+if [[ -n "${QC_EXPECTED_LANGUAGE:-}" ]]; then
+  cmd+=(--qc-expected-language "${QC_EXPECTED_LANGUAGE}")
+fi
+if [[ -n "${QC_MAX_WER:-}" ]]; then
+  cmd+=(--qc-max-wer "${QC_MAX_WER}")
+fi
+if [[ -n "${QC_MAX_EXTRA_TOKENS:-}" ]]; then
+  cmd+=(--qc-max-extra-tokens "${QC_MAX_EXTRA_TOKENS}")
+fi
+if [[ -n "${QC_MAX_ATTEMPTS:-}" ]]; then
+  cmd+=(--qc-max-attempts "${QC_MAX_ATTEMPTS}")
+fi
+if [[ -n "${QC_LLM_JUDGE:-}" ]]; then
+  qc_llm_enabled="$(echo "${QC_LLM_JUDGE}" | tr '[:upper:]' '[:lower:]')"
+  if [[ "${qc_llm_enabled}" == "1" || "${qc_llm_enabled}" == "true" || "${qc_llm_enabled}" == "yes" || "${qc_llm_enabled}" == "on" ]]; then
+    cmd+=(--qc-llm-judge)
+  fi
+fi
+if [[ -n "${QC_LLM_MODEL:-}" ]]; then
+  cmd+=(--qc-llm-model "${QC_LLM_MODEL}")
+fi
 
 "${cmd[@]}"

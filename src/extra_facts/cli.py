@@ -8,6 +8,7 @@ from pathlib import Path
 
 from .audio import (
     DEFAULT_ELEVENLABS_OUTPUT_FORMAT,
+    DEFAULT_OPENAI_TRANSCRIPTION_MODEL,
     DEFAULT_TTS_INSTRUCTIONS,
     AudioRenderProgressUpdate,
 )
@@ -126,6 +127,14 @@ def audio_render_command(args: argparse.Namespace) -> int:
         out_manifest_path=Path(args.out_manifest) if args.out_manifest else None,
         jobs=args.jobs,
         unit_cache_dir=Path(args.unit_cache_dir) if args.unit_cache_dir else None,
+        qc_openai_transcribe=args.qc_openai_transcribe,
+        qc_openai_model=args.qc_openai_model,
+        qc_expected_language=args.qc_expected_language,
+        qc_max_wer=args.qc_max_wer,
+        qc_max_extra_tokens=args.qc_max_extra_tokens,
+        qc_max_attempts=args.qc_max_attempts,
+        qc_llm_judge=args.qc_llm_judge,
+        qc_llm_model=args.qc_llm_model,
         progress_callback=_render_progress,
     )
     print("Audio render complete")
@@ -315,7 +324,56 @@ def create_parser() -> argparse.ArgumentParser:
         default=".cache/audio-render",
         help="Cache directory for rendered unit text/audio artifacts",
     )
-    render_audio.set_defaults(func=audio_render_command, merge=True, embed_chapters=True)
+    render_audio.add_argument(
+        "--no-qc-openai-transcribe",
+        action="store_false",
+        dest="qc_openai_transcribe",
+        help="Disable OpenAI transcription QC and retry checks",
+    )
+    render_audio.add_argument(
+        "--qc-openai-model",
+        default=DEFAULT_OPENAI_TRANSCRIPTION_MODEL,
+        help="OpenAI transcription model for audio QC",
+    )
+    render_audio.add_argument(
+        "--qc-expected-language",
+        default="en",
+        help="Expected language code in transcription results",
+    )
+    render_audio.add_argument(
+        "--qc-max-wer",
+        type=float,
+        default=0.35,
+        help="Maximum WER allowed for transcript mismatch checks",
+    )
+    render_audio.add_argument(
+        "--qc-max-extra-tokens",
+        type=int,
+        default=2,
+        help="Maximum extra transcript tokens beyond expected text",
+    )
+    render_audio.add_argument(
+        "--qc-max-attempts",
+        type=int,
+        default=3,
+        help="Max synthesis attempts per unit when QC fails",
+    )
+    render_audio.add_argument(
+        "--qc-llm-judge",
+        action="store_true",
+        help="Also run an OpenAI text model to judge expected script vs transcript match",
+    )
+    render_audio.add_argument(
+        "--qc-llm-model",
+        default="gpt-4.1-mini",
+        help="OpenAI model used when --qc-llm-judge is enabled",
+    )
+    render_audio.set_defaults(
+        func=audio_render_command,
+        merge=True,
+        embed_chapters=True,
+        qc_openai_transcribe=True,
+    )
 
     verify_audio = sub.add_parser(
         "audio-verify",

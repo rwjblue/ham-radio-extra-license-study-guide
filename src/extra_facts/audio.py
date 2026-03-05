@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import hashlib
+import io
 import json
 import os
+import re
 import subprocess
 import tempfile
 import textwrap
@@ -26,12 +28,65 @@ class TtsClient(Protocol):
         ...
 
 
+@dataclass(frozen=True)
+class TranscriptionResult:
+    text: str
+    language: str | None = None
+
+
+class TranscriptionClient(Protocol):
+    def transcribe(self, audio_bytes: bytes, filename: str) -> TranscriptionResult:
+        ...
+
+
+@dataclass(frozen=True)
+class AudioQualityEvaluation:
+    passed: bool
+    reason: str
+    wer: float
+    expected_tokens: int
+    transcript_tokens: int
+    extra_tokens: int
+    language: str | None
+    transcript_text: str
+
+
+class AudioQualityValidator(Protocol):
+    def validate(
+        self,
+        *,
+        audio_bytes: bytes,
+        expected_text: str,
+        filename: str,
+    ) -> AudioQualityEvaluation:
+        ...
+
+
+@dataclass(frozen=True)
+class TranscriptJudgeEvaluation:
+    passed: bool
+    reason: str
+
+
+class TranscriptJudge(Protocol):
+    def evaluate(self, expected_text: str, transcript_text: str) -> TranscriptJudgeEvaluation:
+        ...
+
+
+@dataclass(frozen=True)
+class AudioQualityConfig:
+    max_wer: float = 0.35
+    max_extra_tokens: int = 2
+    expected_language: str = "en"
+
+
 DurationProbe = Callable[[Path], float]
 AudioMerger = Callable[[list[Path], Path], None]
 ChapterMarkerEmbedder = Callable[[list[dict[str, Any]], Path], None]
 TTS_MAX_CHARS = 3500
 DEFAULT_OPENAI_HTTP_CACHE_DIR = Path(".cache/openai-http")
 DEFAULT_OPENAI_HTTP_CACHE_NAME = "audio-speech-v2"
+DEFAULT_OPENAI_TRANSCRIPTION_MODEL = "gpt-4o-mini-transcribe"
 DEFAULT_ELEVENLABS_HTTP_CACHE_DIR = Path(".cache/elevenlabs-http")
 DEFAULT_ELEVENLABS_HTTP_CACHE_NAME = "text-to-speech-v1"
 DEFAULT_ELEVENLABS_OUTPUT_FORMAT = "mp3_44100_128"
@@ -127,6 +182,216 @@ class OpenAITtsClient:
             },
             json=payload,
             timeout=180,
+        )
+
+
+class OpenAITranscriptionClient:
+    def __init__(
+        self,
+        model: str = DEFAULT_OPENAI_TRANSCRIPTION_MODEL,
+        language: str | None = "en",
+        api_key_env: str = "OPENAI_API_KEY",
+    ) -> None:
+        api_key = os.getenv(api_key_env, "").strip()
+        if not api_key:
+            raise RuntimeError(f"Missing API key env var: {api_key_env}")
+        self.api_key = api_key
+        self.model = model
+        self.language = language.strip() if language else None
+        self._session = requests.Session()
+        adapter = HTTPAdapter(pool_connections=10, pool_maxsize=20)
+        self._session.mount("https://", adapter)
+
+    def transcribe(self, audio_bytes: bytes, filename: str) -> TranscriptionResult:
+        data: dict[str, str] = {
+            "model": self.model,
+            "response_format": "json",
+        }
+        if self.language:
+            data["language"] = self.language
+
+        response = self._session.post(
+            "https://api.openai.com/v1/audio/transcriptions",
+            headers={"Authorization": f"Bearer {self.api_key}"},
+            data=data,
+            files={
+                "file": (
+                    filename,
+                    io.BytesIO(audio_bytes),
+                    "audio/mpeg",
+                )
+            },
+            timeout=180,
+        )
+        if response.status_code >= 400:
+            body = response.text.strip()
+            raise RuntimeError(
+                "OpenAI transcription request failed for /v1/audio/transcriptions "
+                f"({response.status_code}): {body}"
+            )
+
+        payload = cast(dict[str, Any], response.json())
+        transcript_text = payload.get("text")
+        if not isinstance(transcript_text, str):
+            raise RuntimeError(
+                "OpenAI transcription response missing string 'text' field "
+                f"for /v1/audio/transcriptions: {payload!r}"
+            )
+
+        language_raw = payload.get("language")
+        language = language_raw if isinstance(language_raw, str) else None
+        return TranscriptionResult(text=transcript_text, language=language)
+
+
+class OpenAITranscriptJudgeClient:
+    def __init__(
+        self,
+        model: str = "gpt-4.1-mini",
+        api_key_env: str = "OPENAI_API_KEY",
+    ) -> None:
+        api_key = os.getenv(api_key_env, "").strip()
+        if not api_key:
+            raise RuntimeError(f"Missing API key env var: {api_key_env}")
+        self.api_key = api_key
+        self.model = model
+        self._session = requests.Session()
+        adapter = HTTPAdapter(pool_connections=10, pool_maxsize=20)
+        self._session.mount("https://", adapter)
+
+    def evaluate(self, expected_text: str, transcript_text: str) -> TranscriptJudgeEvaluation:
+        response = self._session.post(
+            "https://api.openai.com/v1/chat/completions",
+            headers={
+                "Authorization": f"Bearer {self.api_key}",
+                "Content-Type": "application/json",
+            },
+            json={
+                "model": self.model,
+                "temperature": 0,
+                "response_format": {"type": "json_object"},
+                "messages": [
+                    {
+                        "role": "system",
+                        "content": (
+                            "You evaluate ASR transcript quality for TTS output validation. "
+                            "Return strict JSON with keys: match (boolean), reason (string). "
+                            "Set match=false for gibberish, wrong language, hallucinated lines, "
+                            "or missing key content."
+                        ),
+                    },
+                    {
+                        "role": "user",
+                        "content": (
+                            "Expected script:\n"
+                            f"{expected_text}\n\n"
+                            "ASR transcript:\n"
+                            f"{transcript_text}\n\n"
+                            "Do they match for production audio quality?"
+                        ),
+                    },
+                ],
+            },
+            timeout=180,
+        )
+        if response.status_code >= 400:
+            body = response.text.strip()
+            raise RuntimeError(
+                "OpenAI transcript-judge request failed for /v1/chat/completions "
+                f"({response.status_code}): {body}"
+            )
+        payload = cast(dict[str, Any], response.json())
+        choices_raw = payload.get("choices")
+        if not isinstance(choices_raw, list) or not choices_raw:
+            raise RuntimeError(
+                "OpenAI transcript-judge response missing choices list: "
+                f"{payload!r}"
+            )
+        choices_payload = cast(list[object], choices_raw)
+        choice = choices_payload[0]
+        if not isinstance(choice, dict):
+            raise RuntimeError(f"OpenAI transcript-judge choice is not object: {choice!r}")
+        choice_payload = cast(dict[str, Any], choice)
+        message = choice_payload.get("message")
+        if not isinstance(message, dict):
+            raise RuntimeError(f"OpenAI transcript-judge message missing: {choice!r}")
+        message_payload = cast(dict[str, Any], message)
+        content = message_payload.get("content")
+        if not isinstance(content, str):
+            raise RuntimeError(
+                "OpenAI transcript-judge message content missing string: "
+                f"{message!r}"
+            )
+        parsed = cast(dict[str, Any], json.loads(content))
+        match = parsed.get("match")
+        if not isinstance(match, bool):
+            raise RuntimeError(
+                "OpenAI transcript-judge JSON missing boolean 'match': "
+                f"{parsed!r}"
+            )
+        reason_raw = parsed.get("reason")
+        reason = reason_raw if isinstance(reason_raw, str) and reason_raw.strip() else "llm_judge"
+        return TranscriptJudgeEvaluation(passed=match, reason=reason)
+
+
+class TranscriptMatchQualityValidator:
+    def __init__(
+        self,
+        transcription_client: TranscriptionClient,
+        config: AudioQualityConfig | None = None,
+        transcript_judge: TranscriptJudge | None = None,
+    ) -> None:
+        self.transcription_client = transcription_client
+        self.config = config or AudioQualityConfig()
+        self.transcript_judge = transcript_judge
+
+    def validate(
+        self,
+        *,
+        audio_bytes: bytes,
+        expected_text: str,
+        filename: str,
+    ) -> AudioQualityEvaluation:
+        transcript = self.transcription_client.transcribe(
+            audio_bytes=audio_bytes,
+            filename=filename,
+        )
+        expected_tokens = _tokenize_for_match(expected_text)
+        actual_tokens = _tokenize_for_match(transcript.text)
+        wer = _word_error_rate(expected_tokens, actual_tokens)
+        extra_tokens = max(0, len(actual_tokens) - len(expected_tokens))
+
+        reasons: list[str] = []
+        if wer > self.config.max_wer:
+            reasons.append(f"wer {wer:.3f} exceeds {self.config.max_wer:.3f}")
+        if extra_tokens > self.config.max_extra_tokens:
+            reasons.append(
+                f"extra_tokens {extra_tokens} exceeds {self.config.max_extra_tokens}"
+            )
+        expected_language = self.config.expected_language.strip().lower()
+        observed_language = transcript.language.strip().lower() if transcript.language else ""
+        if expected_language and observed_language and not observed_language.startswith(
+            expected_language
+        ):
+            reasons.append(
+                f"language {observed_language!r} does not match {expected_language!r}"
+            )
+        if self.transcript_judge is not None:
+            judge_evaluation = self.transcript_judge.evaluate(
+                expected_text=expected_text,
+                transcript_text=transcript.text,
+            )
+            if not judge_evaluation.passed:
+                reasons.append(f"llm_judge: {judge_evaluation.reason}")
+
+        return AudioQualityEvaluation(
+            passed=not reasons,
+            reason="; ".join(reasons) if reasons else "ok",
+            wer=wer,
+            expected_tokens=len(expected_tokens),
+            transcript_tokens=len(actual_tokens),
+            extra_tokens=extra_tokens,
+            language=transcript.language,
+            transcript_text=transcript.text,
         )
 
 
@@ -337,6 +602,9 @@ def render_audio_from_manifest(
     provider: str = "openai",
     jobs: int = 1,
     client_factory: Callable[[], TtsClient] | None = None,
+    quality_validator: AudioQualityValidator | None = None,
+    quality_validator_factory: Callable[[], AudioQualityValidator] | None = None,
+    quality_max_attempts: int = 1,
     unit_cache_dir: Path | None = None,
     progress_callback: Callable[[AudioRenderProgressUpdate], None] | None = None,
 ) -> AudioRenderResult:
@@ -357,11 +625,18 @@ def render_audio_from_manifest(
 
     if jobs < 1:
         raise RuntimeError("jobs must be >= 1")
+    if quality_max_attempts < 1:
+        raise RuntimeError("quality_max_attempts must be >= 1")
 
     synthesize_bytes = _synthesize_factory(
         jobs=jobs,
         client=client,
         client_factory=client_factory,
+    )
+    quality_check = _quality_validator_factory(
+        jobs=jobs,
+        validator=quality_validator,
+        validator_factory=quality_validator_factory,
     )
     unit_cache_root = _resolve_unit_cache_root(
         manifest_path=manifest_path,
@@ -444,18 +719,44 @@ def render_audio_from_manifest(
         audio_path = chapters_audio_dir / audio_file_name
         units_payload = _existing_units_by_index(chapter)
         pending_units: list[dict[str, object]] = []
+        chapter_reused_units = 0
         for unit in units:
             unit_index = unit.get("index")
             if not isinstance(unit_index, int):
                 pending_units.append(unit)
                 continue
+            existing_payload = units_payload.get(unit_index)
             if not _can_reuse_render_unit(
                 unit,
-                existing_payload=units_payload.get(unit_index),
+                existing_payload=existing_payload,
                 render_fingerprint=render_fingerprint,
             ):
                 pending_units.append(unit)
-        reused_units += len(units) - len(pending_units)
+                continue
+            if quality_check is not None:
+                cached_audio_path = cast(Path, unit["audio_path"])
+                cached_audio_bytes = cached_audio_path.read_bytes()
+                evaluation = quality_check.validate(
+                    audio_bytes=cached_audio_bytes,
+                    expected_text=cast(str, unit["text"]),
+                    filename=cached_audio_path.name,
+                )
+                if not evaluation.passed:
+                    pending_units.append(unit)
+                    continue
+                unit["quality_check"] = _quality_check_payload(evaluation)
+                continue
+            existing_quality_check = (
+                existing_payload.get("quality_check")
+                if isinstance(existing_payload, dict)
+                else None
+            )
+            if isinstance(existing_quality_check, dict):
+                unit["quality_check"] = cast(dict[str, object], existing_quality_check)
+            chapter_reused_units += 1
+        if quality_check is not None:
+            chapter_reused_units = len(units) - len(pending_units)
+        reused_units += chapter_reused_units
         completed_units = rendered_units + reused_units
         _emit_progress(chapter_number=chapter_number, phase="chapter_start")
 
@@ -467,6 +768,8 @@ def render_audio_from_manifest(
                 pending_units,
                 synthesize=synthesize_bytes,
                 jobs=jobs,
+                quality_validator=quality_check,
+                quality_max_attempts=quality_max_attempts,
                 on_unit_complete=on_unit_complete,
             )
             chapter_rendered = True
@@ -504,6 +807,11 @@ def render_audio_from_manifest(
                 "audio_path": str(cast(Path, unit["audio_path"]).as_posix()),
                 "text_sha256": cast(str, unit["text_sha256"]),
                 "render_fingerprint": render_fingerprint,
+                **(
+                    {"quality_check": cast(dict[str, object], unit["quality_check"])}
+                    if isinstance(unit.get("quality_check"), dict)
+                    else {}
+                ),
             }
             for unit in units
         ]
@@ -832,19 +1140,35 @@ def _render_units(
     units: list[dict[str, object]],
     synthesize: Callable[[str], bytes],
     jobs: int,
+    quality_validator: AudioQualityValidator | None = None,
+    quality_max_attempts: int = 1,
     on_unit_complete: Callable[[], None] | None = None,
 ) -> None:
     if not units:
         return
     if jobs == 1:
         for unit in units:
-            _render_single_unit(unit, synthesize)
+            _render_single_unit(
+                unit,
+                synthesize,
+                quality_validator=quality_validator,
+                quality_max_attempts=quality_max_attempts,
+            )
             if on_unit_complete is not None:
                 on_unit_complete()
         return
 
     with ThreadPoolExecutor(max_workers=jobs) as pool:
-        futures = [pool.submit(_render_single_unit, unit, synthesize) for unit in units]
+        futures = [
+            pool.submit(
+                _render_single_unit,
+                unit,
+                synthesize,
+                quality_validator,
+                quality_max_attempts,
+            )
+            for unit in units
+        ]
         for future in futures:
             future.result()
             if on_unit_complete is not None:
@@ -854,10 +1178,36 @@ def _render_units(
 def _render_single_unit(
     unit: dict[str, object],
     synthesize: Callable[[str], bytes],
+    quality_validator: AudioQualityValidator | None = None,
+    quality_max_attempts: int = 1,
 ) -> None:
     text = cast(str, unit["text"])
     audio_path = cast(Path, unit["audio_path"])
-    audio_path.write_bytes(synthesize(text))
+    attempts = quality_max_attempts if quality_validator is not None else 1
+    last_evaluation: AudioQualityEvaluation | None = None
+    for _attempt in range(1, attempts + 1):
+        audio_bytes = synthesize(text)
+        if quality_validator is None:
+            audio_path.write_bytes(audio_bytes)
+            return
+        evaluation = quality_validator.validate(
+            audio_bytes=audio_bytes,
+            expected_text=text,
+            filename=audio_path.name,
+        )
+        if evaluation.passed:
+            audio_path.write_bytes(audio_bytes)
+            unit["quality_check"] = _quality_check_payload(evaluation)
+            return
+        last_evaluation = evaluation
+
+    chapter_number = unit.get("chapter_number")
+    unit_index = unit.get("index")
+    raise RuntimeError(
+        "Audio quality check failed after retries "
+        f"(chapter={chapter_number}, unit={unit_index}, attempts={attempts}): "
+        f"{last_evaluation.reason if last_evaluation else 'unknown'}"
+    )
 
 
 def _synthesize_factory(
@@ -881,6 +1231,95 @@ def _synthesize_factory(
         return typed_client.synthesize(text)
 
     return _synthesize
+
+
+def _quality_check_payload(evaluation: AudioQualityEvaluation) -> dict[str, object]:
+    return {
+        "wer": round(evaluation.wer, 4),
+        "expected_tokens": evaluation.expected_tokens,
+        "transcript_tokens": evaluation.transcript_tokens,
+        "extra_tokens": evaluation.extra_tokens,
+        "language": evaluation.language,
+        "reason": evaluation.reason,
+    }
+
+
+def _quality_validator_factory(
+    jobs: int,
+    validator: AudioQualityValidator | None,
+    validator_factory: Callable[[], AudioQualityValidator] | None,
+) -> AudioQualityValidator | None:
+    if validator is None:
+        return None
+    if jobs == 1:
+        return validator
+    if validator_factory is None:
+        raise RuntimeError("quality_validator_factory is required when jobs > 1")
+
+    local_state = threading.local()
+
+    class _ThreadLocalValidator:
+        def validate(
+            self,
+            *,
+            audio_bytes: bytes,
+            expected_text: str,
+            filename: str,
+        ) -> AudioQualityEvaluation:
+            local_validator = getattr(local_state, "validator", None)
+            if local_validator is None:
+                local_validator = validator_factory()
+                local_state.validator = local_validator
+            typed_validator = cast(AudioQualityValidator, local_validator)
+            return typed_validator.validate(
+                audio_bytes=audio_bytes,
+                expected_text=expected_text,
+                filename=filename,
+            )
+
+    return _ThreadLocalValidator()
+
+
+def _normalize_for_match(text: str) -> str:
+    lowered = text.lower()
+    collapsed = re.sub(r"[^a-z0-9]+", " ", lowered)
+    return " ".join(collapsed.split())
+
+
+def _tokenize_for_match(text: str) -> list[str]:
+    normalized = _normalize_for_match(text)
+    if not normalized:
+        return []
+    return normalized.split(" ")
+
+
+def _word_error_rate(reference_tokens: list[str], hypothesis_tokens: list[str]) -> float:
+    if not reference_tokens:
+        return 0.0 if not hypothesis_tokens else 1.0
+    distance = _levenshtein_distance(reference_tokens, hypothesis_tokens)
+    return distance / len(reference_tokens)
+
+
+def _levenshtein_distance(lhs: list[str], rhs: list[str]) -> int:
+    if not lhs:
+        return len(rhs)
+    if not rhs:
+        return len(lhs)
+
+    previous = list(range(len(rhs) + 1))
+    for i, left in enumerate(lhs, start=1):
+        current = [i]
+        for j, right in enumerate(rhs, start=1):
+            substitution_cost = 0 if left == right else 1
+            current.append(
+                min(
+                    previous[j] + 1,
+                    current[j - 1] + 1,
+                    previous[j - 1] + substitution_cost,
+                )
+            )
+        previous = current
+    return previous[-1]
 
 
 def _write_manifest_payload(payload: dict[str, Any], target_manifest: Path) -> None:
